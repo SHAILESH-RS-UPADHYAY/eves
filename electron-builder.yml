@@ -1,0 +1,26 @@
+appId: com.personal.eves
+productName: EVES
+directories:
+  output: dist
+  buildResources: resources
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  darkModeSupport: true
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+files:
+  - out/**/*
+  - node_modules/**/*
+  - package.json
