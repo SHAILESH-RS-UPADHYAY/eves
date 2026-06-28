@@ -4,11 +4,11 @@ import { useUIStore } from '../../store/ui.store'
 import { useStealth } from '../../hooks/useStealth'
 
 const pageTitles: Record<string, string> = {
-  dashboard: 'Dashboard',
-  meetings: 'Meetings',
-  transcripts: 'Transcripts',
-  integrations: 'Integrations',
-  settings: 'Settings'
+  dashboard: 'MAIN_INTERFACE',
+  meetings: 'SESSION_LOGS',
+  transcripts: 'TRANSCRIPT_DB',
+  integrations: 'EXT_SERVICES',
+  settings: 'CONFIG'
 }
 
 export function TopBar() {
@@ -21,24 +21,27 @@ export function TopBar() {
   return (
     <div
       style={{
-        height: '48px',
+        height: '44px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 16px',
-        background: 'rgba(5,5,8,0.6)',
+        background: 'rgba(6, 8, 14, 0.7)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        borderBottom: '1px solid rgba(0, 245, 255, 0.06)',
         WebkitAppRegion: 'drag' as any,
         flexShrink: 0,
-        zIndex: 10
+        zIndex: 10,
+        fontFamily: '"Courier New", monospace'
       }}
     >
       {/* Left: logo */}
-      <span className="gradient-text" style={{ fontSize: '14px', fontWeight: 700 }}>EVES</span>
+      <span style={{ fontSize: '13px', fontWeight: 800, color: '#00F5FF', textShadow: '0 0 8px rgba(0,245,255,0.3)', letterSpacing: '2px' }}>
+        ▌EVES
+      </span>
 
       {/* Center: page title */}
-      <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '1px' }}>
         {pageTitles[currentPage] ?? ''}
       </span>
 
@@ -50,15 +53,17 @@ export function TopBar() {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '5px 12px',
-            borderRadius: '8px',
-            background: isStealthActive ? 'rgba(6,182,212,0.1)' : 'var(--glass-2)',
-            border: isStealthActive ? '1px solid rgba(6,182,212,0.3)' : 'var(--border-glass)',
-            color: isStealthActive ? 'var(--text-cyan)' : 'var(--text-muted)',
-            fontSize: '11px',
-            fontWeight: 600,
+            padding: '4px 10px',
+            borderRadius: '6px',
+            background: isStealthActive ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)',
+            border: isStealthActive ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(255,255,255,0.06)',
+            color: isStealthActive ? '#10B981' : 'rgba(255,255,255,0.2)',
+            fontSize: '10px',
+            fontWeight: 700,
             cursor: 'pointer',
-            backdropFilter: 'blur(20px)'
+            fontFamily: '"Courier New", monospace',
+            letterSpacing: '0.5px',
+            textShadow: isStealthActive ? '0 0 6px rgba(16,185,129,0.3)' : 'none'
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.96 }}
@@ -66,15 +71,16 @@ export function TopBar() {
           {isStealthActive && (
             <span
               style={{
-                width: '8px',
-                height: '8px',
+                width: '7px',
+                height: '7px',
                 borderRadius: '50%',
-                background: 'var(--accent-cyan)',
-                animation: 'stealthPulse 2s cubic-bezier(0.4,0,0.6,1) infinite'
+                background: '#10B981',
+                boxShadow: '0 0 6px #10B981',
+                animation: 'pulseDot 1.5s ease-in-out infinite'
               }}
             />
           )}
-          <Shield size={14} />
+          <Shield size={12} />
           <span>STEALTH</span>
         </motion.button>
 
@@ -83,26 +89,26 @@ export function TopBar() {
             <button
               onClick={() => (window as any).eves?.minimize()}
               style={winBtnStyle}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <Minus size={14} />
+              <Minus size={13} />
             </button>
             <button
               onClick={() => (window as any).eves?.maximize()}
               style={winBtnStyle}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <Square size={12} />
+              <Square size={11} />
             </button>
             <button
               onClick={() => (window as any).eves?.close()}
               style={winBtnStyle}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(244,63,94,0.3)')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,0,110,0.2)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           </div>
         )}
@@ -112,14 +118,14 @@ export function TopBar() {
 }
 
 const winBtnStyle: React.CSSProperties = {
-  width: '28px',
-  height: '28px',
+  width: '26px',
+  height: '26px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   border: 'none',
   background: 'transparent',
-  color: 'var(--text-secondary)',
+  color: 'rgba(255,255,255,0.4)',
   cursor: 'pointer',
   borderRadius: '4px',
   transition: 'background 0.2s'

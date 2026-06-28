@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AppShell } from './components/layout/AppShell'
 import { DashboardPage } from './components/dashboard/DashboardPage'
@@ -9,12 +10,37 @@ import { SettingsModal } from './components/settings/SettingsModal'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { EmptyState } from './components/extras/EmptyState'
+import type { Meeting } from './types'
 
 export function App() {
   const currentPage = useUIStore((s) => s.currentPage)
   const meetings = useMeetingsStore((s) => s.meetings)
   const activeMeetingId = useUIStore((s) => s.activeMeetingId)
   const activeMeeting = meetings.find((m) => m.id === activeMeetingId)
+  const addMeeting = useMeetingsStore((s) => s.addMeeting)
+  const addToast = useUIStore((s) => s.addToast)
+
+  // Listen for sessions saved from the overlay (Ctrl+Space)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).eves?.onSessionSaved) {
+      ;(window as any).eves.onSessionSaved((session: any) => {
+        const meeting: Meeting = {
+          id: session.id,
+          title: session.title,
+          date: session.date,
+          duration: session.duration,
+          audioPath: '',
+          tags: [],
+          notes: session.transcript || '',
+          isTranscribing: false,
+          isAnalyzing: false,
+          transcriptionProgress: 0
+        }
+        addMeeting(meeting)
+        addToast({ type: 'success', title: 'Session saved from overlay', message: `${Math.round(session.duration / 60)}min • ${session.source} audio` })
+      })
+    }
+  }, [addMeeting, addToast])
 
   return (
     <>

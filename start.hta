@@ -1,0 +1,223 @@
+<html>
+<head>
+    <title>EVES System</title>
+    <HTA:APPLICATION
+        ID="oApp"
+        APPLICATIONNAME="EVES System"
+        BORDER="none"
+        CAPTION="no"
+        ICON=""
+        MAXIMIZEBUTTON="no"
+        MINIMIZEBUTTON="no"
+        SCROLL="no"
+        SHOWINTASKBAR="no"
+        SINGLEINSTANCE="yes"
+        WINDOWSTATE="normal"
+    />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #06060c;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            color: #00F5FF;
+        }
+        .container {
+            width: 360px;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 245, 255, 0.03) 2px,
+                rgba(0, 245, 255, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+        .grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+        }
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: #00F5FF;
+            filter: blur(80px);
+            opacity: 0.08;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            color: #00F5FF;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5), 0 0 40px rgba(0, 245, 255, 0.2);
+            z-index: 2;
+            position: relative;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 9px;
+            color: rgba(0, 245, 255, 0.4);
+            letter-spacing: 2px;
+            z-index: 2;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .btn {
+            width: 200px;
+            height: 52px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(0, 245, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #00F5FF;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.05), inset 0 0 10px rgba(0, 245, 255, 0.02);
+            animation: borderFlicker 4s ease-in-out infinite;
+        }
+        .btn:hover {
+            background: rgba(0, 245, 255, 0.15);
+            border-color: rgba(0, 245, 255, 0.7);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.2), inset 0 0 15px rgba(0, 245, 255, 0.05);
+            transform: scale(1.03);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-stop {
+            border-color: rgba(255, 0, 110, 0.2);
+            background: rgba(255, 0, 110, 0.04);
+            color: rgba(255, 0, 110, 0.6);
+            text-shadow: 0 0 8px rgba(255, 0, 110, 0.3);
+            animation: none;
+        }
+        .btn-stop:hover {
+            background: rgba(255, 0, 110, 0.1);
+            border-color: rgba(255, 0, 110, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.1);
+        }
+        .status {
+            font-size: 8px;
+            color: rgba(0, 245, 255, 0.2);
+            margin-top: 16px;
+            z-index: 2;
+            position: relative;
+            letter-spacing: 1px;
+        }
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        @keyframes borderFlicker {
+            0%, 100% { border-color: rgba(0, 245, 255, 0.3); }
+            50% { border-color: rgba(0, 245, 255, 0.5); }
+        }
+        .corners {
+            position: absolute;
+            width: 360px;
+            height: 480px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .corners div {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: rgba(0, 245, 255, 0.4);
+        }
+        .corners .tl { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+        .corners .tr { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
+        .corners .bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
+        .corners .br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+    </style>
+    <script language="VBScript">
+        Sub Window_OnLoad
+            window.resizeTo 380, 500
+            Dim screenWidth, screenHeight
+            screenWidth = document.parentWindow.screen.availWidth
+            screenHeight = document.parentWindow.screen.availHeight
+            window.moveTo (screenWidth - 380) / 2, (screenHeight - 500) / 2
+        End Sub
+
+        Sub LaunchEves()
+            Set WshShell = CreateObject("WScript.Shell")
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            projectDir = fso.GetParentFolderName(WScript.ScriptFullName)
+            WshShell.Run "cmd /c cd /d """ & projectDir & """ && npx electron-vite dev", 0, False
+            window.close()
+        End Sub
+
+        Sub StopEves()
+            Set WshShell = CreateObject("WScript.Shell")
+            WshShell.Run "cmd /c taskkill /F /IM electron.exe /T", 0, False
+            WshShell.Run "cmd /c taskkill /F /IM node.exe /T", 0, False
+            window.close()
+        End Sub
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="grid"></div>
+        <div class="glow"></div>
+        <div class="scanlines"></div>
+        <div class="corners">
+            <div class="tl"></div>
+            <div class="tr"></div>
+            <div class="bl"></div>
+            <div class="br"></div>
+        </div>
+
+        <div class="title">EVES</div>
+        <div class="subtitle">[ MEETING INTELLIGENCE SYSTEM v2.1.0 ]</div>
+
+        <button class="btn" onclick="VBScript:LaunchEves()">
+            ./start_eves
+        </button>
+
+        <button class="btn btn-stop" onclick="VBScript:StopEves()">
+            ./kill_eves
+        </button>
+
+        <div class="status">
+            > awaiting command <span class="blink">▊</span>
+        </div>
+    </div>
+</body>
+</html>

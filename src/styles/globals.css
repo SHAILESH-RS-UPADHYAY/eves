@@ -1,8 +1,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-void: #050508;
-  --bg-deep: #080b12;
+  --bg-void: #0c0c18;
+  --bg-deep: #0e1020;
 
   --glass-1: rgba(255, 255, 255, 0.035);
   --glass-2: rgba(255, 255, 255, 0.06);
@@ -99,6 +99,112 @@ html, body, #root {
 .glass-scrollbar::-webkit-scrollbar { width: 4px; }
 .glass-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .glass-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(124, 58, 237, 0.3);
+  background: rgba(0, 245, 255, 0.3);
   border-radius: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HACKER INTERFACE — Keyframes + Utilities
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes bootLineIn {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes logFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glitchShift1 {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitchShift2 {
+  0% { transform: translate(0); }
+  20% { transform: translate(2px, -1px); }
+  40% { transform: translate(-2px, 1px); }
+  60% { transform: translate(1px, 1px); }
+  80% { transform: translate(-1px, -1px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes scanBeamMove {
+  0% { top: -120px; }
+  100% { top: 100%; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px currentColor; }
+  50% { opacity: 0.5; box-shadow: 0 0 12px currentColor; }
+}
+
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flickerText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+  52% { opacity: 1; }
+  54% { opacity: 0.9; }
+}
+
+@keyframes borderFlicker {
+  0%, 100% { border-color: rgba(0, 245, 255, 0.15); }
+  50% { border-color: rgba(0, 245, 255, 0.25); }
+}
+
+.hacker-terminal {
+  font-family: '"Courier New"', 'Consolas', 'SF Mono', monospace;
+}
+
+.hacker-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.6), 0 0 16px rgba(0, 245, 255, 0.3);
+}
+
+.hacker-glow-green {
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 16px rgba(16, 185, 129, 0.3);
+}
+
+.hacker-panel {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 245, 255, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  position: relative;
+}
+
+.hacker-panel::before,
+.hacker-panel::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(0, 245, 255, 0.4);
+  pointer-events: none;
+}
+
+.hacker-panel::before {
+  top: 0; left: 0;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.hacker-panel::after {
+  bottom: 0; right: 0;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
 }

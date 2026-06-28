@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu, nativeImage, screen } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu, desktopCapturer, screen, nativeImage } from 'electron'
 import * as path from 'path'
 import { registerDeepgramHandlers } from './ipc/deepgram.handler'
 import { registerGroqHandlers } from './ipc/groq.handler'
@@ -8,22 +8,33 @@ import { registerSettingsHandlers } from './ipc/settings.handler'
 import { setStealth } from './utils/stealth'
 import { getWindowBounds, saveWindowBounds, getSettings } from './utils/store'
 
-let mainWindow: BrowserWindow | null = null
+// ─── Window references ──────────────────────────────────────
+let dashboardWindow: BrowserWindow | null = null
+let overlayWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 
-function createWindow(): BrowserWindow {
-  const savedBounds = getWindowBounds()
-  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize
+// ─── State ──────────────────────────────────────────────────
+let isOverlayVisible = true
+let isClickThrough = false
+let isStealthActive = true
+let isListening = false
+let currentSource: 'internal' | 'external' = 'internal'
 
-  const windowOptions: Electron.BrowserWindowConstructorOptions = {
+// ─── Dashboard Window (React app, heavy) ────────────────────
+function createDashboardWindow(): BrowserWindow {
+  const savedBounds = getWindowBounds()
+  const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize
+
+  const opts: Electron.BrowserWindowConstructorOptions = {
     width: savedBounds?.width ?? 1400,
     height: savedBounds?.height ?? 900,
-    x: savedBounds?.x ?? Math.floor((screenWidth - 1400) / 2),
-    y: savedBounds?.y ?? Math.floor((screenHeight - 900) / 2),
+    x: savedBounds?.x ?? Math.floor((sw - 1400) / 2),
+    y: savedBounds?.y ?? Math.floor((sh - 900) / 2),
     minWidth: 1100,
     minHeight: 700,
     frame: false,
-    backgroundColor: '#050508',
+    backgroundColor: '#0a0a14',
+    show: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -33,12 +44,12 @@ function createWindow(): BrowserWindow {
   }
 
   if (process.platform === 'darwin') {
-    windowOptions.titleBarStyle = 'hidden'
-    ;(windowOptions as any).vibrancy = 'ultra-dark'
-    ;(windowOptions as any).visualEffectState = 'active'
+    opts.titleBarStyle = 'hidden'
+    ;(opts as any).vibrancy = 'ultra-dark'
+    ;(opts as any).visualEffectState = 'active'
   }
 
-  const win = new BrowserWindow(windowOptions)
+  const win = new BrowserWindow(opts)
 
   if (process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -47,39 +58,212 @@ function createWindow(): BrowserWindow {
   }
 
   win.on('close', () => {
-    const bounds = win.getBounds()
-    saveWindowBounds({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height })
+    const b = win.getBounds()
+    saveWindowBounds({ x: b.x, y: b.y, width: b.width, height: b.height })
   })
 
   return win
 }
 
-function createTray(win: BrowserWindow) {
+// ─── Overlay Window (lightweight, plain HTML, stealth) ──────
+function createOverlayWindow(): BrowserWindow {
+  const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize
+
+  const win = new BrowserWindow({
+    width: 300,
+    height: 380,
+    x: sw - 320,
+    y: 80,
+    transparent: true,
+    backgroundColor: '#00000000',
+    frame: false,
+    hasShadow: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    focusable: true,
+    show: true,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    }
+  })
+
+  // Stealth: invisible to screen-sharing software
+  win.setContentProtection(true)
+
+  // Auto-approve media permissions
+  win.webContents.session.setPermissionRequestHandler((wc, permission, callback) => {
+    if (permission === 'media') callback(true)
+    else callback(false)
+  })
+
+  // Auto-approve display media with loopback (internal system audio)
+  win.webContents.session.setDisplayMediaRequestHandler((request, callback) => {
+    desktopCapturer.getSources({ types: ['screen'] }).then((sources) => {
+      callback({ video: sources[0], audio: 'loopback' })
+    }).catch(() => {
+      callback({ video: null, audio: 'loopback' })
+    })
+  })
+
+  // Load overlay HTML
+  if (process.env['ELECTRON_RENDERER_URL']) {
+    win.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/overlay/index.html')
+  } else {
+    win.loadFile(path.join(__dirname, '../renderer/overlay/index.html'))
+  }
+
+  win.setSkipTaskbar(true)
+
+  win.on('close', (e) => {
+    e.preventDefault()
+    win.hide()
+    isOverlayVisible = false
+  })
+
+  return win
+}
+
+// ─── Click-Through Toggle ───────────────────────────────────
+function setClickThrough(enabled: boolean) {
+  isClickThrough = enabled
+  if (overlayWindow && !overlayWindow.isDestroyed()) {
+    overlayWindow.setIgnoreMouseEvents(enabled, { forward: true })
+    overlayWindow.webContents.send('click-through-changed', enabled)
+  }
+}
+
+// ─── Stealth Toggle ─────────────────────────────────────────
+function toggleStealth() {
+  isStealthActive = !isStealthActive
+  if (process.platform !== 'linux') {
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.setContentProtection(isStealthActive)
+    }
+    if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+      dashboardWindow.setContentProtection(isStealthActive)
+    }
+  }
+  if (overlayWindow && !overlayWindow.isDestroyed()) {
+    overlayWindow.webContents.send('stealth-changed', isStealthActive)
+  }
+}
+
+// ─── Global Hotkeys (different from Acemate) ────────────────
+function registerHotkeys() {
+  // Ctrl+Shift+L — Start / Stop listening
+  globalShortcut.register('CommandOrControl+Shift+L', () => {
+    isListening = !isListening
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.webContents.send('toggle-listening', isListening)
+    }
+    console.log(`Listening: ${isListening ? 'ON' : 'OFF'}`)
+  })
+
+  // Ctrl+Shift+H — Hide overlay (keeps listening)
+  globalShortcut.register('CommandOrControl+Shift+H', () => {
+    if (isOverlayVisible) {
+      overlayWindow?.hide()
+      isOverlayVisible = false
+    } else {
+      overlayWindow?.show()
+      isOverlayVisible = true
+    }
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.webContents.send('visibility-changed', isOverlayVisible)
+    }
+  })
+
+  // Ctrl+Shift+O — Toggle audio source (internal / external)
+  globalShortcut.register('CommandOrControl+Shift+O', () => {
+    currentSource = currentSource === 'internal' ? 'external' : 'internal'
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.webContents.send('source-changed', currentSource)
+    }
+    console.log(`Source: ${currentSource}`)
+  })
+
+  // Ctrl+Shift+T — Toggle click-through
+  globalShortcut.register('CommandOrControl+Shift+T', () => {
+    setClickThrough(!isClickThrough)
+    console.log(`Click-through: ${isClickThrough ? 'ON' : 'OFF'}`)
+  })
+
+  // Ctrl+Shift+D — Show / hide dashboard
+  globalShortcut.register('CommandOrControl+Shift+D', () => {
+    if (!dashboardWindow || dashboardWindow.isDestroyed()) return
+    if (dashboardWindow.isVisible()) {
+      dashboardWindow.hide()
+    } else {
+      dashboardWindow.show()
+      dashboardWindow.focus()
+    }
+  })
+
+  // Ctrl+Shift+S — Toggle stealth
+  globalShortcut.register('CommandOrControl+Shift+S', () => {
+    toggleStealth()
+    console.log(`Stealth: ${isStealthActive ? 'ON' : 'OFF'}`)
+  })
+
+  // Ctrl+Space — Save session to history
+  globalShortcut.register('CommandOrControl+Space', () => {
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.webContents.send('save-session')
+    }
+    console.log('Session saved')
+  })
+
+  // Ctrl+Shift+X — Quit EVES
+  globalShortcut.register('CommandOrControl+Shift+X', () => {
+    console.log('Quitting EVES...')
+    app.quit()
+  })
+
+  console.log('Hotkeys registered:')
+  console.log('  Ctrl+Shift+L  → Start/Stop listening')
+  console.log('  Ctrl+Shift+H  → Hide/Show overlay')
+  console.log('  Ctrl+Shift+O  → Toggle audio source')
+  console.log('  Ctrl+Shift+T  → Toggle click-through')
+  console.log('  Ctrl+Shift+D  → Show/Hide dashboard')
+  console.log('  Ctrl+Shift+S  → Toggle stealth')
+  console.log('  Ctrl+Space    → Save session')
+  console.log('  Ctrl+Shift+X  → Quit')
+}
+
+// ─── Tray ───────────────────────────────────────────────────
+function createTray() {
   const icon = nativeImage.createEmpty()
   tray = new Tray(icon)
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show/Hide',
+      label: 'Show Overlay',
+      click: () => { overlayWindow?.show(); isOverlayVisible = true }
+    },
+    {
+      label: 'Show Dashboard',
+      click: () => { dashboardWindow?.show(); dashboardWindow?.focus() }
+    },
+    { type: 'separator' },
+    {
+      label: 'Toggle Listening',
       click: () => {
-        if (win.isVisible()) win.hide()
-        else win.show()
+        isListening = !isListening
+        overlayWindow?.webContents.send('toggle-listening', isListening)
       }
     },
     {
       label: 'Toggle Stealth',
-      click: () => {
-        if (process.platform !== 'linux' && mainWindow) {
-          setStealth(mainWindow, true)
-        }
-      }
+      click: () => toggleStealth()
     },
     { type: 'separator' },
     {
-      label: 'Quit',
-      click: () => {
-        app.quit()
-      }
+      label: 'Quit EVES',
+      click: () => app.quit()
     }
   ])
 
@@ -87,64 +271,95 @@ function createTray(win: BrowserWindow) {
   tray.setContextMenu(contextMenu)
 
   tray.on('double-click', () => {
-    if (win.isVisible()) win.hide()
-    else win.show()
-  })
-}
-
-function registerGlobalShortcuts(win: BrowserWindow) {
-  globalShortcut.register('CommandOrControl+Shift+E', () => {
-    if (win.isVisible()) win.hide()
-    else { win.show(); win.focus() }
-  })
-
-  globalShortcut.register('CommandOrControl+Shift+S', () => {
-    if (process.platform !== 'linux') {
-      setStealth(win, !win.isVisible())
+    if (isOverlayVisible) {
+      overlayWindow?.hide()
+      isOverlayVisible = false
+    } else {
+      overlayWindow?.show()
+      isOverlayVisible = true
     }
   })
 }
 
-function registerWindowHandlers(win: BrowserWindow) {
-  ipcMain.handle('window:minimize', () => win.minimize())
+// ─── IPC Handlers ───────────────────────────────────────────
+function registerIPC() {
+  // Window controls (from dashboard)
+  ipcMain.handle('window:minimize', () => dashboardWindow?.minimize())
   ipcMain.handle('window:maximize', () => {
-    if (win.isMaximized()) win.unmaximize()
-    else win.maximize()
+    if (dashboardWindow?.isMaximized()) dashboardWindow.unmaximize()
+    else dashboardWindow?.maximize()
   })
-  ipcMain.handle('window:close', () => win.close())
+  ipcMain.handle('window:close', () => dashboardWindow?.close())
 
+  // Stealth
   ipcMain.handle('stealth:toggle', (_e, enable: boolean) => {
-    return setStealth(win, enable)
+    isStealthActive = enable
+    if (process.platform !== 'linux') {
+      overlayWindow?.setContentProtection(enable)
+      dashboardWindow?.setContentProtection(enable)
+    }
+    return { supported: process.platform !== 'linux', active: enable }
   })
-  ipcMain.handle('stealth:status', () => {
-    if (process.platform === 'linux') return { supported: false, active: false }
-    return { supported: true, active: false }
+  ipcMain.handle('stealth:status', () => ({
+    supported: process.platform !== 'linux',
+    active: isStealthActive
+  }))
+
+  // Launch overlay from dashboard
+  ipcMain.handle('overlay:launch', () => {
+    if (!overlayWindow || overlayWindow.isDestroyed()) {
+      overlayWindow = createOverlayWindow()
+    } else {
+      overlayWindow.show()
+      isOverlayVisible = true
+    }
+    return { success: true }
+  })
+
+  // Overlay → Dashboard: forward session data
+  ipcMain.handle('overlay:save-session', (_e, sessionData) => {
+    if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+      dashboardWindow.webContents.send('session-saved', sessionData)
+    }
+    return { success: true }
+  })
+
+  // Overlay requests transcription
+  ipcMain.handle('overlay:transcribe', async (_e, args: { audioBlob: ArrayBuffer; apiKey: string }) => {
+    // This would call the Deepgram handler logic
+    // For now, forward to the deepgram handler channel
+    return { success: true, message: 'Transcription request received' }
   })
 }
 
+// ─── App Lifecycle ──────────────────────────────────────────
 app.whenReady().then(() => {
-  mainWindow = createWindow()
+  // Create both windows
+  dashboardWindow = createDashboardWindow()
+  overlayWindow = createOverlayWindow()
 
-  registerDeepgramHandlers(mainWindow)
+  // Register all handlers
+  registerDeepgramHandlers(overlayWindow)
   registerGroqHandlers()
   registerDriveHandlers()
   registerNotionHandlers()
   registerSettingsHandlers()
-  registerWindowHandlers(mainWindow)
-  registerGlobalShortcuts(mainWindow)
+  registerIPC()
+  registerHotkeys()
 
-  try {
-    createTray(mainWindow)
-  } catch {
-    // Tray creation is non-critical
-  }
+  // Tray
+  try { createTray() } catch {}
 
+  // Auto-enable stealth on launch if configured
   const settings = getSettings()
   if (settings.stealthOnLaunch && process.platform !== 'linux') {
-    setStealth(mainWindow, true)
+    setStealth(overlayWindow, true)
+    isStealthActive = true
   }
 
-  console.log('EVES started — Ctrl+Shift+E to toggle visibility')
+  console.log('EVES started — Both windows visible')
+  console.log('Overlay top-right | Dashboard centered')
+  console.log('Ctrl+Shift+L to start listening')
 })
 
 app.on('will-quit', () => {
@@ -157,6 +372,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    mainWindow = createWindow()
+    dashboardWindow = createDashboardWindow()
+    overlayWindow = createOverlayWindow()
   }
 })

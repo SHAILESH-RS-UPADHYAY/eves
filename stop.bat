@@ -9,6 +9,7 @@ echo.
 echo Cleaning up...
 taskkill /F /IM electron.exe /T >nul 2>&1
 taskkill /F /IM node.exe /T >nul 2>&1
+taskkill /F /IM mshta.exe /T >nul 2>&1
 
 echo.
 echo ===================================================

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVES</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="overlay">
+        <!-- Main Panel -->
+        <div id="main-panel">
+            <!-- Scanlines overlay -->
+            <div class="scanlines"></div>
+
+            <!-- Hex decoration top -->
+            <div class="hex-deco hex-top">0x45564553 0x4D495320 0x56322E31</div>
+
+            <!-- Header -->
+            <div id="header">
+                <div id="logo-wrap">
+                    <div id="logo-orb"></div>
+                    <span id="logo-text">EVES</span>
+                    <span class="logo-ver">v2.1.0</span>
+                </div>
+                <div id="stealth-indicator" class="stealth-on">
+                    <div id="stealth-dot"></div>
+                    <span>STEALTH</span>
+                </div>
+            </div>
+
+            <!-- Status Display -->
+            <div id="status-section">
+                <div id="status-orb-wrap">
+                    <div id="status-orb">
+                        <div id="orb-ring"></div>
+                        <div id="orb-core"></div>
+                        <div id="orb-pulse"></div>
+                    </div>
+                </div>
+                <div id="status-text">
+                    <span id="status-label">STANDBY</span>
+                    <span id="status-time">00:00</span>
+                </div>
+            </div>
+
+            <!-- Audio Source Toggle -->
+            <div id="source-section">
+                <div class="section-label">▸ AUDIO_SOURCE</div>
+                <div id="source-toggle">
+                    <button class="source-btn active" data-source="internal">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/>
+                        </svg>
+                        <span>INT</span>
+                    </button>
+                    <button class="source-btn" data-source="external">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="22"/>
+                        </svg>
+                        <span>EXT</span>
+                    </button>
+                </div>
+                <select id="device-select" class="hidden"></select>
+            </div>
+
+            <!-- Listen Button -->
+            <button id="listen-btn">
+                <div id="btn-glow"></div>
+                <div id="btn-content">
+                    <div id="btn-icon">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                    <span id="btn-text">▶ EXECUTE_LISTEN</span>
+                </div>
+            </button>
+
+            <!-- Live Transcript Preview -->
+            <div id="transcript-preview">
+                <div class="section-label">▸ LIVE_FEED</div>
+                <div id="transcript-text"></div>
+                <span id="transcript-cursor">▊</span>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div id="bottom-bar">
+                <div id="hotkey-hints">
+                    <kbd>L</kbd> listen
+                    <kbd>H</kbd> hide
+                    <kbd>␣</kbd> save
+                </div>
+                <button id="history-arrow" title="Show history">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Hex decoration bottom -->
+            <div class="hex-deco hex-bottom">SECURE_CHANNEL // ENC: AES-256 // PID: 0x1A4F</div>
+        </div>
+
+        <!-- History Side Panel (slides out from right) -->
+        <div id="history-panel">
+            <div class="scanlines"></div>
+            <div id="history-header">
+                <span>▸ SESSION_LOG</span>
+                <button id="history-close">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="history-list">
+                <div class="history-empty">$ No sessions found.<br>$ Press Ctrl+Space to save.<br><span class="cursor-blink">▊</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

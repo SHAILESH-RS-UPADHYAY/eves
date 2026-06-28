@@ -4,12 +4,12 @@ import { LayoutDashboard, Mic, FileText, Link2, Settings } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
 import type { NavPage } from '../../types'
 
-const navItems: { page: NavPage; icon: typeof LayoutDashboard; label: string }[] = [
-  { page: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { page: 'meetings', icon: Mic, label: 'Meetings' },
-  { page: 'transcripts', icon: FileText, label: 'Transcripts' },
-  { page: 'integrations', icon: Link2, label: 'Integrations' },
-  { page: 'settings', icon: Settings, label: 'Settings' }
+const navItems: { page: NavPage; icon: typeof LayoutDashboard; label: string; cmd: string }[] = [
+  { page: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', cmd: 'main.sh' },
+  { page: 'meetings', icon: Mic, label: 'Meetings', cmd: 'logs.sh' },
+  { page: 'transcripts', icon: FileText, label: 'Transcripts', cmd: 'cat.sh' },
+  { page: 'integrations', icon: Link2, label: 'Integrations', cmd: 'sync.sh' },
+  { page: 'settings', icon: Settings, label: 'Settings', cmd: 'cfg.sh' }
 ]
 
 export function Sidebar() {
@@ -22,16 +22,17 @@ export function Sidebar() {
     <motion.div
       style={{
         width: hovered ? 220 : 72,
-        background: 'rgba(5,5,8,0.8)',
+        background: 'rgba(6, 8, 14, 0.85)',
         backdropFilter: 'blur(20px)',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
+        borderRight: '1px solid rgba(0, 245, 255, 0.06)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         padding: '16px 0',
         zIndex: 10,
         flexShrink: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        fontFamily: '"Courier New", monospace'
       }}
       animate={{ width: hovered ? 220 : 72 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -43,8 +44,7 @@ export function Sidebar() {
         <AnimatePresence>
           {hovered && (
             <motion.span
-              className="gradient-text"
-              style={{ fontSize: '18px', fontWeight: 700, marginLeft: '8px' }}
+              style={{ fontSize: '16px', fontWeight: 800, marginLeft: '8px', color: '#00F5FF', textShadow: '0 0 10px rgba(0,245,255,0.4)', letterSpacing: '2px' }}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
@@ -54,7 +54,7 @@ export function Sidebar() {
           )}
         </AnimatePresence>
         {!hovered && (
-          <span className="gradient-text" style={{ fontSize: '18px', fontWeight: 700, textAlign: 'center', width: '100%' }}>◈</span>
+          <span style={{ fontSize: '18px', fontWeight: 800, textAlign: 'center', width: '100%', color: '#00F5FF', textShadow: '0 0 10px rgba(0,245,255,0.4)' }}>◈</span>
         )}
       </div>
 
@@ -75,15 +75,16 @@ export function Sidebar() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '12px',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 border: 'none',
                 background: 'transparent',
                 cursor: 'pointer',
-                color: isActive ? 'var(--accent-violet-mid)' : 'var(--text-secondary)',
+                color: isActive ? '#00F5FF' : 'rgba(255,255,255,0.4)',
                 position: 'relative',
-                textAlign: 'left'
+                textAlign: 'left',
+                fontFamily: '"Courier New", monospace'
               }}
-              whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+              whileHover={{ backgroundColor: 'rgba(0,245,255,0.04)' }}
             >
               {isActive && (
                 <motion.div
@@ -91,18 +92,19 @@ export function Sidebar() {
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'rgba(124,58,237,0.15)',
-                    borderRadius: '10px',
-                    borderLeft: '2px solid var(--accent-violet)'
+                    background: 'rgba(0,245,255,0.08)',
+                    borderRadius: '8px',
+                    borderLeft: '2px solid #00F5FF',
+                    boxShadow: '0 0 12px rgba(0,245,255,0.1)'
                   }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <Icon size={22} style={{ flexShrink: 0, position: 'relative', zIndex: 1 }} />
+              <Icon size={20} style={{ flexShrink: 0, position: 'relative', zIndex: 1 }} />
               <AnimatePresence>
                 {hovered && (
                   <motion.span
-                    style={{ fontSize: '13px', fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}
+                    style={{ fontSize: '12px', fontWeight: 600, position: 'relative', zIndex: 1, whiteSpace: 'nowrap', letterSpacing: '0.5px' }}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
@@ -117,8 +119,8 @@ export function Sidebar() {
       </div>
 
       {/* Version */}
-      <div style={{ padding: '12px 16px', fontSize: '10px', color: 'var(--text-muted)' }}>
-        {hovered ? 'EVES v1.0.0' : 'v1'}
+      <div style={{ padding: '12px 16px', fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontFamily: '"Courier New", monospace' }}>
+        {hovered ? '> eves v2.1.0' : '> v2.1'}
       </div>
     </motion.div>
   )
