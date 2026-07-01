@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Rocket, Terminal, Shield, Mic2, Brain, Zap, FileText, Activity, Cpu, Wifi } from 'lucide-react'
+import { Rocket, Terminal, Shield, Mic2, Brain, Zap, FileText, Activity, Cpu, Wifi, Key } from 'lucide-react'
 import { StatsRow } from './StatsRow'
 import { MeetingFeed } from './MeetingFeed'
 import { RecentInsights } from './RecentInsights'
@@ -108,6 +108,7 @@ function HackerHeader() {
 export function DashboardPage() {
   const meetings = useMeetingsStore((s) => s.meetings)
   const setPage = useUIStore((s) => s.setPage)
+  const setSettingsOpen = useUIStore((s) => s.setSettingsOpen)
 
   const totalMeetings = meetings.length
   const audioHours = meetings.reduce((sum, m) => sum + m.duration, 0) / 3600
@@ -281,6 +282,39 @@ export function DashboardPage() {
                       }}
                     >
                       <FileText size={16} /> history.log
+                    </button>
+
+                    <button
+                      onClick={() => setSettingsOpen(true)}
+                      style={{
+                        padding: '12px 20px',
+                        background: 'rgba(245, 158, 11, 0.08)',
+                        border: '1px solid rgba(245, 158, 11, 0.25)',
+                        borderRadius: '6px',
+                        color: '#F59E0B',
+                        fontFamily: '"Courier New", monospace',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        letterSpacing: '1px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textShadow: '0 0 6px rgba(245, 158, 11, 0.3)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(245, 158, 11, 0.15)'
+                        e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.5)'
+                        e.currentTarget.style.boxShadow = '0 0 16px rgba(245, 158, 11, 0.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(245, 158, 11, 0.08)'
+                        e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.25)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    >
+                      <Key size={14} /> api_keys
                     </button>
                   </div>
                 </div>
