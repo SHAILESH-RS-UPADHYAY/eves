@@ -64,9 +64,9 @@ export function HackerImage({ src, alt, label, topLabel, height = '180px' }: {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: loaded ? 0.6 : 0,
+            opacity: loaded ? 0.85 : 0,
             transition: 'opacity 0.5s ease, transform 0.5s ease',
-            filter: 'contrast(1.1) brightness(0.8) saturate(1.2)',
+            filter: 'contrast(1.2) brightness(1.0) saturate(1.4) hue-rotate(10deg)',
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
@@ -89,27 +89,32 @@ export function HackerImage({ src, alt, label, topLabel, height = '180px' }: {
         </div>
       )}
 
-      {/* Error fallback - CSS gradient art */}
+      {/* Error fallback - cyberpunk grid */}
       {error && (
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(135deg, #0a0a14 0%, #1a1a2e 50%, #0a0a14 100%)',
+          background: 'linear-gradient(135deg, #0a0a14 0%, #1a0033 30%, #0a1a0a 60%, #0a0a14 100%)',
         }}>
           <div style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'linear-gradient(rgba(0, 245, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
+            backgroundImage: 'linear-gradient(rgba(0, 245, 255, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 110, 0.06) 1px, transparent 1px)',
+            backgroundSize: '24px 24px'
+          }} />
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(circle at 30% 50%, rgba(0, 245, 255, 0.06) 0%, transparent 60%), radial-gradient(circle at 70% 30%, rgba(255, 0, 110, 0.05) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%)',
           }} />
         </div>
       )}
 
-      {/* Cyan overlay tint */}
+      {/* Hacker color overlay tint (cyan → magenta → yellow gradient) */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(180deg, rgba(0, 245, 255, 0.05) 0%, transparent 30%, rgba(0, 0, 0, 0.6) 100%)',
+        background: 'linear-gradient(135deg, rgba(0, 245, 255, 0.08) 0%, rgba(255, 0, 110, 0.05) 50%, rgba(245, 158, 11, 0.05) 100%)',
         pointerEvents: 'none',
         zIndex: 2
       }} />
@@ -118,7 +123,7 @@ export function HackerImage({ src, alt, label, topLabel, height = '180px' }: {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 245, 255, 0.03) 3px, rgba(0, 245, 255, 0.03) 4px)',
+        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 245, 255, 0.025) 2px, rgba(245, 158, 11, 0.01) 3px)',
         pointerEvents: 'none',
         zIndex: 3
       }} />

@@ -22,7 +22,7 @@ echo.
 echo ===================================================
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0.."
 npx electron-vite dev
 
 pause

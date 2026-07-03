@@ -33,7 +33,7 @@ function createDashboardWindow(): BrowserWindow {
     minWidth: 1100,
     minHeight: 700,
     frame: false,
-    backgroundColor: '#0a0a14',
+    backgroundColor: '#050508',
     show: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
@@ -70,9 +70,11 @@ function createOverlayWindow(): BrowserWindow {
   const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize
 
   const win = new BrowserWindow({
-    width: 300,
-    height: 380,
-    x: sw - 320,
+    width: 360,
+    height: 460,
+    minWidth: 260,
+    minHeight: 320,
+    x: sw - 380,
     y: 80,
     transparent: true,
     backgroundColor: '#00000000',
@@ -80,7 +82,7 @@ function createOverlayWindow(): BrowserWindow {
     hasShadow: false,
     alwaysOnTop: true,
     skipTaskbar: true,
-    resizable: false,
+    resizable: true,
     focusable: true,
     show: true,
     webPreferences: {
@@ -163,8 +165,8 @@ function registerHotkeys() {
     console.log(`Listening: ${isListening ? 'ON' : 'OFF'}`)
   })
 
-  // Ctrl+Shift+H — Hide overlay (keeps listening)
-  globalShortcut.register('CommandOrControl+Shift+H', () => {
+  // Ctrl+Shift+A — Hide overlay (keeps listening)
+  globalShortcut.register('CommandOrControl+Shift+A', () => {
     if (isOverlayVisible) {
       overlayWindow?.hide()
       isOverlayVisible = false
@@ -225,7 +227,7 @@ function registerHotkeys() {
 
   console.log('Hotkeys registered:')
   console.log('  Ctrl+Shift+L  → Start/Stop listening')
-  console.log('  Ctrl+Shift+H  → Hide/Show overlay')
+  console.log('  Ctrl+Shift+A  → Hide/Show overlay')
   console.log('  Ctrl+Shift+O  → Toggle audio source')
   console.log('  Ctrl+Shift+T  → Toggle click-through')
   console.log('  Ctrl+Shift+D  → Show/Hide dashboard')

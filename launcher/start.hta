@@ -179,7 +179,8 @@
         Sub LaunchEves()
             Set WshShell = CreateObject("WScript.Shell")
             Set fso = CreateObject("Scripting.FileSystemObject")
-            projectDir = fso.GetParentFolderName(WScript.ScriptFullName)
+            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
+            projectDir = fso.GetParentFolderName(launchDir)
             WshShell.Run "cmd /c cd /d """ & projectDir & """ && npx electron-vite dev", 0, False
             window.close()
         End Sub

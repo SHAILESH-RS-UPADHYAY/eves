@@ -9,7 +9,7 @@ echo.
 echo Initializing components...
 echo.
 
-powershell -WindowStyle Hidden -Command "Start-Process cmd -ArgumentList '/c cd /d ""%~dp0"" && npx electron-vite dev' -WindowStyle Hidden"
+powershell -WindowStyle Hidden -Command "Start-Process cmd -ArgumentList '/c cd /d ""%~dp0.."" && npx electron-vite dev' -WindowStyle Hidden"
 
 echo.
 echo ===================================================

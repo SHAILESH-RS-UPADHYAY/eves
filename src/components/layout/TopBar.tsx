@@ -26,24 +26,39 @@ export function TopBar() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 16px',
-        background: 'rgba(6, 8, 14, 0.7)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(0, 245, 255, 0.06)',
+        background: 'rgba(3, 3, 6, 0.8)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(0, 245, 255, 0.08)',
         WebkitAppRegion: 'drag' as any,
         flexShrink: 0,
         zIndex: 10,
-        fontFamily: '"Courier New", monospace'
+        fontFamily: '"Courier New", monospace',
+        position: 'relative'
       }}
     >
-      {/* Left: logo */}
-      <span style={{ fontSize: '13px', fontWeight: 800, color: '#00F5FF', textShadow: '0 0 8px rgba(0,245,255,0.3)', letterSpacing: '2px' }}>
-        ▌EVES
-      </span>
+      {/* Corner brackets */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '10px', height: '10px', borderBottom: '2px solid rgba(0,245,255,0.3)', borderLeft: '2px solid rgba(0,245,255,0.3)' }} />
 
-      {/* Center: page title */}
-      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '1px' }}>
-        {pageTitles[currentPage] ?? ''}
-      </span>
+      {/* Left: terminal prompt + logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontSize: '13px', fontWeight: 800, color: '#00F5FF', textShadow: '0 0 10px rgba(0,245,255,0.4)', letterSpacing: '2px' }}>
+          ▌EVES
+        </span>
+        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>::</span>
+        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textShadow: '0 0 6px rgba(0,245,255,0.15)' }}>
+          {pageTitles[currentPage] ?? ''}
+        </span>
+      </div>
+
+      {/* Center: system status */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <span style={{ fontSize: '9px', color: 'rgba(34, 214, 140, 0.5)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#22D68C', boxShadow: '0 0 6px #22D68C', animation: 'pulseDot 2s ease-in-out infinite' }} />
+          ONLINE
+        </span>
+        <span style={{ fontSize: '9px', color: 'rgba(252, 211, 77, 0.4)' }}>CPU: 12%</span>
+        <span style={{ fontSize: '9px', color: 'rgba(0, 245, 255, 0.4)' }}>NET: 16kHz</span>
+      </div>
 
       {/* Right: stealth + window controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' as any }}>
@@ -54,16 +69,16 @@ export function TopBar() {
             alignItems: 'center',
             gap: '6px',
             padding: '4px 10px',
-            borderRadius: '6px',
-            background: isStealthActive ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)',
-            border: isStealthActive ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(255,255,255,0.06)',
-            color: isStealthActive ? '#10B981' : 'rgba(255,255,255,0.2)',
-            fontSize: '10px',
+            borderRadius: '4px',
+            background: isStealthActive ? 'rgba(34,214,140,0.08)' : 'rgba(255,255,255,0.02)',
+            border: isStealthActive ? '1px solid rgba(34,214,140,0.25)' : '1px solid rgba(255,255,255,0.06)',
+            color: isStealthActive ? '#22D68C' : 'rgba(255,255,255,0.5)',
+            fontSize: '9px',
             fontWeight: 700,
             cursor: 'pointer',
             fontFamily: '"Courier New", monospace',
             letterSpacing: '0.5px',
-            textShadow: isStealthActive ? '0 0 6px rgba(16,185,129,0.3)' : 'none'
+            textShadow: isStealthActive ? '0 0 8px rgba(34,214,140,0.4)' : 'none'
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.96 }}
@@ -71,16 +86,16 @@ export function TopBar() {
           {isStealthActive && (
             <span
               style={{
-                width: '7px',
-                height: '7px',
+                width: '6px',
+                height: '6px',
                 borderRadius: '50%',
-                background: '#10B981',
-                boxShadow: '0 0 6px #10B981',
+                background: '#22D68C',
+                boxShadow: '0 0 8px #22D68C',
                 animation: 'pulseDot 1.5s ease-in-out infinite'
               }}
             />
           )}
-          <Shield size={12} />
+          <Shield size={11} />
           <span>STEALTH</span>
         </motion.button>
 
@@ -92,7 +107,7 @@ export function TopBar() {
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <Minus size={13} />
+              <Minus size={12} />
             </button>
             <button
               onClick={() => (window as any).eves?.maximize()}
@@ -100,7 +115,7 @@ export function TopBar() {
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <Square size={11} />
+              <Square size={10} />
             </button>
             <button
               onClick={() => (window as any).eves?.close()}
@@ -108,11 +123,14 @@ export function TopBar() {
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,0,110,0.2)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <X size={13} />
+              <X size={12} />
             </button>
           </div>
         )}
       </div>
+
+      {/* Right corner bracket */}
+      <div style={{ position: 'absolute', bottom: 0, right: 0, width: '10px', height: '10px', borderBottom: '2px solid rgba(0,245,255,0.3)', borderRight: '2px solid rgba(0,245,255,0.3)' }} />
     </div>
   )
 }

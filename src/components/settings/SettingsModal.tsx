@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eye, EyeOff, Loader2, CheckCircle, XCircle, Save, Terminal, Key } from 'lucide-react'
 import { GlassButton } from '../glass/GlassButton'
@@ -28,6 +28,13 @@ export function SettingsModal() {
   const [groqSaved, setGroqSaved] = useState(false)
   const [localDeepgramKey, setLocalDeepgramKey] = useState(settings.deepgramApiKey)
   const [localGroqKey, setLocalGroqKey] = useState(settings.groqApiKey)
+
+  useEffect(() => {
+    if (isOpen) {
+      setLocalDeepgramKey(settings.deepgramApiKey)
+      setLocalGroqKey(settings.groqApiKey)
+    }
+  }, [isOpen])
 
   const saveApiKeys = () => {
     updateSettings({ deepgramApiKey: localDeepgramKey, groqApiKey: localGroqKey })

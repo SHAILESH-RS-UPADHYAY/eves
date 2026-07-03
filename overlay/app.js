@@ -15,6 +15,10 @@
   let elapsedTimer = null
   let elapsedSeconds = 0
   let sessionHistory = []
+  let deepgramSocket = null
+  let deepgramTranscript = ''
+  let deepgramKeepAlive = null
+  let deepgramConnected = false
 
   // ─── DOM ────────────────────────────────────────────────────
   const listenBtn = document.getElementById('listen-btn')
@@ -93,9 +97,10 @@
         pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
       }
 
-      // ── Placeholder: send pcm.buffer to Deepgram via IPC ──
-      // window.eves?.transcribe({ audioBlob: pcm.buffer, apiKey: ... })
-      // For now, we just measure audio level for the orb animation
+      // ── Stream PCM data to Deepgram WebSocket ──
+      if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+        deepgramSocket.send(pcm.buffer)
+      }
     }
 
     source.connect(processor)
@@ -137,6 +142,130 @@
     if (analyser) { analyser = null }
   }
 
+  // ─── Deepgram WebSocket (Real-time Streaming) ─────────────
+  function buildDeepgramUrl() {
+    var p = new URLSearchParams({
+      encoding: 'linear16',
+      sample_rate: '16000',
+      channels: '1',
+      model: 'nova-2',
+      smart_format: 'true',
+      interim_results: 'true',
+      language: 'en',
+      endpointing: '200'
+    })
+    return 'wss://api.deepgram.com/v1/listen?' + p.toString()
+  }
+
+  function sendKeepAlive() {
+    if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+      deepgramSocket.send(JSON.stringify({ type: 'KeepAlive' }))
+    }
+  }
+
+  var transcriptColors = ['color-cyan', 'color-green', 'color-white', 'color-amber', 'color-red']
+
+  function colorizeText(text) {
+    if (!text) return ''
+    var words = text.split(' ')
+    var result = ''
+    for (var i = 0; i < words.length; i++) {
+      var c = transcriptColors[i % transcriptColors.length]
+      result += '<span class="' + c + '">' + words[i] + '</span> '
+    }
+    return result.trim()
+  }
+
+  function handleDeepgramMessage(data) {
+    if (data.type !== 'Results') return
+
+    var alt = data.channel?.alternatives?.[0]
+    var transcript = alt?.transcript || ''
+    var isFinal = data.is_final || false
+
+    if (!transcript) return
+
+    if (isFinal) {
+      deepgramTranscript += (deepgramTranscript ? ' ' : '') + transcript
+      sessionTranscript += (sessionTranscript ? ' ' : '') + transcript
+      transcriptText.innerHTML = colorizeText(deepgramTranscript)
+    } else {
+      var displayText = deepgramTranscript
+        ? deepgramTranscript + ' ' + transcript
+        : transcript
+      transcriptText.innerHTML = colorizeText(displayText)
+    }
+
+    var preview = document.getElementById('transcript-preview')
+    if (preview) preview.scrollTop = preview.scrollHeight
+  }
+
+  async function connectDeepgram() {
+    var settings = await window.eves?.getSettings()
+    var apiKey = settings?.deepgramApiKey
+
+    if (!apiKey) {
+      throw new Error('ERR_DG_NOKEY: No Deepgram API key — open Settings → api_keys')
+    }
+
+    return new Promise(function (resolve, reject) {
+      var timeout = setTimeout(function () {
+        reject(new Error('ERR_DG_TIMEOUT: Deepgram connection timed out (10s)'))
+      }, 10000)
+
+      var ws = new WebSocket(buildDeepgramUrl(), ['token', apiKey])
+
+      ws.onopen = function () {
+        clearTimeout(timeout)
+        deepgramKeepAlive = setInterval(sendKeepAlive, 5000)
+        deepgramConnected = true
+        resolve()
+      }
+
+      ws.onmessage = function (e) {
+        try {
+          handleDeepgramMessage(JSON.parse(e.data))
+        } catch (parseErr) {
+          console.warn('DG: parse error', parseErr)
+        }
+      }
+
+      ws.onerror = function () {
+        clearTimeout(timeout)
+        if (!deepgramConnected) {
+          reject(new Error('ERR_DG_CONNECT: Deepgram connection failed. Check API key.'))
+        } else {
+          transcriptText.innerHTML = '<span class="color-red">ERR_DG_STREAM: Connection lost</span>'
+          statusLabel.textContent = 'ERROR'
+        }
+      }
+
+      ws.onclose = function (ev) {
+        clearTimeout(timeout)
+        if (deepgramKeepAlive) { clearInterval(deepgramKeepAlive); deepgramKeepAlive = null }
+        deepgramSocket = null
+        deepgramConnected = false
+        if (isListening && ev.code !== 1000) {
+          transcriptText.innerHTML = '<span class="color-red">ERR_DG_CLOSED: Stream ended (' + ev.code + ')</span>'
+        }
+      }
+
+      deepgramSocket = ws
+    })
+  }
+
+  function disconnectDeepgram() {
+    if (deepgramSocket) {
+      if (deepgramSocket.readyState === WebSocket.OPEN) {
+        deepgramSocket.send(JSON.stringify({ type: 'CloseStream' }))
+      }
+      deepgramSocket.close()
+      deepgramSocket = null
+    }
+    if (deepgramKeepAlive) { clearInterval(deepgramKeepAlive); deepgramKeepAlive = null }
+    deepgramConnected = false
+  }
+
   // ─── Start Listening ────────────────────────────────────────
   async function startListening() {
     try {
@@ -147,6 +276,11 @@
         : await startExternalCapture()
 
       processStream(stream)
+
+      // Connect Deepgram for real-time transcription
+      deepgramTranscript = ''
+      await connectDeepgram()
+
       isListening = true
       sessionStartTime = Date.now()
       elapsedSeconds = 0
@@ -181,6 +315,8 @@
 
   // ─── Stop Listening ─────────────────────────────────────────
   function stopListening() {
+    disconnectDeepgram()
+    deepgramTranscript = ''
     stopCapture()
     isListening = false
 

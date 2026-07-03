@@ -9,6 +9,7 @@ import { NotionExport } from './components/integrations/NotionExport'
 import { SettingsModal } from './components/settings/SettingsModal'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
+import { useSettingsStore } from './store/settings.store'
 import { EmptyState } from './components/extras/EmptyState'
 import type { Meeting } from './types'
 
@@ -19,6 +20,12 @@ export function App() {
   const activeMeeting = meetings.find((m) => m.id === activeMeetingId)
   const addMeeting = useMeetingsStore((s) => s.addMeeting)
   const addToast = useUIStore((s) => s.addToast)
+  const loadSettings = useSettingsStore((s) => s.loadSettings)
+
+  // Load saved settings (API keys etc.) from disk on mount
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
 
   // Listen for sessions saved from the overlay (Ctrl+Space)
   useEffect(() => {

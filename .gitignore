@@ -7,5 +7,6 @@ out/
 .DS_Store
 website/node_modules/
 website/dist/
-
+*.log
 *.txt
+!README.md

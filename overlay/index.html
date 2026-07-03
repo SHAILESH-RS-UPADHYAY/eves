@@ -83,7 +83,7 @@
 
             <!-- Live Transcript Preview -->
             <div id="transcript-preview">
-                <div class="section-label">▸ LIVE_FEED</div>
+                <div class="section-label">▸ LIVE_FEED <span style="color:rgba(255,255,255,0.2);font-size:8px">[COLOR]</span></div>
                 <div id="transcript-text"></div>
                 <span id="transcript-cursor">▊</span>
             </div>
@@ -92,7 +92,7 @@
             <div id="bottom-bar">
                 <div id="hotkey-hints">
                     <kbd>L</kbd> listen
-                    <kbd>H</kbd> hide
+                    <kbd>A</kbd> hide
                     <kbd>␣</kbd> save
                 </div>
                 <button id="history-arrow" title="Show history">
@@ -104,6 +104,9 @@
 
             <!-- Hex decoration bottom -->
             <div class="hex-deco hex-bottom">SECURE_CHANNEL // ENC: AES-256 // PID: 0x1A4F</div>
+
+            <!-- Resize Handle -->
+            <div id="resize-handle"></div>
         </div>
 
         <!-- History Side Panel (slides out from right) -->
