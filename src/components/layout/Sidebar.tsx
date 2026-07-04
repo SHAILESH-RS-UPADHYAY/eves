@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LayoutDashboard, Mic, FileText, Link2, Settings } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
+import { EvesLogo } from '../brand/EvesLogo'
 import type { NavPage } from '../../types'
 
 const navItems: { page: NavPage; icon: typeof LayoutDashboard; label: string; cmd: string }[] = [
@@ -44,22 +45,8 @@ export function Sidebar() {
       <div style={{ position: 'absolute', top: 0, right: 0, width: '12px', height: '12px', borderTop: '2px solid rgba(0,245,255,0.3)', borderRight: '2px solid rgba(0,245,255,0.3)' }} />
 
       {/* Logo */}
-      <div style={{ padding: '0 16px 20px', height: '48px', display: 'flex', alignItems: 'center' }}>
-        <AnimatePresence>
-          {hovered && (
-            <motion.span
-              style={{ fontSize: '16px', fontWeight: 800, marginLeft: '8px', color: '#00F5FF', textShadow: '0 0 12px rgba(0,245,255,0.5)', letterSpacing: '3px' }}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-            >
-              ▌EVES
-            </motion.span>
-          )}
-        </AnimatePresence>
-        {!hovered && (
-          <span style={{ fontSize: '18px', fontWeight: 800, textAlign: 'center', width: '100%', color: '#00F5FF', textShadow: '0 0 12px rgba(0,245,255,0.5)' }}>◈</span>
-        )}
+      <div style={{ padding: '0 16px 20px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: hovered ? 'flex-start' : 'center' }}>
+        <EvesLogo size={34} showWordmark={hovered} />
       </div>
 
       {/* Section label */}
@@ -77,10 +64,7 @@ export function Sidebar() {
           return (
             <motion.button
               key={item.page}
-              onClick={() => {
-                if (item.page === 'settings') setSettingsOpen(true)
-                else setPage(item.page)
-              }}
+              onClick={() => setPage(item.page)}
               style={{
                 display: 'flex',
                 alignItems: 'center',

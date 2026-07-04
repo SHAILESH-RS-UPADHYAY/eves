@@ -7,6 +7,9 @@ import { TranscriptView } from './components/meeting/TranscriptView'
 import { DriveSync } from './components/integrations/DriveSync'
 import { NotionExport } from './components/integrations/NotionExport'
 import { SettingsModal } from './components/settings/SettingsModal'
+import { IntegrationsPage } from './components/integrations/IntegrationsPage'
+import { TranscriptsPage } from './components/meeting/TranscriptsPage'
+import { ControlPanelPage } from './components/settings/ControlPanelPage'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { useSettingsStore } from './store/settings.store'
@@ -63,22 +66,9 @@ export function App() {
           >
             {currentPage === 'dashboard' && <DashboardPage />}
             {currentPage === 'meetings' && <MeetingPage />}
-            {currentPage === 'transcripts' && (
-              activeMeeting?.transcription ? (
-                <div style={{ padding: '32px', height: '100%' }}>
-                  <TranscriptView transcription={activeMeeting.transcription} standalone />
-                </div>
-              ) : (
-                <EmptyState message="No transcript available" subtext="Select a meeting that has been transcribed" />
-              )
-            )}
-            {currentPage === 'integrations' && (
-              <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '800px', margin: '0 auto' }}>
-                <DriveSync />
-                <NotionExport />
-              </div>
-            )}
-            {currentPage === 'settings' && <DashboardPage />}
+            {currentPage === 'transcripts' && <TranscriptsPage />}
+            {currentPage === 'integrations' && <IntegrationsPage />}
+            {currentPage === 'settings' && <ControlPanelPage />}
           </motion.div>
         </AnimatePresence>
       </AppShell>

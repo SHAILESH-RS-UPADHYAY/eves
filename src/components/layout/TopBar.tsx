@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Minus, Square, X, Shield } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
 import { useStealth } from '../../hooks/useStealth'
+import { EvesLogo } from '../brand/EvesLogo'
 
 const pageTitles: Record<string, string> = {
   dashboard: 'MAIN_INTERFACE',
@@ -41,10 +42,8 @@ export function TopBar() {
 
       {/* Left: terminal prompt + logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ fontSize: '13px', fontWeight: 800, color: '#00F5FF', textShadow: '0 0 10px rgba(0,245,255,0.4)', letterSpacing: '2px' }}>
-          ▌EVES
-        </span>
-        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>::</span>
+        <EvesLogo size={22} showWordmark />
+        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', marginLeft: '4px' }}>::</span>
         <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textShadow: '0 0 6px rgba(0,245,255,0.15)' }}>
           {pageTitles[currentPage] ?? ''}
         </span>

@@ -14,40 +14,49 @@ import { SystemStatus } from '../hacker/SystemStatus'
 import { LiveLogFeed } from '../hacker/LiveLogFeed'
 import { RadarSweep } from '../hacker/RadarSweep'
 import { HackerImage } from '../hacker/HackerImage'
+import type { CyberVariant } from '../hacker/CyberArt'
+import { PacketSniffer, PortScan, ThreatMap, CipherStream, DataTicker, AsciiBanner } from '../hacker/HackerPanels'
 
-const CHECK_COLORS = ['#00F5FF', '#10B981', '#FCD34D', '#FF006E', '#A78BFA', '#F59E0B', '#22D68C']
+const CHECK_COLORS = ['#22d3ee', '#7ee787', '#ffcb6b', '#ff5370', '#c678dd', '#f78c6c', '#61afef']
 
-const features = [
+const features: {
+  icon: typeof Brain
+  color: string
+  title: string
+  desc: string
+  variant: CyberVariant
+  topLabel: string
+}[] = [
   {
     icon: Brain,
-    color: '#00F5FF',
+    color: '#22d3ee',
     title: 'AI TRANSCRIPTION',
     desc: 'Deepgram nova-2 engine. 95%+ accuracy. Real-time streaming with speaker diarization.',
-    img: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80&auto=format',
+    variant: 'neural',
     topLabel: '> MODULE_01.DLL'
   },
   {
     icon: Shield,
-    color: '#22D68C',
+    color: '#7ee787',
     title: 'STEALTH MODE',
     desc: 'Invisible to screen share, OBS, screenshots. WDA_EXCLUDEFROMCAPTURE active. Zero footprint.',
-    img: 'https://images.unsplash.com/photo-1526374965328-7f182d8093eb?w=600&q=80&auto=format',
+    variant: 'stealth',
     topLabel: '> MODULE_02.DLL'
   },
   {
     icon: Mic2,
-    color: '#FCD34D',
+    color: '#ffcb6b',
     title: 'AUDIO CAPTURE',
     desc: 'Internal loopback (system audio) + external microphone. Runtime source toggle. 16kHz PCM.',
-    img: 'https://images.unsplash.com/photo-1451187580459-9546f01094cf?w=600&q=80&auto=format',
+    variant: 'waveform',
     topLabel: '> MODULE_03.DLL'
   },
   {
     icon: Zap,
-    color: '#FF006E',
+    color: '#f78c6c',
     title: 'AI SUMMARIZATION',
     desc: 'Groq LLaMA-3 70B inference. Summary + intent extraction + action items. One-click export.',
-    img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80&auto=format',
+    variant: 'circuit',
     topLabel: '> MODULE_04.DLL'
   },
 ]
@@ -174,10 +183,10 @@ export function DashboardPage() {
                 height: '460px',
                 background: 'rgba(0, 0, 0, 0.7)'
               }}>
-                {/* Hero background image */}
+                {/* Hero background — live network graph (self-contained, always renders) */}
                 <HackerImage
-                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80&auto=format"
-                  alt="Cyberpunk circuit board"
+                  variant="network"
+                  accent="#22d3ee"
                   height="460px"
                 />
 
@@ -428,15 +437,15 @@ export function DashboardPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0, 245, 255, 0.1)' }}
                   >
                     <HackerImage
-                      src={f.img}
-                      alt={f.title}
+                      variant={f.variant}
+                      accent={f.color}
                       label={f.title}
                       topLabel={f.topLabel}
                       height="150px"
                     />
                     <div style={{
                       padding: '12px 14px',
-                      background: 'rgba(3, 3, 6, 0.7)',
+                      background: 'linear-gradient(150deg, rgba(40,44,52,0.66), rgba(22,24,29,0.74))',
                       backdropFilter: 'blur(10px)',
                     }}>
                       <div style={{
@@ -482,7 +491,7 @@ export function DashboardPage() {
               transition={{ duration: 0.4, delay: 0.6 }}
             >
               <div style={{
-                background: 'rgba(3, 3, 6, 0.6)',
+                background: 'linear-gradient(150deg, rgba(40,44,52,0.6), rgba(26,29,35,0.72))',
                 border: '1px solid rgba(0, 245, 255, 0.1)',
                 borderRadius: '8px',
                 padding: '16px',
@@ -531,7 +540,7 @@ export function DashboardPage() {
               transition={{ duration: 0.4, delay: 0.7 }}
             >
               <div style={{
-                background: 'rgba(3, 3, 6, 0.6)',
+                background: 'linear-gradient(150deg, rgba(40,44,52,0.6), rgba(26,29,35,0.72))',
                 border: '1px solid rgba(0, 245, 255, 0.1)',
                 borderRadius: '8px',
                 padding: '16px',
@@ -596,7 +605,7 @@ export function DashboardPage() {
             transition={{ duration: 0.4, delay: 0.85 }}
           >
             <div style={{
-              background: 'rgba(3, 3, 6, 0.5)',
+              background: 'linear-gradient(150deg, rgba(40,44,52,0.52), rgba(26,29,35,0.64))',
               border: '1px solid rgba(0, 245, 255, 0.08)',
               borderRadius: '8px',
               padding: '14px 20px',
@@ -633,7 +642,7 @@ export function DashboardPage() {
             transition={{ duration: 0.4, delay: 0.9 }}
           >
             <div style={{
-              background: 'rgba(3, 3, 6, 0.5)',
+              background: 'linear-gradient(150deg, rgba(40,44,52,0.52), rgba(26,29,35,0.64))',
               border: '1px solid rgba(0, 245, 255, 0.08)',
               borderRadius: '8px',
               padding: '20px 24px',
@@ -689,6 +698,63 @@ export function DashboardPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* ═══ CYBER-OPS SECTION DIVIDER ═══ */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.95 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0 16px' }}
+          >
+            <span style={{ fontSize: '11px', fontFamily: '"Courier New", monospace', color: '#7ee787', fontWeight: 700, letterSpacing: '2px', textShadow: '0 0 10px rgba(126,231,135,0.4)', whiteSpace: 'nowrap' }}>
+              ▌ CYBER_OPS // LIVE FEED
+            </span>
+            <div className="neon-rule" style={{ flex: 1 }} />
+            <span style={{ fontSize: '9px', fontFamily: '"Courier New", monospace', color: 'rgba(171,178,191,0.4)', letterSpacing: '1px' }}>
+              realtime · 0 telemetry
+            </span>
+          </motion.div>
+
+          {/* ═══ ASCII BANNER ═══ */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 1.0 }}
+            style={{ marginBottom: '16px' }}
+          >
+            <AsciiBanner />
+          </motion.div>
+
+          {/* ═══ THREAT MAP + PACKET SNIFFER ═══ */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 1.05 }}
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '16px', marginBottom: '16px' }}
+          >
+            <ThreatMap />
+            <PacketSniffer />
+          </motion.div>
+
+          {/* ═══ PORT SCAN + CIPHER STREAM ═══ */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 1.1 }}
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}
+          >
+            <PortScan />
+            <CipherStream />
+          </motion.div>
+
+          {/* ═══ DATA TICKER ═══ */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 1.15 }}
+          >
+            <DataTicker />
+          </motion.div>
         </div>
       </motion.div>
     )
@@ -709,27 +775,27 @@ export function DashboardPage() {
           onClick={handleLaunchEves}
           style={{
             padding: '10px 20px',
-            background: 'rgba(0, 245, 255, 0.1)',
-            border: '1px solid rgba(0, 245, 255, 0.4)',
+            background: 'rgba(34, 211, 238, 0.1)',
+            border: '1px solid rgba(34, 211, 238, 0.4)',
             borderRadius: '6px',
-            color: '#00F5FF',
+            color: '#22d3ee',
             fontFamily: '"Courier New", monospace',
             fontSize: '12px',
             fontWeight: 700,
             letterSpacing: '0.5px',
             cursor: 'pointer',
-            textShadow: '0 0 8px rgba(0, 245, 255, 0.5)',
+            textShadow: '0 0 8px rgba(34, 211, 238, 0.5)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
             transition: 'all 0.3s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 245, 255, 0.2)'
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 245, 255, 0.2)'
+            e.currentTarget.style.background = 'rgba(34, 211, 238, 0.2)'
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.2)'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 245, 255, 0.1)'
+            e.currentTarget.style.background = 'rgba(34, 211, 238, 0.1)'
             e.currentTarget.style.boxShadow = 'none'
           }}
         >
