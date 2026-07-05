@@ -1,0 +1,103 @@
+<svg viewBox="0 0 920 320" xmlns="http://www.w3.org/2000/svg" font-family="'Courier New',monospace" role="img" aria-label="EVES — animated hacker terminal banner">
+  <defs>
+    <filter id="g" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/><stop offset="52%" stop-color="#7ee787"/><stop offset="100%" stop-color="#c678dd"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop offset="0%" stop-color="#171b22"/><stop offset="100%" stop-color="#0b0e13"/></radialGradient>
+    <clipPath id="win"><rect width="920" height="320" rx="14"/></clipPath>
+    <clipPath id="logclip"><rect x="266" y="70" width="628" height="176"/></clipPath>
+    <clipPath id="typeclip"><rect x="266" y="270" width="0" height="22"><animate attributeName="width" values="0;300;300;300;0" keyTimes="0;0.45;0.8;0.92;1" dur="6.5s" repeatCount="indefinite"/></rect></clipPath>
+  </defs>
+
+  <g clip-path="url(#win)">
+    <rect width="920" height="320" fill="url(#bg)"/>
+
+    <!-- matrix rain -->
+    <g fill="#39d353" font-size="13" opacity="0.16">
+      <g><text x="40" y="0">E</text><text x="40" y="18">V</text><text x="40" y="36">3</text><text x="40" y="54">5</text><text x="40" y="72">A</text><text x="40" y="90">F</text>
+        <animateTransform attributeName="transform" type="translate" from="0 -110" to="0 340" dur="4.2s" repeatCount="indefinite"/></g>
+      <g><text x="130" y="0">0</text><text x="130" y="18">1</text><text x="130" y="36">D</text><text x="130" y="54">7</text><text x="130" y="72">2</text>
+        <animateTransform attributeName="transform" type="translate" from="0 -60" to="0 380" dur="5.6s" repeatCount="indefinite"/></g>
+      <g><text x="205" y="0">&lt;</text><text x="205" y="18">/</text><text x="205" y="36">&gt;</text><text x="205" y="54">$</text><text x="205" y="72">#</text>
+        <animateTransform attributeName="transform" type="translate" from="0 -90" to="0 360" dur="3.6s" repeatCount="indefinite"/></g>
+      <g><text x="720" y="0">9</text><text x="720" y="18">C</text><text x="720" y="36">4</text><text x="720" y="54">B</text><text x="720" y="72">1</text>
+        <animateTransform attributeName="transform" type="translate" from="0 -120" to="0 340" dur="4.8s" repeatCount="indefinite"/></g>
+      <g><text x="860" y="0">F</text><text x="860" y="18">0</text><text x="860" y="36">A</text><text x="860" y="54">E</text><text x="860" y="72">6</text>
+        <animateTransform attributeName="transform" type="translate" from="0 -40" to="0 380" dur="6.2s" repeatCount="indefinite"/></g>
+    </g>
+
+    <!-- title bar -->
+    <rect width="920" height="30" fill="#0d1117" opacity="0.9"/>
+    <circle cx="20" cy="15" r="4.5" fill="#ff5370"/><circle cx="36" cy="15" r="4.5" fill="#ffcb6b"/><circle cx="52" cy="15" r="4.5" fill="#7ee787"/>
+    <text x="72" y="19" font-size="11" fill="#8b949e" letter-spacing="1">evessys@localhost: ~/eves — zsh — 120×32</text>
+    <g><circle cx="838" cy="15" r="3.5" fill="#7ee787"><animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite"/></circle><text x="850" y="19" font-size="10" fill="#7ee787" letter-spacing="1">ONLINE</text></g>
+
+    <!-- ===== EVES hex-eye logo ===== -->
+    <g transform="translate(48,96) scale(2.2)">
+      <polygon points="24,3 41.18,13.5 41.18,34.5 24,45 6.82,34.5 6.82,13.5" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linejoin="round" filter="url(#g)"/>
+      <g style="transform-origin:24px 24px"><animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="14s" repeatCount="indefinite"/>
+        <circle cx="24" cy="24" r="14.5" fill="none" stroke="#22d3ee" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.4"/></g>
+      <path d="M12,24 Q24,14.5 36,24 Q24,33.5 12,24 Z" fill="none" stroke="url(#lg)" stroke-width="1.7" stroke-linejoin="round" filter="url(#g)"/>
+      <circle cx="24" cy="24" r="4" fill="#7ee787" filter="url(#g)"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/></circle>
+      <circle r="1.7" fill="#22d3ee" filter="url(#g)"><animateMotion dur="6s" repeatCount="indefinite" path="M24,3 41.18,13.5 41.18,34.5 24,45 6.82,34.5 6.82,13.5 Z"/></circle>
+    </g>
+    <text x="102" y="245" font-size="26" font-weight="800" letter-spacing="6" fill="url(#lg)" text-anchor="middle">EVES</text>
+    <text x="102" y="262" font-size="8.5" letter-spacing="3" fill="#8b949e" text-anchor="middle">MEETING·INTEL</text>
+
+    <!-- ===== scrolling console ===== -->
+    <text x="266" y="52" font-size="10" fill="#39d353" letter-spacing="1">▌ tail -f /var/log/eves.log</text>
+    <g clip-path="url(#logclip)" font-size="11.5">
+      <g>
+        <animateTransform attributeName="transform" type="translate" from="0 0" to="0 -204" dur="9s" repeatCount="indefinite"/>
+        <g fill="#6e7681">
+          <text x="266" y="84"><tspan fill="#8b949e">17:08:07</tspan> <tspan fill="#7ee787">[ OK ]</tspan> neural core initialized</text>
+          <text x="266" y="101"><tspan fill="#8b949e">17:08:08</tspan> <tspan fill="#22d3ee">[INFO]</tspan> deepgram nova-2 websocket ready</text>
+          <text x="266" y="118"><tspan fill="#8b949e">17:08:09</tspan> <tspan fill="#6e7681">[ DBG]</tspan> pcm chunk 4096 samples @ 16kHz</text>
+          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> stealth active · WDA_EXCLUDEFROMCAPTURE</text>
+          <text x="266" y="152"><tspan fill="#8b949e">17:08:12</tspan> <tspan fill="#22d3ee">[INFO]</tspan> hotkey Ctrl+Shift+L registered</text>
+          <text x="266" y="169"><tspan fill="#8b949e">17:08:14</tspan> <tspan fill="#6e7681">[ DBG]</tspan> interim: "let's circle back on the…"</text>
+          <text x="266" y="186"><tspan fill="#8b949e">17:08:15</tspan> <tspan fill="#ffcb6b">[WARN]</tspan> latency spike 78ms</text>
+          <text x="266" y="203"><tspan fill="#8b949e">17:08:17</tspan> <tspan fill="#22d3ee">[INFO]</tspan> groq inference queued · llama-3.1-70b</text>
+          <text x="266" y="220"><tspan fill="#8b949e">17:08:19</tspan> <tspan fill="#7ee787">[ OK ]</tspan> summary + intent + actions extracted</text>
+          <text x="266" y="237"><tspan fill="#8b949e">17:08:21</tspan> <tspan fill="#6e7681">[ DBG]</tspan> ipc overlay → dashboard</text>
+          <text x="266" y="254"><tspan fill="#8b949e">17:08:22</tspan> <tspan fill="#7ee787">[ OK ]</tspan> session auto-saved · 0 telemetry</text>
+          <text x="266" y="271"><tspan fill="#8b949e">17:08:24</tspan> <tspan fill="#c678dd">[INTL]</tspan> 3 action items · 2 hidden agendas</text>
+        </g>
+        <g fill="#6e7681" transform="translate(0,204)">
+          <text x="266" y="84"><tspan fill="#8b949e">17:08:07</tspan> <tspan fill="#7ee787">[ OK ]</tspan> neural core initialized</text>
+          <text x="266" y="101"><tspan fill="#8b949e">17:08:08</tspan> <tspan fill="#22d3ee">[INFO]</tspan> deepgram nova-2 websocket ready</text>
+          <text x="266" y="118"><tspan fill="#8b949e">17:08:09</tspan> <tspan fill="#6e7681">[ DBG]</tspan> pcm chunk 4096 samples @ 16kHz</text>
+          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> stealth active · WDA_EXCLUDEFROMCAPTURE</text>
+          <text x="266" y="152"><tspan fill="#8b949e">17:08:12</tspan> <tspan fill="#22d3ee">[INFO]</tspan> hotkey Ctrl+Shift+L registered</text>
+          <text x="266" y="169"><tspan fill="#8b949e">17:08:14</tspan> <tspan fill="#6e7681">[ DBG]</tspan> interim: "let's circle back on the…"</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- prompt + typewriter -->
+    <text x="266" y="286" font-size="12"><tspan fill="#7ee787">evessys@localhost</tspan><tspan fill="#8b949e">:</tspan><tspan fill="#22d3ee">~/eves</tspan><tspan fill="#8b949e">$</tspan></text>
+    <text x="266" y="286" font-size="12" fill="#e6edf3" clip-path="url(#typeclip)"><tspan dx="86">./eves --stream --stealth --analyze</tspan></text>
+    <rect x="368" y="276" width="7" height="13" fill="#22d3ee"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1s" repeatCount="indefinite"/></rect>
+
+    <!-- waveform strip under logo -->
+    <g fill="#7ee787">
+      <rect x="44"  y="285" width="4" height="14" rx="1"><animate attributeName="height" values="4;16;4" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y" values="292;283;292" dur="0.8s" repeatCount="indefinite"/></rect>
+      <rect x="52"  y="285" width="4" height="14" rx="1" fill="#22d3ee"><animate attributeName="height" values="6;20;6" dur="1.1s" repeatCount="indefinite"/><animate attributeName="y" values="291;280;291" dur="1.1s" repeatCount="indefinite"/></rect>
+      <rect x="60"  y="285" width="4" height="14" rx="1"><animate attributeName="height" values="10;22;10" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y" values="289;278;289" dur="0.9s" repeatCount="indefinite"/></rect>
+      <rect x="68"  y="285" width="4" height="14" rx="1" fill="#c678dd"><animate attributeName="height" values="4;18;4" dur="1.3s" repeatCount="indefinite"/><animate attributeName="y" values="292;281;292" dur="1.3s" repeatCount="indefinite"/></rect>
+      <rect x="76"  y="285" width="4" height="14" rx="1" fill="#22d3ee"><animate attributeName="height" values="8;24;8" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y" values="290;277;290" dur="0.7s" repeatCount="indefinite"/></rect>
+      <rect x="84"  y="285" width="4" height="14" rx="1"><animate attributeName="height" values="12;20;12" dur="1.0s" repeatCount="indefinite"/><animate attributeName="y" values="288;280;288" dur="1.0s" repeatCount="indefinite"/></rect>
+      <rect x="92"  y="285" width="4" height="14" rx="1" fill="#ffcb6b"><animate attributeName="height" values="6;22;6" dur="1.2s" repeatCount="indefinite"/><animate attributeName="y" values="291;279;291" dur="1.2s" repeatCount="indefinite"/></rect>
+      <rect x="100" y="285" width="4" height="14" rx="1"><animate attributeName="height" values="10;18;10" dur="0.85s" repeatCount="indefinite"/><animate attributeName="y" values="289;281;289" dur="0.85s" repeatCount="indefinite"/></rect>
+      <rect x="108" y="285" width="4" height="14" rx="1" fill="#22d3ee"><animate attributeName="height" values="4;20;4" dur="1.15s" repeatCount="indefinite"/><animate attributeName="y" values="292;280;292" dur="1.15s" repeatCount="indefinite"/></rect>
+      <rect x="116" y="285" width="4" height="14" rx="1"><animate attributeName="height" values="8;16;8" dur="0.95s" repeatCount="indefinite"/><animate attributeName="y" values="290;282;290" dur="0.95s" repeatCount="indefinite"/></rect>
+      <rect x="124" y="285" width="4" height="14" rx="1" fill="#7ee787"><animate attributeName="height" values="12;24;12" dur="1.05s" repeatCount="indefinite"/><animate attributeName="y" values="288;277;288" dur="1.05s" repeatCount="indefinite"/></rect>
+      <rect x="132" y="285" width="4" height="14" rx="1"><animate attributeName="height" values="6;18;6" dur="0.75s" repeatCount="indefinite"/><animate attributeName="y" values="291;281;291" dur="0.75s" repeatCount="indefinite"/></rect>
+    </g>
+
+    <!-- scanline -->
+    <rect x="0" y="0" width="920" height="2" fill="#39d353" opacity="0.35"><animate attributeName="y" values="30;318;30" dur="5.5s" repeatCount="indefinite"/></rect>
+    <rect width="920" height="320" rx="14" fill="none" stroke="#22d3ee" stroke-opacity="0.28"/>
+  </g>
+</svg>

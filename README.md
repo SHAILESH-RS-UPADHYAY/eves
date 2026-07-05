@@ -1,101 +1,108 @@
-```
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║   EVES // MEETING INTELLIGENCE SYSTEM  ·  dark-web hacker edition       ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
 
+<div align="center">
 
-                                   ███████╗██╗   ██╗███████╗███████╗
-                                   ██╔════╝██║   ██║██╔════╝██╔════╝
-                                   █████╗  ██║   ██║█████╗  ███████╗
-                                   ██╔══╝  ╚██╗ ██╔╝██╔══╝  ╚════██║
-                                   ███████╗ ╚████╔╝ ███████╗███████║
-                                   ╚══════╝  ╚═══╝  ╚══════╝╚══════╝
+<img src="docs/eves-hero.svg" alt="EVES — live hacker terminal" width="100%" />
 
-                                   ███╗   ███╗███████╗███████╗████████╗
-                                   ████╗ ████║██╔════╝██╔════╝╚══██╔══╝
-                                   ██╔████╔██║█████╗  █████╗     ██║
-                                   ██║╚██╔╝██║██╔══╝  ██╔══╝     ██║
-                                   ██║ ╚═╝ ██║███████╗███████╗   ██║
-                                   ╚═╝     ╚═╝╚══════╝╚══════╝   ╚═╝
+<br/><br/>
 
-
-                                   ██╗███╗   ██╗████████╗███████╗██╗
-                                   ██║████╗  ██║╚══██╔══╝██╔════╝██║
-                                   ██║██╔██╗ ██║   ██║   █████╗  ██║
-                                   ██║██║╚██╗██║   ██║   ██╔══╝  ██║
-                                   ██║██║ ╚████║   ██║   ███████╗███████╗
-                                   ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚══════╝
-
-                              ███╗   ███╗███████╗ ██████╗ ██████╗ ██████╗
-                              ████╗ ████║██╔════╝██╔════╝██╔═══██╗██╔══██╗
-                              ██╔████╔██║█████╗  ██║     ██║   ██║██████╔╝
-                              ██║╚██╔╝██║██╔══╝  ██║     ██║   ██║██╔══██╗
-                              ██║ ╚═╝ ██║███████╗╚██████╗╚██████╔╝██║  ██║
-                              ╚═╝     ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝
-
-
-         ╔══════════════════════════════════════════════════════════════════════════╗
-         ║            MEETING INTELLIGENCE SYSTEM  ◆  v2.1.0                      ║
-         ║            [ STEALTH ]  [ AI-POWERED ]  [ REAL-TIME ]  [ LOCAL ]       ║
-         ╚══════════════════════════════════════════════════════════════════════════╝
-
-
-       ┌─────────────────────────────────────────────────────────────────────────────┐
-       │                                                                             │
-       │   $ whoami                                                                  │
-       │   > EVES — The only meeting intelligence system that sees everything         │
-       │     and is invisible while doing it.                                        │
-       │                                                                             │
-       │   $ ./eves --what                                                            │
-       │   > Real-time meeting transcription + AI summarization                      │
-       │   > Runs entirely on YOUR machine — zero cloud dependency                   │
-       │   > Invisible on screen share (SetWindowDisplayAffinity)                    │
-       │   > Captures internal loopback (system audio) AND external mic              │
-       │   > Hollywood hacker HUD interface with Matrix rain + scanlines             │
-       │   > Deepgram nova-2 → Groq LLaMA-3 70B pipeline                            │
-       │                                                                             │
-       └─────────────────────────────────────────────────────────────────────────────┘
-
-
-```
+<img src="https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=700&size=24&duration=2600&pause=800&color=22D3EE&center=true&vCenter=true&width=820&height=46&lines=YOUR+MEETINGS.+HACKED.;Real-time+transcription+%2B+AI+intelligence;Invisible+on+screen+share.+100%25+local.;Deepgram+nova-2+%E2%86%92+Groq+LLaMA-3+70B" alt="typing" />
 
 <br/>
 
----
+![status](https://img.shields.io/badge/status-OPERATIONAL-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
+![electron](https://img.shields.io/badge/Electron-32-0d1117?style=flat-square&logo=electron&logoColor=61afef&labelColor=0d1117)
+![react](https://img.shields.io/badge/React-18-0d1117?style=flat-square&logo=react&logoColor=22d3ee&labelColor=0d1117)
+![typescript](https://img.shields.io/badge/TypeScript-5.5-0d1117?style=flat-square&logo=typescript&logoColor=61afef&labelColor=0d1117)
+![deepgram](https://img.shields.io/badge/Deepgram-nova--2-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
+![groq](https://img.shields.io/badge/Groq-LLaMA--3.1--70B-0d1117?style=flat-square&labelColor=0d1117&color=c678dd)
+![stealth](https://img.shields.io/badge/stealth-INVISIBLE-0d1117?style=flat-square&labelColor=0d1117&color=ff5370)
+![license](https://img.shields.io/badge/license-MIT-0d1117?style=flat-square&labelColor=0d1117&color=ffcb6b)
 
-## ▌ DEPLOYMENT VECTORS
-
-```
-┌──────────────────────────────────────────────────────────────────────────────────────────┐
-│  ./launch/                                                                                │
-│   ├── start.vbs           ◆ VBScript launcher — zero visible terminal                     │
-│   ├── start.hta           ◆ Animated HTA launcher — scanlines + grid + glow               │
-│   ├── start.bat           ◆ Terminal launch — shows EVES ASCII header                     │
-│   ├── stop.bat            ◆ Kill all EVES processes                                       │
-│   └── "Launch EVES.bat"   ◆ One-click batch — npx electron-vite dev                       │
-│                                                                                           │
-│  $ npm install            ◆ Install 20+ dependencies (Electron 32, React 18,              │
-│                             Deepgram SDK, Groq SDK, Zustand, Framer Motion, Recharts)     │
-│  $ npm run dev            ◆ Launch both windows: Dashboard (center) + Overlay (top-right) │
-│  $ npm run build          ◆ Production build → out/ directory                              │
-│  $ npm run package        ◆ Package with electron-builder → standalone installer          │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### API KEY ACQUISITION
+</div>
 
 ```bash
-$ cat ~/eves/api_keys.cfg
+$ whoami
+> EVES — the only meeting intelligence system that sees everything,
+  and stays invisible while doing it.
 
-  ┌────────────────────────────────────────────────────────────────┐
-  │  SERVICE         │  PURPOSE                │  ACQUIRE AT        │
-  ├──────────────────┼─────────────────────────┼────────────────────┤
-  │  Deepgram        │  Real-time transcription│  console.deepgram  │
-  │                  │  (nova-2, 95%+ acc.)    │  .com              │
-  ├──────────────────┼─────────────────────────┼────────────────────┤
-  │  Groq            │  AI summarization       │  console.groq      │
-  │                  │  (LLaMA-3.1 70B)        │  .com              │
-  └──────────────────┴─────────────────────────┴────────────────────┘
+$ ./eves --what
+> Real-time transcription + AI summarization, entirely on YOUR machine
+> Invisible on screen share  (SetWindowDisplayAffinity / content protection)
+> Captures internal loopback (system audio) AND external mic
+> Atom One Dark hacker HUD — matrix rain, scanlines, glassmorphism
+> Deepgram nova-2  →  Groq LLaMA-3.1 70B  →  local history
+> Zero cloud storage. Zero telemetry. They'll never know.
+```
 
-  > Enter both keys in Settings → api_keys → ./save_keys
-  > Keys persist locally via Conf store. Never transmitted except to respective APIs.
+---
+
+## ▌ NAVIGATION
+
+<details open>
+<summary><b><code>$ ls -la ./docs</code></b></summary>
+
+- [`▸ LIVE ARCHITECTURE`](#-live-architecture) — the whole system, wired & flowing
+- [`▸ REAL-TIME PIPELINE`](#-real-time-pipeline) — the capture → intel sequence
+- [`▸ CORE CAPABILITIES`](#-core-capabilities) — the five modules
+- [`▸ INTERFACE`](#-interface--atom-one-dark-hud) — the hacker UI
+- [`▸ KEY BINDINGS`](#-key-bindings) — every hotkey
+- [`▸ DEPLOYMENT`](#-deployment-vectors) — install & launch
+- [`▸ PROJECT STRUCTURE`](#-project-structure) — the tree
+- [`▸ TECH SPECS`](#-technical-specifications) — the stack
+
+</details>
+
+---
+
+## ▌ LIVE ARCHITECTURE
+
+> Every process wired together — watch the packets flow through the pipeline.
+
+<div align="center">
+<img src="docs/eves-architecture.svg" alt="EVES live architecture — animated data flow" width="100%" />
+</div>
+
+```
+LAUNCH ─▶ ELECTRON ─▶ AUDIO ─▶ DEEPGRAM ─▶ GROQ ─▶ DASHBOARD
+   │         │  ╲                              │        ├─▶ Notion
+ vbs/hta   overlay ╲──── stealth layer ────────┘        ├─▶ Drive
+ /bat        hud     (invisible to screen share)        └─▶ History
+```
+
+---
+
+## ▌ REAL-TIME PIPELINE
+
+> What happens between `Ctrl+Shift+L` and a saved, analyzed session.
+
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'monospace','primaryColor':'#161b22','primaryTextColor':'#c9d1d9','actorBkg':'#0d1117','actorBorder':'#22d3ee','actorTextColor':'#22d3ee','signalColor':'#39d353','signalTextColor':'#c9d1d9','noteBkgColor':'#161b22','noteBorderColor':'#c678dd','noteTextColor':'#ffcb6b','labelBoxBkgColor':'#0d1117','labelBoxBorderColor':'#22d3ee'}}}%%
+sequenceDiagram
+    autonumber
+    participant U as USER
+    participant OL as OVERLAY
+    participant AU as AUDIO
+    participant DG as DEEPGRAM
+    participant GQ as GROQ
+    participant DB as DASHBOARD
+    U->>OL: Ctrl+Shift+L
+    OL->>AU: start capture
+    AU->>AU: select source (INT / EXT)
+    loop live stream
+        AU->>DG: PCM chunk · 16kHz
+        DG-->>OL: interim + final transcript
+    end
+    Note over OL: multi-color live feed, real-time
+    U->>OL: Ctrl+Space
+    OL->>GQ: full transcript
+    GQ-->>OL: summary · intent · actions
+    OL->>DB: save session (IPC)
+    Note over DB: stored in local history
+    U->>DB: open dashboard
+    DB-->>U: transcripts · analytics · export
 ```
 
 ---
@@ -109,7 +116,6 @@ $ cat ~/eves/api_keys.cfg
 │  ■ 16kHz PCM audio — internal loopback + external mic                                │
 │  ■ Speaker diarization — knows who said what                                         │
 │  ■ Smart formatting — punctuation, paragraphs, numbers                               │
-│  ■ Multi-color terminal output ⚡ green ⚡ red ⚡ cyan ⚡ yellow                       │
 │                                                                                       │
 │  MODULE_02.DLL  ◆  STEALTH MODE                                                      │
 │  ■ setContentProtection() — WDA_EXCLUDEFROMCAPTURE active                            │
@@ -118,325 +124,202 @@ $ cat ~/eves/api_keys.cfg
 │  ■ setIgnoreMouseEvents() — click-through mode                                       │
 │                                                                                       │
 │  MODULE_03.DLL  ◆  AUDIO CAPTURE                                                      │
-│  ■ Internal: getDisplayMedia({ audio: 'loopback' }) — captures system audio          │
+│  ■ Internal: getDisplayMedia({ audio:'loopback' }) — system audio                    │
 │  ■ External: getUserMedia() — microphone input                                       │
 │  ■ Runtime source toggle — Ctrl+Shift+O                                              │
-│  ■ 16kHz PCM→Deepgram WebSocket pipeline                                            │
 │                                                                                       │
 │  MODULE_04.DLL  ◆  AI SUMMARIZATION                                                  │
 │  ■ Groq LLaMA-3.1 70B — inference engine                                             │
-│  ■ Summary extraction — what was decided, what was avoided                           │
+│  ■ Summary — what was decided, what was avoided                                      │
 │  ■ Intent detection — hidden agendas, unspoken concerns                              │
 │  ■ Action items — who needs to do what by when                                       │
 │                                                                                       │
 │  MODULE_05.DLL  ◆  SESSION HISTORY                                                   │
 │  ■ Full transcripts saved to dashboard via IPC                                       │
 │  ■ AI summaries + intent + action items per session                                  │
-│  ■ Overlay history panel — slides out from right                                     │
 │  ■ Ctrl+Space to save — auto-syncs to dashboard                                      │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ▌ SYSTEM ARCHITECTURE
+## ▌ INTERFACE — ATOM ONE DARK HUD
+
+> A top-0.1% hacker interface: charcoal glass, neon syntax colors, everything alive.
+
+| Layer | What you get |
+|:--|:--|
+| **Theme** | Atom One Dark charcoal ramp (`#16181d → #282c34`) + neon syntax palette |
+| **Logo** | Original hex-eye sigil — negative space reads as eye **and** "E", audio-equalizer pupil, sweeping scan line, orbiting node |
+| **Backgrounds** | `CyberArt` procedural SVG — `neural · stealth · waveform · network · circuit · hexcore`. 100% self-contained, always renders (no external images) |
+| **Panels** | Glassmorphism + hover-lift glow + **click-to-expand** full-screen modals |
+| **System recon** | **Real** hardware telemetry — CPU threads, GPU, device memory, battery, network, JS heap, storage, timezone |
+| **Live ops** | Threat map · packet sniffer · nmap port scan · AES cipher stream · data ticker |
+| **FX** | Matrix rain, CRT scanlines, boot sequence, glitch text, radar sweep, live log feed |
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                       │
-│  ┌──────────────┐    ┌──────────────────┐    ┌──────────────────────────────────┐    │
-│  │  LAUNCHER     │    │  ELECTRON        │    │  AUDIO PIPELINE                   │    │
-│  │               │    │                  │    │                                    │    │
-│  │  start.vbs ───┼───>│  Main Process    │    │  ┌──────────┐   ┌─────────────┐   │    │
-│  │  start.hta    │    │  ┌────────────┐  │    │  │ Internal  │   │  Deepgram   │   │    │
-│  │  Launch.bat ──┼───>│  │ Dashboard  │  │    │  │ Loopback──┼──>│  WebSocket  │   │    │
-│  │               │    │  │ (React App)│  │    │  │ 16kHz PCM │   │  nova-2     │   │    │
-│  │               │    │  ├────────────┤  │    │  ├──────────┤   └──────┬──────┘   │    │
-│  │               │    │  │  Preload   │  │    │  │ External  │          │          │    │
-│  │               │    │  │ (IPC Bridge│  │    │  │ Mic ──────┼──────────┘          │    │
-│  │               │    │  └─────┬──────┘  │    │  └──────────┘                     │    │
-│  │               │    │        │         │    └──────────────────┬───────────────────┘    │
-│  │               │    │  ┌─────┴──────┐  │                       │                        │
-│  │               │    │  │  Overlay   │  │              ┌────────┴────────┐               │
-│  │               │    │  │ (HTML+HUD) │<─┼──────────────┤  Live Transcript│               │
-│  │               │    │  └────────────┘  │              │  (Multi-Color)  │               │
-│  │               │    └──────────────────┘              └─────────────────┘               │
-│  └──────────────┘                                                                         │
-│                                                                                           │
-│  ┌──────────────────┐    ┌─────────────────────┐    ┌────────────────────────────────┐   │
-│  │  AI PROCESSING    │    │  STEALTH LAYER      │    │  DATA PERSISTENCE               │   │
-│  │                   │    │                     │    │                                  │   │
-│  │  Groq             │    │  setContentProtect  │    │  Conf store (local JSON)         │   │
-│  │  LLaMA-3.1 70B   │    │  skipTaskbar        │    │  Session transcripts             │   │
-│  │  ┌─────────────┐  │    │  setIgnoreMouse    │    │  AI summaries                   │   │
-│  │  │ Summary     │  │    │  WS_EX_TOOLWINDOW  │    │  API keys (encrypted)            │   │
-│  │  │ Intent      │  │    │  Alt+Tab invisible │    │  Window bounds                  │   │
-│  │  │ Actions     │  │    │                     │    │                                  │   │
-│  │  └─────────────┘  │    └─────────────────────┘    └────────────────────────────────┘   │
-│  └──────────────────┘                                                                     │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### AUDIO PIPELINE SEQUENCE
-
-```
- TIME  │  USER ACTION                │  OVERLAY              │  DEEPGRAM              │  GROQ
-───────┼─────────────────────────────┼───────────────────────┼────────────────────────┼───────────────
-  0    │  Ctrl+Shift+L               │  CONNECTING...         │                        │
-  1    │  (select audio source)      │  ▶ EXECUTE_LISTEN      │  WebSocket handshake   │
-  2    │                             │  LISTENING [00:00]     │  ← Metadata            │
-  3    │  (someone speaks)           │  ┌─ LIVE_FEED ──────┐  │  ← interim results     │
-  4    │                             │  │ hello world ...  │  │                        │
-  5    │  (continued speech)         │  │ this is a test   │  │  ← final results       │
-  6    │                             │  └──────────────────┘  │                        │
-  ...  │  Ctrl+Space                 │  [OK] saving...        │                        │  ← transcript
-  ...  │                             │                        │                        │  → summary
-  ...  │                             │  Session saved to DB   │                        │  → actions
+  COLOR CHANNELS  ░▒▓█  cyan #22d3ee   green #7ee787   red #ff5370
+                        yellow #ffcb6b  orange #f78c6c  blue #61afef  purple #c678dd
 ```
 
 ---
 
 ## ▌ KEY BINDINGS
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                           │
-│  Ctrl + Shift + L    ║  Start / Stop listening     ║  Toggles the audio capture pipeline  │
-│  Ctrl + Shift + A    ║  Hide / Show overlay        ║  Keeps listening while hidden        │
-│  Ctrl + Shift + O    ║  Toggle audio source        ║  Internal ↔ External mic             │
-│  Ctrl + Shift + T    ║  Toggle click-through       ║  Mouse passes through overlay        │
-│  Ctrl + Shift + D    ║  Show / Hide dashboard      ║  Focus the main EVES dashboard       │
-│  Ctrl + Shift + S    ║  Toggle stealth mode        ║  Invisible to screen share           │
-│  Ctrl + Space        ║  Save session to history    ║  Transcript + summary saved          │
-│  Ctrl + Shift + X    ║  Quit EVES                  ║  Kills all processes                 │
-│                                                                                           │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-```
+| Keybind | Action | Effect |
+|:--|:--|:--|
+| `Ctrl + Shift + L` | Start / Stop listening | Toggles the audio capture pipeline |
+| `Ctrl + Shift + A` | Hide / Show overlay | Keeps listening while hidden |
+| `Ctrl + Shift + O` | Toggle audio source | Internal ↔ External mic |
+| `Ctrl + Shift + T` | Toggle click-through | Mouse passes through the overlay |
+| `Ctrl + Shift + D` | Show / Hide dashboard | Focus the main EVES dashboard |
+| `Ctrl + Shift + S` | Toggle stealth mode | Invisible to screen share |
+| `Ctrl + Space` | Save session to history | Transcript + summary saved |
+| `Ctrl + Shift + X` | Quit EVES | Kills all processes |
 
 ---
 
-## ▌ OVERLAY HUD REFERENCE
+## ▌ DEPLOYMENT VECTORS
 
+```bash
+# ── 1. clone ──────────────────────────────────────────────
+git clone https://github.com/SHAILESH-RS-UPADHYAY/eves.git && cd eves
+
+# ── 2. install (Electron 32, React 18, Deepgram, Groq, Zustand…) ──
+npm install
+
+# ── 3. configure keys ─────────────────────────────────────
+#     Settings → api_keys → paste Deepgram + Groq → ./save_keys
+#     Keys persist locally via Conf. Never sent anywhere but the APIs.
+
+# ── 4. launch (Dashboard + Overlay) ───────────────────────
+npm run dev
+
+# ── 5. package → standalone installer ─────────────────────
+npm run build      # → out/
+npm run package    # → electron-builder installer
 ```
-┌──────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                           │
-│  0x45564553 0x4D495320 0x56322E31                                                         │
-│                                                                                           │
-│  ┌────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │  ● EVES  v2.1.0                                        [● STEALTH]                │  │
-│  │                                                                                     │  │
-│  │  ┌──────┐                                                                           │  │
-│  │  │  ●   │  STANDBY / LISTENING / CONNECTING... / ERROR                              │  │
-│  │  └──────┘  00:00                                                                    │  │
-│  │                                                                                     │  │
-│  │  ▸ AUDIO_SOURCE                                                                     │  │
-│  │  ┌─────────┐  ┌─────────┐                                                          │  │
-│  │  │ [INT]   │  │  EXT    │                                                          │  │
-│  │  └─────────┘  └─────────┘                                                          │  │
-│  │                                                                                     │  │
-│  │  ┌──────────────────────────────────────────────────────────────────────────────┐   │  │
-│  │  │ ▸ LIVE_FEED [COLOR]                                                         │   │  │
-│  │  │ <span class="color-cyan">hello</span> <span class="color-green">world</span>│   │  │
-│  │  │ <span class="color-white">this</span> <span class="color-red">is</span>    │   │  │
-│  │  │ a test transcript in multi-color ▊                                       │   │  │
-│  │  └──────────────────────────────────────────────────────────────────────────────┘   │  │
-│  │                                                                                     │  │
-│  │  [▶ EXECUTE_LISTEN]                                        [☰] ← CTRL+SPACE SAVE  │  │
-│  │  ┌──────────┐                                                                            │  │
-│  │  │ L listen │ A hide │ ␣ save │                                                          │  │
-│  │  └──────────┘                                                                            │  │
-│  │                                                                                     │  │
-│  │  SECURE_CHANNEL // ENC: AES-256 // PID: 0x1A4F                                      │  │
-│  └────────────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                           │
-│  ┌────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │  ▸ SESSION_LOG                                                         [✕]         │  │
-│  │  $ Session at 14:32                                 ────  INT  3:45                 │  │
-│  │  $ Standup notes                                      ────  EXT  12:10              │  │
-│  │  $ Client call                                        ────  INT  24:30              │  │
-│  └────────────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                           │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-```
+
+**Launch vectors** (Windows): `start.vbs` (zero visible terminal) · `start.hta` (animated) · `start.bat` (ASCII header) · `Launch EVES.bat` (one-click) · `stop.bat` (kill all).
 
 ---
 
-## ├── PROJECT STRUCTURE
+## ▌ PROJECT STRUCTURE
 
 ```
 evessys@machine:~$ tree eves/ --depth 2
 
 eves/
-├── electron/                          # Electron main process
-│   ├── main.ts                        # Window creation, hotkeys, IPC, tray
-│   ├── preload.ts                     # contextBridge API (eves.* methods)
-│   └── ipc/                           # IPC handlers per service
-│       ├── deepgram.handler.ts
-│       ├── groq.handler.ts
-│       ├── drive.handler.ts
-│       ├── notion.handler.ts
-│       └── settings.handler.ts
+├── electron/                     # Main process
+│   ├── main.ts                   # windows, hotkeys, IPC, tray, stealth
+│   ├── preload.ts                # contextBridge → window.eves.*
+│   └── ipc/                      # deepgram · groq · drive · notion · settings
 │
-├── overlay/                           # Overlay HUD (plain HTML/CSS/JS)
-│   ├── index.html                     # HUD layout with hex decorations
-│   ├── app.js                         # Audio capture + Deepgram WebSocket
-│   └── styles.css                     # Glassmorphism + scanlines + glitch
+├── overlay/                      # Overlay HUD (plain HTML/CSS/JS)
+│   ├── index.html · app.js · styles.css
 │
-├── src/                               # Dashboard React application
-│   ├── main.tsx                       # React entry point
-│   ├── App.tsx                        # App shell + routing
-│   ├── components/                    # UI components
-│   │   ├── hacker/                    # 8 hacker-themed components
-│   │   ├── dashboard/                 # Dashboard pages
-│   │   ├── layout/                    # Sidebar + TopBar
-│   │   ├── settings/                  # Settings modal
-│   │   ├── glass/                     # Glass UI primitives
-│   │   └── meetings/                  # Meeting views
-│   ├── store/                         # Zustand state stores
-│   ├── styles/                        # Global CSS + hacker animations
-│   ├── types/                         # TypeScript interfaces
-│   └── index.html                     # Vite entry page
+├── src/                          # Dashboard (React + TS)
+│   ├── App.tsx  main.tsx
+│   ├── components/
+│   │   ├── brand/                # ◆ EvesLogo.tsx  (the hex-eye sigil)
+│   │   ├── hacker/               # CyberArt · CyberKit · HackerPanels
+│   │   │                         #   MatrixRain · Scanlines · BootSequence
+│   │   │                         #   GlitchText · RadarSweep · SystemStatus
+│   │   ├── dashboard/            # DashboardPage + feeds
+│   │   ├── integrations/         # IntegrationsPage (uplink matrix)
+│   │   ├── meeting/              # TranscriptsPage (signal intercept)
+│   │   ├── settings/             # ControlPanelPage (system recon)
+│   │   ├── layout/               # Sidebar · TopBar · AppShell
+│   │   └── glass/                # glass UI primitives
+│   ├── store/                    # Zustand stores
+│   ├── styles/                   # globals.css (Atom One Dark) + animations
+│   └── types/                    # TS interfaces
 │
-├── launcher/                          # Launch scripts
-│   ├── start.hta                      # Animated HTA launcher
-│   ├── start.vbs                      # Stealth VBS launcher
-│   ├── start.bat                      # Terminal launcher
-│   ├── stop.bat                       # Kill EVES
-│   └── Launch EVES.bat                # One-click batch launch
-│
-├── config/                            # Build configuration
-│   ├── electron-builder.yml
-│   ├── electron.vite.config.ts
-│   ├── tsconfig.json
-│   └── tailwind.config.ts
-│
-├── package.json
-├── .gitignore
-└── README.md
+├── docs/                         # ◆ animated SVGs (hero + architecture)
+├── launcher/                     # start.vbs · start.hta · *.bat
+├── package.json · README.md
 ```
 
 ---
 
-## ─── HACKER COMPONENT LIBRARY
+## ▌ HACKER COMPONENT LIBRARY
 
 ```
+src/components/brand/
+  EvesLogo.tsx       ◆ Original hex-eye sigil — gradient stroke, equalizer
+                     ◆ pupil, sweeping scan line, orbiting node, HUD ticks
+
 src/components/hacker/
+  CyberArt.tsx       ◆ Procedural animated SVG backdrops (6 variants)
+                     ◆ neural · stealth · waveform · network · circuit · hexcore
+                     ◆ zero external assets — always renders offline
 
-  MatrixRain.tsx       ◆ Canvas-based falling katakana + hex characters
-                       ◆ Variable speed, cyan glow trails
-                       ◆ Full-screen or container-cropped
+  CyberKit.tsx       ◆ ExpandableCard (hover-lift + click-to-enlarge modal)
+                     ◆ SystemRecon — REAL laptop telemetry (CPU/GPU/mem/net…)
+                     ◆ ConnectionMatrix · ConfigConsole · DecryptStandby
 
-  Scanlines.tsx        ◆ CRT monitor effect
-                       ◆ Horizontal lines + moving scan beam + vignette
+  HackerPanels.tsx   ◆ PacketSniffer · PortScan · ThreatMap
+                     ◆ CipherStream (AES) · DataTicker · AsciiBanner
 
-  BootSequence.tsx     ◆ Full-screen terminal boot animation
-                       ◆ 28 lines: "Initializing neural core... [OK]"
-                       ◆ Fades to reveal dashboard after completion
-
-  GlitchText.tsx       ◆ RGB split animation
-                       ◆ glitchShift1 + glitchShift2 keyframes
-                       ◆ Random offset on cycle
-
-  SystemStatus.tsx     ◆ Animated CPU/Memory/Network/Latency bars
-                       ◆ Sparkline graphs + audio equalizer
-
-  LiveLogFeed.tsx      ◆ Scrolling terminal log entries
-                       ◆ Timestamps + [INFO]/[WARN]/[DEBUG] levels
-                       ◆ Blinking cursor prompt
-
-  RadarSweep.tsx       ◆ Radar SVG animation
-                       ◆ Rotating sweep line + random blips
-                       ◆ Ping-style contact detection
-
-  HackerImage.tsx      ◆ Cyberpunk image card
-                       ◆ Scanline overlay + HUD corner brackets
-                       ◆ Cyan/magenta/yellow gradient tint
-                       ◆ Error fallback: CSS gradient grid
+  MatrixRain.tsx     ◆ Canvas katakana + hex rain, green glow trails
+  Scanlines.tsx      ◆ CRT lines + moving scan beam + vignette
+  BootSequence.tsx   ◆ Full-screen terminal boot animation
+  GlitchText.tsx     ◆ RGB-split glitch headline
+  RadarSweep.tsx     ◆ Rotating radar SVG + contact blips
+  SystemStatus.tsx   ◆ Live CPU / MEM / NET / latency bars
+  LiveLogFeed.tsx    ◆ Scrolling [INFO]/[WARN]/[DEBUG] log stream
 ```
 
 ---
 
-## ─── TECHNICAL SPECIFICATIONS
+## ▌ TECHNICAL SPECIFICATIONS
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                           │
-│  FRAMEWORK      Electron 32 + React 18 + TypeScript 5.5                                  │
-│  BUILD           electron-vite 2.3 → out/ directory                                       │
-│  STATE           Zustand 5 (renderer) + Conf 10 (main process store)                      │
-│  ANIMATIONS      Framer Motion 11 + GSAP patterns + CSS keyframes                         │
-│  CHARTS          Recharts 2 (sparklines + stats)                                          │
-│  AUDIO           Web Audio API (ScriptProcessor) + Deepgram WebSocket SDK                 │
-│  AI              Groq SDK (LLaMA-3.1 70B) — summarization, intent, actions               │
-│  STORAGE          Conf 10 → local JSON (api keys, settings, window bounds)                │
-│  STEALTH          setContentProtection, skipTaskbar, WS_EX_TOOLWINDOW, click-through      │
-│  FONTS            Courier New, Consolas, SF Mono (monospace stack)                        │
-│  COLORS           Cyan #00F5FF, Green #10B981, Red #FF006E, Yellow #FCD34D, Violet       │
-│  LICENSE          MIT                                                                     │
-│                                                                                           │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-```
+| Layer | Stack |
+|:--|:--|
+| **Framework** | Electron 32 · React 18 · TypeScript 5.5 |
+| **Build** | electron-vite 2.3 → `out/` |
+| **State** | Zustand 5 (renderer) · Conf 10 (main-process store) |
+| **Animation** | Framer Motion 11 · CSS keyframes · SMIL SVG |
+| **Charts** | Recharts 2 (sparklines + stats) |
+| **Audio** | Web Audio API (ScriptProcessor) · Deepgram WebSocket SDK |
+| **AI** | Groq SDK — LLaMA-3.1 70B (summary · intent · actions) |
+| **Storage** | Conf 10 → local JSON (keys, settings, window bounds) |
+| **Stealth** | setContentProtection · skipTaskbar · WS_EX_TOOLWINDOW · click-through |
+| **Theme** | Atom One Dark — `#16181d/#21252b/#282c34` + neon syntax palette |
+| **License** | MIT |
 
 ---
 
-## ─── DEPENDENCIES
+## ▌ DEPENDENCIES
 
 ```
 $ npm ls --depth=0
 
 eves@1.0.0
-├── @deepgram/sdk@^3.6.0          # Deepgram transcription SDK
-├── @tanstack/react-query@^5.56   # Async state management
-├── clsx@^2.1.1                   # Conditional classes
-├── conf@^10.2.0                  # Persistent config store
-├── date-fns@^3.6.0              # Date formatting
-├── framer-motion@^11.5           # Animations
-├── groq-sdk@^0.7.0              # Groq AI inference
-├── lucide-react@^0.447          # Icons
-├── react@^18.3.0                # UI framework
-├── react-dom@^18.3.0            # DOM renderer
-├── react-dropzone@^14.2          # File upload
-├── react-hotkeys-hook@^4.5     # Hotkey bindings
-├── recharts@^2.12               # Charts & sparklines
-├── wavesurfer.js@^7.8           # Audio waveform
-└── zustand@^5.0.0               # State management
+├── @deepgram/sdk@^3.6.0          # transcription SDK
+├── @tanstack/react-query@^5.56   # async state
+├── conf@^10.2.0                  # persistent config store
+├── framer-motion@^11.5           # animations
+├── groq-sdk@^0.7.0               # Groq AI inference
+├── lucide-react@^0.447           # icons
+├── react@^18.3.0  react-dom      # UI
+├── react-dropzone@^14.2          # file upload
+├── react-hotkeys-hook@^4.5       # hotkeys
+├── recharts@^2.12                # charts
+├── wavesurfer.js@^7.8            # audio waveform
+└── zustand@^5.0.0                # state management
 ```
 
 ---
 
-## ─── QUICK DEPLOY
+<div align="center">
 
-```bash
-# 1. Clone
-git clone https://github.com/SHAILESH-RS-UPADHYAY/eves.git
-cd eves
+<img src="https://readme-typing-svg.demolab.com/?font=Fira+Code&size=15&duration=3500&pause=1000&color=7EE787&center=true&vCenter=true&width=600&height=30&lines=root%40eves%3A~%24+built+by+SHAILESH-RS-UPADHYAY;100%25+local+%C2%B7+zero+telemetry+%C2%B7+they'll+never+know" alt="footer" />
 
-# 2. Install
-npm install
+<br/>
 
-# 3. Configure API keys
-#    Open Settings → api_keys → enter Deepgram + Groq keys → ./save_keys
+![made-with](https://img.shields.io/badge/made_with-%E2%9A%A1_%2B_%F0%9F%96%A4-0d1117?style=flat-square&labelColor=0d1117&color=22d3ee)
+![local](https://img.shields.io/badge/data-100%25_LOCAL-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
+![telemetry](https://img.shields.io/badge/telemetry-ZERO-0d1117?style=flat-square&labelColor=0d1117&color=ff5370)
 
-# 4. Launch
-npm run dev
-
-# 5. Use
-#    Ctrl+Shift+L    → Start listening
-#    Ctrl+Shift+A    → Hide overlay
-#    Ctrl+Space      → Save session
-#    Ctrl+Shift+X    → Quit
-```
-
----
-
-<p align="center">
-  <sub>
-    Built with ██████ by <a href="https://github.com/SHAILESH-RS-UPADHYAY">SHAILESH-RS-UPADHYAY</a>
-    <br/>
-    <br/>
-    <img src="https://img.shields.io/badge/license-MIT-0c0c18?style=flat&labelColor=0c0c18&color=00F5FF" />
-    <img src="https://img.shields.io/badge/electron-32-0c0c18?style=flat&logo=electron&logoColor=00F5FF&labelColor=0c0c18&color=00F5FF" />
-    <img src="https://img.shields.io/badge/react-18-0c0c18?style=flat&logo=react&logoColor=00F5FF&labelColor=0c0c18&color=00F5FF" />
-    <img src="https://img.shields.io/badge/version-2.1.0-0c0c18?style=flat&labelColor=0c0c18&color=10B981" />
-  </sub>
-</p>
+</div>
