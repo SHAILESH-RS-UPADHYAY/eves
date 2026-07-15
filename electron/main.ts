@@ -16,7 +16,7 @@ let tray: Tray | null = null
 // ─── State ──────────────────────────────────────────────────
 let isOverlayVisible = true
 let isClickThrough = false
-let isStealthActive = true
+let isStealthActive = false
 let isListening = false
 let currentSource: 'internal' | 'external' = 'internal'
 
@@ -50,9 +50,6 @@ function createDashboardWindow(): BrowserWindow {
   }
 
   const win = new BrowserWindow(opts)
-
-  // Stealth: invisible to screen-sharing software
-  win.setContentProtection(true)
 
   if (process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -95,9 +92,6 @@ function createOverlayWindow(): BrowserWindow {
       sandbox: false
     }
   })
-
-  // Stealth: invisible to screen-sharing software
-  win.setContentProtection(true)
 
   // Auto-approve media permissions
   win.webContents.session.setPermissionRequestHandler((wc, permission, callback) => {
