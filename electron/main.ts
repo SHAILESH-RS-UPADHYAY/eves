@@ -51,6 +51,9 @@ function createDashboardWindow(): BrowserWindow {
 
   const win = new BrowserWindow(opts)
 
+  // Stealth: invisible to screen-sharing software
+  win.setContentProtection(true)
+
   if (process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
