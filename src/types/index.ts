@@ -110,6 +110,9 @@ export interface Meeting {
   date: string
   duration: number
   audioPath: string
+  /** protocol url for playback (recorded sessions); falls back to audioPath */
+  audioUrl?: string
+  source?: 'internal' | 'external' | 'both' | 'upload'
   transcription?: TranscriptionResult
   analysis?: MeetingAnalysis
   tags: Tag[]
@@ -156,4 +159,24 @@ export interface IpcResult<T> {
   success: boolean
   data?: T
   error?: string
+}
+
+/** Session handed over from the overlay window */
+export interface OverlaySession {
+  id: string
+  title: string
+  date: string
+  duration: number
+  source: 'internal' | 'external' | 'both'
+  transcript: string
+  utterances: Utterance[]
+  audioPath: string
+  audioUrl: string
+  timestamp: number
+}
+
+declare global {
+  interface Window {
+    eves?: import('../../electron/preload').EvesAPI
+  }
 }

@@ -6,7 +6,11 @@
   let currentSource = 'internal'
   let selectedDeviceId = ''
   let audioContext = null
-  let mediaStream = null
+  let mediaStreams = []
+  let mediaRecorder = null
+  let recordingId = null
+  let writeChain = Promise.resolve()
+  let sessionUtterances = []
   let processor = null
   let analyser = null
   let animationFrameId = null
@@ -39,23 +43,23 @@
   // ─── Audio Capture: Internal (system loopback) ─────────────
   // Same technique as Acemate: getDisplayMedia + audio:'loopback'
   async function startInternalCapture() {
-    mediaStream = await navigator.mediaDevices.getDisplayMedia({
+    const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
       audio: true
     })
 
-    if (!mediaStream) throw new Error('Screen capture cancelled')
+    if (!stream) throw new Error('Screen capture cancelled')
 
-    const audioTrack = mediaStream.getAudioTracks()[0]
+    const audioTrack = stream.getAudioTracks()[0]
     if (!audioTrack) {
-      mediaStream.getTracks().forEach(t => t.stop())
+      stream.getTracks().forEach(t => t.stop())
       throw new Error('No audio track in loopback stream')
     }
 
     // Stop video track — we only need audio
-    mediaStream.getVideoTracks().forEach(t => t.stop())
+    stream.getVideoTracks().forEach(t => t.stop())
 
-    return mediaStream
+    return stream
   }
 
   // ─── Audio Capture: External (microphone) ──────────────────
@@ -66,26 +70,53 @@
         : true
     }
 
-    mediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+    const stream = await navigator.mediaDevices.getUserMedia(constraints)
 
-    if (!mediaStream || !mediaStream.getAudioTracks()[0]) {
+    if (!stream || !stream.getAudioTracks()[0]) {
       throw new Error('No audio track from external device')
     }
 
-    return mediaStream
+    return stream
+  }
+
+  // BOTH = them (system loopback) + you (mic), summed into one recording.
+  // If the mic fails in BOTH mode we keep the system audio rather than losing
+  // the whole meeting — the other side is the part you can't reconstruct.
+  async function startCapture() {
+    if (currentSource === 'internal') return [await startInternalCapture()]
+    if (currentSource === 'external') return [await startExternalCapture()]
+
+    const streams = [await startInternalCapture()]
+    try {
+      streams.push(await startExternalCapture())
+    } catch (err) {
+      console.warn('BOTH: mic unavailable, recording system audio only:', err)
+      transcriptText.innerHTML = '<span class="color-amber">WARN: mic unavailable — system audio only</span>'
+    }
+    return streams
   }
 
   // ─── Process Audio Stream ───────────────────────────────────
-  function processStream(stream) {
+  // Returns the summed stream that gets recorded — one mixed file whether the
+  // source is INT, EXT, or BOTH.
+  function processStream(streams) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)({
       sampleRate: 16000
     })
 
-    const source = audioContext.createMediaStreamSource(stream)
     analyser = audioContext.createAnalyser()
     analyser.fftSize = 256
 
     processor = audioContext.createScriptProcessor(4096, 1, 1)
+
+    const recordDest = audioContext.createMediaStreamDestination()
+
+    streams.forEach(function (s) {
+      const source = audioContext.createMediaStreamSource(s)
+      source.connect(processor)
+      source.connect(analyser)
+      source.connect(recordDest)
+    })
 
     processor.onaudioprocess = function (e) {
       const input = e.inputBuffer.getChannelData(0)
@@ -103,15 +134,14 @@
       }
     }
 
-    source.connect(processor)
     processor.connect(audioContext.destination)
-    source.connect(analyser)
 
     // Audio level animation
     const dataArray = new Uint8Array(analyser.frequencyBinCount)
 
+    // Gate on the analyser, not isListening — this starts before the flag is set
     function animateLevel() {
-      if (!isListening) return
+      if (!analyser) return
       analyser.getByteTimeDomainData(dataArray)
 
       // Update orb intensity based on audio level
@@ -131,27 +161,80 @@
       animationFrameId = requestAnimationFrame(animateLevel)
     }
     animateLevel()
+
+    return recordDest.stream
+  }
+
+  // ─── Recording to disk ──────────────────────────────────────
+  // Chunks are appended to the file as they arrive, so a crash, a power cut or
+  // Ctrl+Shift+X mid-meeting costs at most the last 5 seconds — not the meeting.
+  function startRecorder(stream) {
+    recordingId = 'rec-' + Date.now()
+    writeChain = Promise.resolve()
+
+    // Audio-only clone: the loopback stream still carries a (stopped) video track
+    mediaRecorder = new MediaRecorder(new MediaStream(stream.getAudioTracks()), {
+      mimeType: 'audio/webm;codecs=opus'
+    })
+
+    mediaRecorder.ondataavailable = function (e) {
+      if (!e.data || e.data.size === 0) return
+      const id = recordingId
+      // Serialized: arrayBuffer() is async, so unchained writes could reorder
+      writeChain = writeChain
+        .then(function () { return e.data.arrayBuffer() })
+        .then(function (buf) { return window.eves?.appendRecording({ id: id, data: buf }) })
+        .catch(function (err) { console.error('Chunk write failed:', err) })
+    }
+
+    mediaRecorder.start(5000)
+  }
+
+  // Flush pending chunks and close out the file. Returns { path, url } or null.
+  function stopRecorder() {
+    return new Promise(function (resolve) {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') return resolve(null)
+      const id = recordingId
+
+      mediaRecorder.onstop = async function () {
+        mediaRecorder = null
+        try {
+          await writeChain
+          const res = await window.eves?.finishRecording(id)
+          resolve(res && res.success ? res.data : null)
+        } catch (err) {
+          console.error('Recording save failed:', err)
+          resolve(null)
+        }
+      }
+      mediaRecorder.stop()
+    })
   }
 
   // ─── Stop Capture ───────────────────────────────────────────
   function stopCapture() {
     if (processor) { processor.disconnect(); processor = null }
     if (audioContext) { audioContext.close().catch(() => {}); audioContext = null }
-    if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null }
+    mediaStreams.forEach(function (s) { s.getTracks().forEach(function (t) { t.stop() }) })
+    mediaStreams = []
     if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null }
     if (analyser) { analyser = null }
   }
 
   // ─── Deepgram WebSocket (Real-time Streaming) ─────────────
-  function buildDeepgramUrl() {
+  // language 'multi' = nova-3 code-switching (Hindi <-> English in one sentence).
+  // 'en' on nova-2 forces English decoding, which is what mangles Hinglish.
+  function buildDeepgramUrl(language) {
+    var lang = language || 'multi'
     var p = new URLSearchParams({
       encoding: 'linear16',
       sample_rate: '16000',
       channels: '1',
-      model: 'nova-2',
+      model: lang === 'multi' ? 'nova-3' : 'nova-2',
       smart_format: 'true',
       interim_results: 'true',
-      language: 'en',
+      diarize: 'true',
+      language: lang,
       endpointing: '200'
     })
     return 'wss://api.deepgram.com/v1/listen?' + p.toString()
@@ -188,6 +271,15 @@
     if (isFinal) {
       deepgramTranscript += (deepgramTranscript ? ' ' : '') + transcript
       sessionTranscript += (sessionTranscript ? ' ' : '') + transcript
+      // Keep timing + speaker so the saved meeting has a seekable transcript
+      var words = alt.words || []
+      sessionUtterances.push({
+        speaker: words[0]?.speaker ?? 0,
+        start: data.start ?? words[0]?.start ?? 0,
+        end: (data.start ?? 0) + (data.duration ?? 0),
+        transcript: transcript,
+        words: words
+      })
       transcriptText.innerHTML = colorizeText(deepgramTranscript)
     } else {
       var displayText = deepgramTranscript
@@ -213,7 +305,7 @@
         reject(new Error('ERR_DG_TIMEOUT: Deepgram connection timed out (10s)'))
       }, 10000)
 
-      var ws = new WebSocket(buildDeepgramUrl(), ['token', apiKey])
+      var ws = new WebSocket(buildDeepgramUrl(settings?.defaultLanguage), ['token', apiKey])
 
       ws.onopen = function () {
         clearTimeout(timeout)
@@ -245,8 +337,16 @@
         if (deepgramKeepAlive) { clearInterval(deepgramKeepAlive); deepgramKeepAlive = null }
         deepgramSocket = null
         deepgramConnected = false
+        // Meetings run long — a dropped socket must not silently end the transcript.
+        // Audio keeps recording either way.
         if (isListening && ev.code !== 1000) {
-          transcriptText.innerHTML = '<span class="color-red">ERR_DG_CLOSED: Stream ended (' + ev.code + ')</span>'
+          statusLabel.textContent = 'RECONNECTING...'
+          setTimeout(function () {
+            if (!isListening) return
+            connectDeepgram()
+              .then(function () { statusLabel.textContent = 'LISTENING' })
+              .catch(function () { statusLabel.textContent = 'REC (NO STT)' })
+          }, 2000)
         }
       }
 
@@ -268,18 +368,15 @@
 
   // ─── Start Listening ────────────────────────────────────────
   async function startListening() {
+    if (isListening) return
     try {
       statusLabel.textContent = 'CONNECTING...'
 
-      const stream = currentSource === 'internal'
-        ? await startInternalCapture()
-        : await startExternalCapture()
+      mediaStreams = await startCapture()
 
-      processStream(stream)
-
-      // Connect Deepgram for real-time transcription
-      deepgramTranscript = ''
-      await connectDeepgram()
+      // Recording starts before transcription and never depends on it — a bad
+      // API key or a dead network must not cost you the meeting audio.
+      startRecorder(processStream(mediaStreams))
 
       isListening = true
       sessionStartTime = Date.now()
@@ -299,10 +396,14 @@
         statusTime.textContent = m + ':' + s.toString().padStart(2, '0')
       }, 1000)
 
-      // Notify main process
-      if (window.eves) {
-        // IPC notification if needed
-      }
+      // Live transcript is best-effort on top of a recording that is already running
+      deepgramTranscript = ''
+      sessionUtterances = []
+      connectDeepgram().catch(function (err) {
+        console.error('Deepgram failed:', err)
+        transcriptText.innerHTML = '<span class="color-red">' + err.message + '</span>'
+        statusLabel.textContent = 'REC / NO_STT'
+      })
     } catch (err) {
       console.error('Capture failed:', err)
       statusLabel.textContent = 'ERROR'
@@ -314,23 +415,29 @@
   }
 
   // ─── Stop Listening ─────────────────────────────────────────
-  function stopListening() {
+  async function stopListening() {
+    if (!isListening) return
+    isListening = false
     disconnectDeepgram()
     deepgramTranscript = ''
+
+    statusLabel.textContent = 'SAVING...'
+    const recording = await stopRecorder()   // must flush before tracks die
     stopCapture()
-    isListening = false
 
     if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null }
 
     listenBtn.classList.remove('active')
     statusOrb.classList.remove('listening')
     btnText.textContent = '▶ EXECUTE_LISTEN'
-    statusLabel.textContent = 'STANDBY'
     statusTime.textContent = '00:00'
 
     // Reset orb core scale
     const orbCore = document.getElementById('orb-core')
     if (orbCore) orbCore.style.transform = 'scale(1)'
+
+    // Auto-save — the whole point is not losing what was said
+    saveSession(recording)
   }
 
   // ─── Toggle Listening ───────────────────────────────────────
@@ -354,9 +461,11 @@
   }
 
   // ─── Switch Source ──────────────────────────────────────────
-  function switchSource(source) {
+  // Switching mid-meeting closes the current recording and starts a new one —
+  // you can't splice a different source into one file.
+  async function switchSource(source) {
     const wasListening = isListening
-    if (wasListening) stopListening()
+    if (wasListening) await stopListening()
 
     currentSource = source
 
@@ -364,16 +473,14 @@
       btn.classList.toggle('active', btn.dataset.source === source)
     })
 
-    if (source === 'external') {
+    if (source === 'external' || source === 'both') {
       deviceSelect.classList.remove('hidden')
       enumerateDevices()
     } else {
       deviceSelect.classList.add('hidden')
     }
 
-    if (wasListening) {
-      setTimeout(() => startListening(), 300)
-    }
+    if (wasListening) startListening()
   }
 
   // ─── Device Enumeration ─────────────────────────────────────
@@ -402,8 +509,9 @@
   }
 
   // ─── Save Session ───────────────────────────────────────────
-  function saveSession() {
+  function saveSession(recording) {
     if (!sessionStartTime || elapsedSeconds === 0) {
+      statusLabel.textContent = isListening ? 'LISTENING' : 'STANDBY'
       transcriptText.textContent = 'Nothing to save — start listening first'
       setTimeout(() => { if (!isListening) transcriptText.textContent = '' }, 3000)
       return
@@ -416,6 +524,9 @@
       duration: elapsedSeconds,
       source: currentSource,
       transcript: sessionTranscript || '(no transcript captured yet)',
+      utterances: sessionUtterances,
+      audioPath: recording ? recording.path : '',
+      audioUrl: recording ? recording.url : '',
       timestamp: Date.now()
     }
 
@@ -435,8 +546,11 @@
 
     // Reset session
     sessionTranscript = ''
+    sessionUtterances = []
     elapsedSeconds = 0
+    sessionStartTime = null
     statusTime.textContent = '00:00'
+    statusLabel.textContent = isListening ? 'LISTENING' : 'STANDBY'
   }
 
   // ─── Render History ─────────────────────────────────────────
@@ -450,6 +564,8 @@
     sessionHistory.forEach(session => {
       const item = document.createElement('div')
       item.className = 'history-item'
+      item.title = 'Open in dashboard'
+      item.addEventListener('click', function () { window.eves?.showDashboard() })
       const m = Math.floor(session.duration / 60)
       const s = session.duration % 60
       item.innerHTML = `
@@ -505,10 +621,11 @@
       })
     }
 
-    // Save session from hotkey
+    // Save session from hotkey — while listening this stops + saves (audio included)
     if (window.eves.onSaveSession) {
       window.eves.onSaveSession(() => {
-        saveSession()
+        if (isListening) stopListening()
+        else saveSession(null)
       })
     }
 

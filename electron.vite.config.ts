@@ -32,7 +32,11 @@ export default defineConfig({
     root: resolve(__dirname),
     build: {
       rollupOptions: {
-        input: resolve(__dirname, 'index.html')
+        // overlay is a second entry — without it the packaged app has no overlay
+        input: {
+          index: resolve(__dirname, 'index.html'),
+          overlay: resolve(__dirname, 'overlay/index.html')
+        }
       }
     },
     resolve: {

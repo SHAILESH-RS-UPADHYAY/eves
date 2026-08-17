@@ -3,10 +3,22 @@ import type { AppSettings, Meeting, MeetingAnalysis } from '../src/types'
 
 const api = {
   // ─── Transcription ──────────────────────────────────────
-  transcribe: (args: { filePath: string; apiKey: string }) =>
+  transcribe: (args: { filePath: string; apiKey: string; language?: string }) =>
     ipcRenderer.invoke('deepgram:transcribe', args),
   onTranscribeProgress: (callback: (pct: number) => void) =>
     ipcRenderer.on('deepgram:progress', (_e, pct) => callback(pct)),
+
+  // ─── Recording ──────────────────────────────────────────
+  appendRecording: (args: { id: string; data: ArrayBuffer }) =>
+    ipcRenderer.invoke('recording:append', args) as Promise<{ success: boolean; error?: string }>,
+  finishRecording: (id: string) =>
+    ipcRenderer.invoke('recording:finish', id) as Promise<{ success: boolean; data?: { path: string; url: string }; error?: string }>,
+  deleteRecording: (audioPath: string) =>
+    ipcRenderer.invoke('recording:delete', audioPath) as Promise<{ success: boolean; error?: string }>,
+
+  // ─── Meeting persistence ────────────────────────────────
+  getMeetings: () => ipcRenderer.invoke('meetings:get') as Promise<Meeting[]>,
+  saveMeetings: (meetings: Meeting[]) => ipcRenderer.invoke('meetings:save', meetings),
 
   // ─── Analysis ───────────────────────────────────────────
   analyze: (args: { transcript: string; apiKey: string }) =>
@@ -39,6 +51,7 @@ const api = {
   minimize: () => ipcRenderer.invoke('window:minimize'),
   maximize: () => ipcRenderer.invoke('window:maximize'),
   close: () => ipcRenderer.invoke('window:close'),
+  showDashboard: () => ipcRenderer.invoke('window:showDashboard'),
 
   // ─── Overlay: Launch from dashboard ─────────────────────
   launchOverlay: () => ipcRenderer.invoke('overlay:launch'),

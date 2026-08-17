@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Rocket, Terminal, Shield, Mic2, Brain, Zap, FileText, Activity, Cpu, Wifi, Key } from 'lucide-react'
+import { Terminal, Shield, Mic2, Brain, Zap, FileText, Key } from 'lucide-react'
 import { StatsRow } from './StatsRow'
 import { MeetingFeed } from './MeetingFeed'
 import { RecentInsights } from './RecentInsights'
@@ -136,15 +136,17 @@ export function DashboardPage() {
     }
   }
 
-  if (totalMeetings === 0) {
-    return (
-      <motion.div
-        style={{ padding: '0 24px 40px', height: '100%', overflow: 'auto' }}
-        className="glass-scrollbar"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+  // The cyber landing page IS the dashboard — it renders whether or not meetings
+  // exist. Saved sessions appear in the archive section at the bottom, so having
+  // history never costs you the look.
+  return (
+    <motion.div
+      style={{ padding: '0 24px 40px', height: '100%', overflow: 'auto' }}
+      className="glass-scrollbar"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
         {/* Matrix rain inside the page content */}
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
           <MatrixRain opacity={0.03} color="#00F5FF" speed={2} />
@@ -755,61 +757,41 @@ export function DashboardPage() {
           >
             <DataTicker />
           </motion.div>
+
+          {/* ═══ MEETING ARCHIVE — only once there is something to show ═══ */}
+          {totalMeetings > 0 && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.2 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0 16px' }}
+              >
+                <span style={{ fontSize: '11px', fontFamily: '"Courier New", monospace', color: '#22d3ee', fontWeight: 700, letterSpacing: '2px', textShadow: '0 0 10px rgba(34,211,238,0.4)', whiteSpace: 'nowrap' }}>
+                  ▌ MEETING_ARCHIVE // RECORDED SESSIONS
+                </span>
+                <div className="neon-rule" style={{ flex: 1 }} />
+                <span style={{ fontSize: '9px', fontFamily: '"Courier New", monospace', color: 'rgba(171,178,191,0.4)', letterSpacing: '1px' }}>
+                  {totalMeetings} archived · local only
+                </span>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 1.25 }}
+              >
+                <StatsRow totalMeetings={totalMeetings} audioHours={Math.round(audioHours * 10) / 10} pendingActions={pendingActions} speakers={speakers} />
+                <div style={{ display: 'flex', gap: '20px', height: '520px' }}>
+                  <div style={{ flex: 1 }}>
+                    <MeetingFeed />
+                  </div>
+                  <RecentInsights />
+                </div>
+              </motion.div>
+            </>
+          )}
         </div>
       </motion.div>
-    )
-  }
-
-  // Normal dashboard with stats when meetings exist
-  return (
-    <motion.div
-      style={{ padding: '0 24px 32px', height: '100%' }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <HackerHeader />
-
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-        <button
-          onClick={handleLaunchEves}
-          style={{
-            padding: '10px 20px',
-            background: 'rgba(34, 211, 238, 0.1)',
-            border: '1px solid rgba(34, 211, 238, 0.4)',
-            borderRadius: '6px',
-            color: '#22d3ee',
-            fontFamily: '"Courier New", monospace',
-            fontSize: '12px',
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            cursor: 'pointer',
-            textShadow: '0 0 8px rgba(34, 211, 238, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.3s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(34, 211, 238, 0.2)'
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(34, 211, 238, 0.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(34, 211, 238, 0.1)'
-            e.currentTarget.style.boxShadow = 'none'
-          }}
-        >
-          <Rocket size={14} /> ./launch_overlay
-        </button>
-      </div>
-
-      <StatsRow totalMeetings={totalMeetings} audioHours={Math.round(audioHours * 10) / 10} pendingActions={pendingActions} speakers={speakers} />
-      <div style={{ display: 'flex', gap: '20px', height: 'calc(100% - 180px)' }}>
-        <div style={{ flex: 1 }}>
-          <MeetingFeed />
-        </div>
-        <RecentInsights />
-      </div>
-    </motion.div>
   )
 }

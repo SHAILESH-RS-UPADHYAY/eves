@@ -16,7 +16,6 @@ import { useDeepgram } from '../../hooks/useDeepgram'
 import { useGroq } from '../../hooks/useGroq'
 import { useSettingsStore } from '../../store/settings.store'
 import { format } from 'date-fns'
-import * as path from 'path'
 
 export function MeetingPage() {
   const meetings = useMeetingsStore((s) => s.meetings)
@@ -63,6 +62,12 @@ export function MeetingPage() {
 
   const handleWordClick = (time: number) => setSeekTo(time)
 
+  // Transcribe a recording that already exists on disk
+  const handleTranscribeExisting = useCallback(async (id: string, filePath: string) => {
+    const result = await transcribe(id, filePath)
+    if (result && settings.autoAnalyze) await analyze(id, result.transcript)
+  }, [transcribe, analyze, settings.autoAnalyze])
+
   if (!activeMeeting && meetings.length === 0) {
     return (
       <motion.div
@@ -106,15 +111,39 @@ export function MeetingPage() {
             {activeMeeting.isAnalyzing && (
               <ProgressOrb progress={50} label="Analyzing" />
             )}
+            {/* Audio but no transcript — a recovered session, or one where the live
+                stream died. Without this the recording is unreadable. */}
+            {activeMeeting.audioPath && !activeMeeting.transcription && !activeMeeting.isTranscribing && (
+              <button
+                onClick={() => handleTranscribeExisting(activeMeeting.id, activeMeeting.audioPath)}
+                style={{
+                  padding: '10px 20px',
+                  background: 'rgba(0, 245, 255, 0.1)',
+                  border: '1px solid rgba(0, 245, 255, 0.4)',
+                  borderRadius: '6px',
+                  color: '#00F5FF',
+                  fontFamily: '"Courier New", monospace',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '1px',
+                  cursor: 'pointer',
+                  textShadow: '0 0 8px rgba(0, 245, 255, 0.5)'
+                }}
+              >
+                ./transcribe_audio
+              </button>
+            )}
           </div>
 
           {/* Audio player */}
+          {(activeMeeting.audioUrl || activeMeeting.audioPath) && (
           <AudioPlayer
-            audioPath={activeMeeting.audioPath}
+            audioPath={activeMeeting.audioUrl || activeMeeting.audioPath}
             transcription={activeMeeting.transcription}
-            onWordClick={handleWordClick}
+            onReady={(dur) => updateMeeting(activeMeeting.id, { duration: dur })}
             seekTo={seekTo}
           />
+          )}
 
           {/* Two column layout: transcript + analysis */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

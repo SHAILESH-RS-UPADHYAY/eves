@@ -4,7 +4,7 @@ import type { AppSettings } from '../types'
 const defaultSettings: AppSettings = {
   deepgramApiKey: '',
   groqApiKey: '',
-  defaultLanguage: 'en',
+  defaultLanguage: 'multi',
   enableDiarization: true,
   autoTranscribe: true,
   autoAnalyze: true,

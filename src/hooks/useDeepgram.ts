@@ -24,7 +24,7 @@ export function useDeepgram() {
           updateMeeting(meetingId, { transcriptionProgress: pct })
         })
 
-        const result = await window.eves.transcribe({ filePath, apiKey: settings.deepgramApiKey })
+        const result = await window.eves.transcribe({ filePath, apiKey: settings.deepgramApiKey, language: settings.defaultLanguage })
 
         if (result.success && result.data) {
           updateMeeting(meetingId, {

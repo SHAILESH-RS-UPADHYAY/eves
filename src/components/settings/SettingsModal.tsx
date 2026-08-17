@@ -254,7 +254,7 @@ export function SettingsModal() {
                       onChange={(e) => updateSettings({ defaultLanguage: e.target.value })}
                       style={inputStyle}
                     >
-                      {['en', 'hi', 'es', 'fr', 'de', 'ja', 'zh'].map((l) => <option key={l} value={l} style={{ background: '#08080f' }}>{l}</option>)}
+                      {['multi', 'en', 'hi', 'es', 'fr', 'de', 'ja', 'zh'].map((l) => <option key={l} value={l} style={{ background: '#08080f' }}>{l === 'multi' ? 'multi — hinglish / code-switching' : l}</option>)}
                     </select>
                   </div>
                   <ToggleRow label="Enable Diarization (speaker detection)" value={settings.enableDiarization} onChange={(v) => updateSettings({ enableDiarization: v })} />

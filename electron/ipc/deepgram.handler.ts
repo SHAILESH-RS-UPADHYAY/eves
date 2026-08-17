@@ -1,10 +1,15 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { createClient } from '@deepgram/sdk'
 import * as fs from 'fs'
+import { getSettings } from '../utils/store'
 import type { TranscriptionResult, IpcResult, Word, Utterance } from '../../src/types'
 
-export function registerDeepgramHandlers(mainWindow: BrowserWindow) {
-  ipcMain.handle('deepgram:transcribe', async (_event, args: { filePath: string; apiKey: string }): Promise<IpcResult<TranscriptionResult>> => {
+// Broadcast — the dashboard may not exist yet when this is registered
+const progress = (pct: number) =>
+  BrowserWindow.getAllWindows().forEach((w) => w.webContents.send('deepgram:progress', pct))
+
+export function registerDeepgramHandlers() {
+  ipcMain.handle('deepgram:transcribe', async (_event, args: { filePath: string; apiKey: string; language?: string }): Promise<IpcResult<TranscriptionResult>> => {
     const { filePath, apiKey } = args
 
     if (!apiKey) {
@@ -14,22 +19,25 @@ export function registerDeepgramHandlers(mainWindow: BrowserWindow) {
     try {
       const deepgram = createClient(apiKey)
 
-      mainWindow.webContents.send('deepgram:progress', 10)
+      progress(10)
 
       const audioBuffer = fs.readFileSync(filePath)
 
-      mainWindow.webContents.send('deepgram:progress', 50)
+      progress(50)
+
+      // 'multi' needs nova-3 — that's the combination that handles Hinglish
+      const language = args.language || getSettings().defaultLanguage || 'multi'
 
       const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
         audioBuffer,
         {
-          model: 'nova-2',
+          model: language === 'multi' ? 'nova-3' : 'nova-2',
           smart_format: true,
           diarize: true,
           paragraphs: true,
           utterances: true,
           punctuate: true,
-          language: 'en'
+          language
         }
       )
 
@@ -37,7 +45,7 @@ export function registerDeepgramHandlers(mainWindow: BrowserWindow) {
         return { success: false, error: error.message ?? 'Transcription failed' }
       }
 
-      mainWindow.webContents.send('deepgram:progress', 90)
+      progress(90)
 
       const results = result?.results
       const channels = results?.channels?.[0]
@@ -87,7 +95,7 @@ export function registerDeepgramHandlers(mainWindow: BrowserWindow) {
         paragraphs
       }
 
-      mainWindow.webContents.send('deepgram:progress', 100)
+      progress(100)
 
       return { success: true, data: mapped }
     } catch (err: any) {

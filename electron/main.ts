@@ -1,12 +1,13 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu, desktopCapturer, screen, nativeImage } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu, desktopCapturer, screen, nativeImage, protocol } from 'electron'
 import * as path from 'path'
+import { registerRecorderHandlers, sessionToMeeting, saveMeeting, recoverOrphanRecordings } from './ipc/recorder.handler'
 import { registerDeepgramHandlers } from './ipc/deepgram.handler'
 import { registerGroqHandlers } from './ipc/groq.handler'
 import { registerDriveHandlers } from './ipc/drive.handler'
 import { registerNotionHandlers } from './ipc/notion.handler'
 import { registerSettingsHandlers } from './ipc/settings.handler'
 import { setStealth } from './utils/stealth'
-import { getWindowBounds, saveWindowBounds, getSettings } from './utils/store'
+import { getWindowBounds, saveWindowBounds, getSettings, migrateSettings } from './utils/store'
 
 // ─── Window references ──────────────────────────────────────
 let dashboardWindow: BrowserWindow | null = null
@@ -18,7 +19,9 @@ let isOverlayVisible = true
 let isClickThrough = false
 let isStealthActive = false
 let isListening = false
-let currentSource: 'internal' | 'external' = 'internal'
+let isQuitting = false
+const sources = ['internal', 'external', 'both'] as const
+let currentSource: (typeof sources)[number] = 'internal'
 
 // ─── Dashboard Window (React app, heavy) ────────────────────
 function createDashboardWindow(): BrowserWindow {
@@ -34,7 +37,7 @@ function createDashboardWindow(): BrowserWindow {
     minHeight: 700,
     frame: false,
     backgroundColor: '#050508',
-    show: true,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -57,12 +60,33 @@ function createDashboardWindow(): BrowserWindow {
     win.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 
-  win.on('close', () => {
+  // Closing the dashboard hides it — EVES keeps listening from the overlay
+  win.on('close', (e) => {
     const b = win.getBounds()
     saveWindowBounds({ x: b.x, y: b.y, width: b.width, height: b.height })
+    if (!isQuitting) {
+      e.preventDefault()
+      win.hide()
+    }
   })
 
+  if (isStealthActive && process.platform !== 'linux') win.setContentProtection(true)
+
   return win
+}
+
+/** Dashboard is created on demand — startup shows the overlay only. */
+function ensureDashboard(): BrowserWindow {
+  if (!dashboardWindow || dashboardWindow.isDestroyed()) {
+    dashboardWindow = createDashboardWindow()
+  }
+  return dashboardWindow
+}
+
+function showDashboard() {
+  const win = ensureDashboard()
+  win.show()
+  win.focus()
 }
 
 // ─── Overlay Window (lightweight, plain HTML, stealth) ──────
@@ -116,12 +140,18 @@ function createOverlayWindow(): BrowserWindow {
   }
 
   win.setSkipTaskbar(true)
+  // Float above fullscreen Zoom/Teams, and follow across desktops
+  win.setAlwaysOnTop(true, 'screen-saver')
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
   win.on('close', (e) => {
+    if (isQuitting) return
     e.preventDefault()
     win.hide()
     isOverlayVisible = false
   })
+
+  if (isStealthActive && process.platform !== 'linux') win.setContentProtection(true)
 
   return win
 }
@@ -178,7 +208,7 @@ function registerHotkeys() {
 
   // Ctrl+Shift+O — Toggle audio source (internal / external)
   globalShortcut.register('CommandOrControl+Shift+O', () => {
-    currentSource = currentSource === 'internal' ? 'external' : 'internal'
+    currentSource = sources[(sources.indexOf(currentSource) + 1) % sources.length]
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.webContents.send('source-changed', currentSource)
     }
@@ -191,14 +221,12 @@ function registerHotkeys() {
     console.log(`Click-through: ${isClickThrough ? 'ON' : 'OFF'}`)
   })
 
-  // Ctrl+Shift+D — Show / hide dashboard
+  // Ctrl+Shift+D — Show / hide dashboard (created on first use)
   globalShortcut.register('CommandOrControl+Shift+D', () => {
-    if (!dashboardWindow || dashboardWindow.isDestroyed()) return
-    if (dashboardWindow.isVisible()) {
+    if (dashboardWindow && !dashboardWindow.isDestroyed() && dashboardWindow.isVisible()) {
       dashboardWindow.hide()
     } else {
-      dashboardWindow.show()
-      dashboardWindow.focus()
+      showDashboard()
     }
   })
 
@@ -245,7 +273,7 @@ function createTray() {
     },
     {
       label: 'Show Dashboard',
-      click: () => { dashboardWindow?.show(); dashboardWindow?.focus() }
+      click: () => showDashboard()
     },
     { type: 'separator' },
     {
@@ -288,7 +316,8 @@ function registerIPC() {
     if (dashboardWindow?.isMaximized()) dashboardWindow.unmaximize()
     else dashboardWindow?.maximize()
   })
-  ipcMain.handle('window:close', () => dashboardWindow?.close())
+  ipcMain.handle('window:close', () => dashboardWindow?.hide())
+  ipcMain.handle('window:showDashboard', () => showDashboard())
 
   // Stealth
   ipcMain.handle('stealth:toggle', (_e, enable: boolean) => {
@@ -315,63 +344,66 @@ function registerIPC() {
     return { success: true }
   })
 
-  // Overlay → Dashboard: forward session data
-  ipcMain.handle('overlay:save-session', (_e, sessionData) => {
+  // Overlay → disk (always) → dashboard (only if it happens to be open)
+  ipcMain.handle('overlay:save-session', (_e, session) => {
+    const meeting = sessionToMeeting(session)
+    saveMeeting(meeting)
     if (dashboardWindow && !dashboardWindow.isDestroyed()) {
-      dashboardWindow.webContents.send('session-saved', sessionData)
+      dashboardWindow.webContents.send('session-saved', meeting)
     }
     return { success: true }
-  })
-
-  // Overlay requests transcription
-  ipcMain.handle('overlay:transcribe', async (_e, args: { audioBlob: ArrayBuffer; apiKey: string }) => {
-    // This would call the Deepgram handler logic
-    // For now, forward to the deepgram handler channel
-    return { success: true, message: 'Transcription request received' }
   })
 }
 
 // ─── App Lifecycle ──────────────────────────────────────────
+// Must run before ready — lets wavesurfer fetch/seek recorded audio.
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'eves-audio', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: true } }
+])
+
 app.whenReady().then(() => {
-  // Create both windows
-  dashboardWindow = createDashboardWindow()
+  migrateSettings()
+
+  // Stealth decided before any window exists so both are born protected
+  const settings = getSettings()
+  isStealthActive = settings.stealthOnLaunch && process.platform !== 'linux'
+
+  // Overlay only — dashboard opens on Ctrl+Shift+D
   overlayWindow = createOverlayWindow()
 
   // Register all handlers
-  registerDeepgramHandlers(overlayWindow)
+  registerDeepgramHandlers()
   registerGroqHandlers()
   registerDriveHandlers()
   registerNotionHandlers()
   registerSettingsHandlers()
+  registerRecorderHandlers()
   registerIPC()
   registerHotkeys()
 
   // Tray
   try { createTray() } catch {}
 
-  // Auto-enable stealth on launch if configured
-  const settings = getSettings()
-  if (settings.stealthOnLaunch && process.platform !== 'linux') {
-    setStealth(overlayWindow, true)
-    isStealthActive = true
-  }
+  if (isStealthActive) setStealth(overlayWindow, true)
 
-  console.log('EVES started — Both windows visible')
-  console.log('Overlay top-right | Dashboard centered')
-  console.log('Ctrl+Shift+L to start listening')
+  const recovered = recoverOrphanRecordings()
+  if (recovered > 0) console.log(`Recovered ${recovered} orphaned recording(s) from a previous session`)
+
+  console.log(`EVES started — overlay only${isStealthActive ? ' (stealth ON)' : ''}`)
+  console.log('Ctrl+Shift+L to listen  |  Ctrl+Shift+D for dashboard')
 })
+
+// Let the hide-on-close handlers know a real quit is in progress
+app.on('before-quit', () => { isQuitting = true })
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
 })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+// Overlay lives in the tray — closing windows must not kill EVES
+app.on('window-all-closed', () => {})
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    dashboardWindow = createDashboardWindow()
-    overlayWindow = createOverlayWindow()
-  }
+  if (!overlayWindow || overlayWindow.isDestroyed()) overlayWindow = createOverlayWindow()
+  else overlayWindow.show()
 })

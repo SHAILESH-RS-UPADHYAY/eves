@@ -5,6 +5,7 @@ interface MeetingsStore {
   meetings: Meeting[]
   activeMeetingId: string | null
 
+  loadMeetings: () => Promise<void>
   addMeeting: (meeting: Meeting) => void
   updateMeeting: (id: string, partial: Partial<Meeting>) => void
   deleteMeeting: (id: string) => void
@@ -19,8 +20,16 @@ export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
   meetings: [],
   activeMeetingId: null,
 
+  loadMeetings: async () => {
+    const saved = await window.eves?.getMeetings()
+    if (saved?.length) set({ meetings: saved })
+  },
+
+  // Dedupe by id — main persists overlay sessions too, so one can arrive twice
   addMeeting: (meeting) =>
-    set((state) => ({ meetings: [meeting, ...state.meetings] })),
+    set((state) => ({
+      meetings: [meeting, ...state.meetings.filter((m) => m.id !== meeting.id)]
+    })),
 
   updateMeeting: (id, partial) =>
     set((state) => ({
@@ -30,10 +39,16 @@ export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
     })),
 
   deleteMeeting: (id) =>
-    set((state) => ({
-      meetings: state.meetings.filter((m) => m.id !== id),
-      activeMeetingId: state.activeMeetingId === id ? null : state.activeMeetingId
-    })),
+    set((state) => {
+      // Drop the audio too, or startup recovery re-adds it as a "Recovered" meeting.
+      // Main ignores paths outside EVES's own recordings dir.
+      const gone = state.meetings.find((m) => m.id === id)
+      if (gone?.audioPath) window.eves?.deleteRecording(gone.audioPath)
+      return {
+        meetings: state.meetings.filter((m) => m.id !== id),
+        activeMeetingId: state.activeMeetingId === id ? null : state.activeMeetingId
+      }
+    }),
 
   setActiveMeeting: (id) => set({ activeMeetingId: id }),
 
@@ -65,3 +80,9 @@ export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
       )
     }))
 }))
+
+// Persist every change — meetings survive a restart.
+// ponytail: whole list rewritten per change; fine at hundreds of meetings.
+useMeetingsStore.subscribe((state, prev) => {
+  if (state.meetings !== prev.meetings) window.eves?.saveMeetings(state.meetings)
+})
