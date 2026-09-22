@@ -8,6 +8,7 @@ const pageTitles: Record<string, string> = {
   dashboard: 'MAIN_INTERFACE',
   meetings: 'SESSION_LOGS',
   transcripts: 'TRANSCRIPT_DB',
+  repo: 'REPO_SYNTHESIS',
   integrations: 'EXT_SERVICES',
   settings: 'CONFIG'
 }

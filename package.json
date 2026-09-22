@@ -4,6 +4,8 @@
   "description": "EVES — Meeting Intelligence Dashboard",
   "main": "out/main/index.js",
   "scripts": {
+    "start": "node launcher/runner.js",
+    "dashboard": "node launcher/runner.js --dashboard",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "package": "npm run build && electron-builder",

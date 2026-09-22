@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { AppSettings, Meeting, MeetingAnalysis } from '../src/types'
+import type { AppSettings, Meeting, MeetingAnalysis, IpcResult, RepoInfo, RepoSynthesisResult } from '../src/types'
 
 const api = {
   // ─── Transcription ──────────────────────────────────────
@@ -7,6 +7,19 @@ const api = {
     ipcRenderer.invoke('deepgram:transcribe', args),
   onTranscribeProgress: (callback: (pct: number) => void) =>
     ipcRenderer.on('deepgram:progress', (_e, pct) => callback(pct)),
+
+  // ─── Repository Intel ───────────────────────────────────
+  selectRepoFolder: () =>
+    ipcRenderer.invoke('repo:select-folder') as Promise<IpcResult<string>>,
+  scanRepoFolder: (folderPath: string) =>
+    ipcRenderer.invoke('repo:scan-folder', folderPath) as Promise<IpcResult<RepoInfo>>,
+  synthesizeRepoDirective: (args: {
+    repoInfo: RepoInfo
+    transcript: string
+    meetingTitle?: string
+    meetingId?: string
+    apiKey: string
+  }) => ipcRenderer.invoke('repo:synthesize', args) as Promise<IpcResult<RepoSynthesisResult>>,
 
   // ─── Recording ──────────────────────────────────────────
   appendRecording: (args: { id: string; data: ArrayBuffer }) =>

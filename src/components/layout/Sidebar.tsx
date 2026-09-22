@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LayoutDashboard, Mic, FileText, Link2, Settings } from 'lucide-react'
+import { LayoutDashboard, Mic, FileText, FolderGit2, Link2, Settings } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
 import { EvesLogo } from '../brand/EvesLogo'
 import type { NavPage } from '../../types'
@@ -9,6 +9,7 @@ const navItems: { page: NavPage; icon: typeof LayoutDashboard; label: string; cm
   { page: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', cmd: 'main.sh' },
   { page: 'meetings', icon: Mic, label: 'Meetings', cmd: 'logs.sh' },
   { page: 'transcripts', icon: FileText, label: 'Transcripts', cmd: 'cat.sh' },
+  { page: 'repo', icon: FolderGit2, label: 'Repo Intel', cmd: 'repo.sh' },
   { page: 'integrations', icon: Link2, label: 'Integrations', cmd: 'sync.sh' },
   { page: 'settings', icon: Settings, label: 'Settings', cmd: 'cfg.sh' }
 ]

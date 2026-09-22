@@ -46,7 +46,7 @@
     <line x1="70" y1="160" x2="840" y2="160" stroke="#39d353" stroke-opacity=".7" class="flow"/>
     <path d="M220,160 L300,238" stroke="#22d3ee" stroke-opacity=".3"/>
     <path d="M300,238 L380,160" stroke="#22d3ee" stroke-opacity=".3"/>
-    <line x1="220" y1="96" x2="220" y2="150" stroke="#ff5370" stroke-opacity=".45" stroke-dasharray="3 4"/>
+    <line x1="220" y1="96" x2="220" y2="150" stroke="#61afef" stroke-opacity=".45" stroke-dasharray="3 4"/>
     <line x1="840" y1="150" x2="840" y2="96" stroke="#f78c6c" stroke-opacity=".4"/>
     <line x1="840" y1="170" x2="840" y2="228" stroke="#7ee787" stroke-opacity=".4"/>
   </g>
@@ -83,12 +83,12 @@
     <!-- DASHBOARD -->
     <circle cx="840" cy="160" r="15" fill="#22d3ee22" class="glow"/><circle cx="840" cy="160" r="7" fill="#0d1117" stroke="#22d3ee" stroke-width="1.6" class="pulse3"/>
     <text x="840" y="196" fill="#22d3ee">DASHBOARD</text>
-    <!-- STEALTH -->
-    <circle cx="220" cy="82" r="6" fill="#0d1117" stroke="#ff5370" stroke-width="1.5" class="pulse"/>
-    <text x="220" y="70" fill="#ff5370" font-size="9">STEALTH</text>
-    <!-- OVERLAY -->
+    <!-- PROMPT ENGINE -->
+    <circle cx="220" cy="82" r="6" fill="#0d1117" stroke="#61afef" stroke-width="1.5" class="pulse"/>
+    <text x="220" y="70" fill="#61afef" font-size="9">PROMPT ENGINE</text>
+    <!-- CURSOR / IDE -->
     <circle cx="300" cy="238" r="6" fill="#0d1117" stroke="#22d3ee" stroke-width="1.5" class="pulse2"/>
-    <text x="300" y="262" fill="#22d3ee" font-size="9">OVERLAY HUD</text>
+    <text x="300" y="262" fill="#22d3ee" font-size="9">CURSOR / LLM</text>
     <!-- NOTION -->
     <circle cx="840" cy="82" r="6" fill="#0d1117" stroke="#f78c6c" stroke-width="1.5" class="pulse"/>
     <text x="840" y="70" fill="#f78c6c" font-size="9">NOTION</text>

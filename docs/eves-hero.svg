@@ -54,21 +54,21 @@
           <text x="266" y="84"><tspan fill="#8b949e">17:08:07</tspan> <tspan fill="#7ee787">[ OK ]</tspan> neural core initialized</text>
           <text x="266" y="101"><tspan fill="#8b949e">17:08:08</tspan> <tspan fill="#22d3ee">[INFO]</tspan> deepgram nova-2 websocket ready</text>
           <text x="266" y="118"><tspan fill="#8b949e">17:08:09</tspan> <tspan fill="#6e7681">[ DBG]</tspan> pcm chunk 4096 samples @ 16kHz</text>
-          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> stealth active · WDA_EXCLUDEFROMCAPTURE</text>
+          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> audio stream ready · loopback + mic</text>
           <text x="266" y="152"><tspan fill="#8b949e">17:08:12</tspan> <tspan fill="#22d3ee">[INFO]</tspan> hotkey Ctrl+Shift+L registered</text>
           <text x="266" y="169"><tspan fill="#8b949e">17:08:14</tspan> <tspan fill="#6e7681">[ DBG]</tspan> interim: "let's circle back on the…"</text>
           <text x="266" y="186"><tspan fill="#8b949e">17:08:15</tspan> <tspan fill="#ffcb6b">[WARN]</tspan> latency spike 78ms</text>
           <text x="266" y="203"><tspan fill="#8b949e">17:08:17</tspan> <tspan fill="#22d3ee">[INFO]</tspan> groq inference queued · llama-3.1-70b</text>
           <text x="266" y="220"><tspan fill="#8b949e">17:08:19</tspan> <tspan fill="#7ee787">[ OK ]</tspan> summary + intent + actions extracted</text>
           <text x="266" y="237"><tspan fill="#8b949e">17:08:21</tspan> <tspan fill="#6e7681">[ DBG]</tspan> ipc overlay → dashboard</text>
-          <text x="266" y="254"><tspan fill="#8b949e">17:08:22</tspan> <tspan fill="#7ee787">[ OK ]</tspan> session auto-saved · 0 telemetry</text>
-          <text x="266" y="271"><tspan fill="#8b949e">17:08:24</tspan> <tspan fill="#c678dd">[INTL]</tspan> 3 action items · 2 hidden agendas</text>
+          <text x="266" y="254"><tspan fill="#8b949e">17:08:22</tspan> <tspan fill="#7ee787">[ OK ]</tspan> session auto-saved · local storage</text>
+          <text x="266" y="271"><tspan fill="#8b949e">17:08:24</tspan> <tspan fill="#c678dd">[INTL]</tspan> 3 action items · brief + prompt ready</text>
         </g>
         <g fill="#6e7681" transform="translate(0,204)">
           <text x="266" y="84"><tspan fill="#8b949e">17:08:07</tspan> <tspan fill="#7ee787">[ OK ]</tspan> neural core initialized</text>
           <text x="266" y="101"><tspan fill="#8b949e">17:08:08</tspan> <tspan fill="#22d3ee">[INFO]</tspan> deepgram nova-2 websocket ready</text>
           <text x="266" y="118"><tspan fill="#8b949e">17:08:09</tspan> <tspan fill="#6e7681">[ DBG]</tspan> pcm chunk 4096 samples @ 16kHz</text>
-          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> stealth active · WDA_EXCLUDEFROMCAPTURE</text>
+          <text x="266" y="135"><tspan fill="#8b949e">17:08:11</tspan> <tspan fill="#7ee787">[ OK ]</tspan> audio stream ready · loopback + mic</text>
           <text x="266" y="152"><tspan fill="#8b949e">17:08:12</tspan> <tspan fill="#22d3ee">[INFO]</tspan> hotkey Ctrl+Shift+L registered</text>
           <text x="266" y="169"><tspan fill="#8b949e">17:08:14</tspan> <tspan fill="#6e7681">[ DBG]</tspan> interim: "let's circle back on the…"</text>
         </g>
@@ -77,7 +77,7 @@
 
     <!-- prompt + typewriter -->
     <text x="266" y="286" font-size="12"><tspan fill="#7ee787">evessys@localhost</tspan><tspan fill="#8b949e">:</tspan><tspan fill="#22d3ee">~/eves</tspan><tspan fill="#8b949e">$</tspan></text>
-    <text x="266" y="286" font-size="12" fill="#e6edf3" clip-path="url(#typeclip)"><tspan dx="86">./eves --stream --stealth --analyze</tspan></text>
+    <text x="266" y="286" font-size="12" fill="#e6edf3" clip-path="url(#typeclip)"><tspan dx="86">./eves --stream --listen --analyze</tspan></text>
     <rect x="368" y="276" width="7" height="13" fill="#22d3ee"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1s" repeatCount="indefinite"/></rect>
 
     <!-- waveform strip under logo -->

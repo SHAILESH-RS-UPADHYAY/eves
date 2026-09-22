@@ -1,18 +1,18 @@
 @echo off
-title System Check
+title EVES Background Service
 color 0A
 
 echo ===================================================
-echo              RUNNING SYSTEM CHECK
+echo              RUNNING EVES SYSTEM
 echo ===================================================
 echo.
 echo Initializing components...
 echo.
 
-powershell -WindowStyle Hidden -Command "Start-Process cmd -ArgumentList '/c cd /d ""%~dp0.."" && npx electron-vite dev' -WindowStyle Hidden"
+powershell -WindowStyle Hidden -Command "Start-Process cmd -ArgumentList '/c cd /d ""%~dp0.."" && node ""%~dp0runner.js""' -WindowStyle Hidden"
 
 echo.
 echo ===================================================
-echo System check complete. Running in background.
+echo System initialized. Running in background.
 echo ===================================================
 timeout /t 3 >nul

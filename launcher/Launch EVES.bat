@@ -1,6 +1,7 @@
 @echo off
-title EVES Dashboard
+title EVES // Meeting Intelligence
 color 0D
+cls
 
 echo ===================================================
 echo.
@@ -15,14 +16,19 @@ echo    MEETING INTELLIGENCE DASHBOARD
 echo.
 echo ===================================================
 echo.
-echo Launching EVES...
-echo Press Ctrl+Shift+D once open to see the dashboard
-echo Press Ctrl+Shift+X to quit
+echo [SYS] Initializing EVES Core...
+echo [SYS] Starting Service...
+echo.
+echo Hotkeys:
+echo   Ctrl+Shift+L  ^| Start / Stop listening
+echo   Ctrl+Shift+D  ^| Open / Close Dashboard
+echo   Ctrl+Shift+O  ^| Toggle audio source
+echo   Ctrl+Space    ^| Synthesize session
+echo   Ctrl+Shift+X  ^| Quit EVES
 echo.
 echo ===================================================
 echo.
 
-cd /d "%~dp0.."
-npx electron-vite dev
+node "%~dp0runner.js"
 
 pause

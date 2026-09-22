@@ -14,7 +14,7 @@ export const defaultSettings: AppSettings = {
   autoAnalyze: true,
   analysisModel: 'llama-3.1-70b-versatile',
   deleteAudioAfterTranscription: false,
-  stealthOnLaunch: true,
+  stealthOnLaunch: false,
   accentColor: '#7C3AED',
   orbIntensity: 0.13,
   reduceMotion: false
@@ -32,13 +32,17 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
   return updated
 }
 
-/** One-time: 'en' was the old default and mangles Hinglish. Runs once, then
- *  never overrides a deliberate choice again. */
+/** One-time migrations and safety defaults. */
 export function migrateSettings() {
-  if (store.get('langMigrated')) return
-  store.set('langMigrated', true)
   const stored = store.get('settings') as Partial<AppSettings> | undefined
-  if (stored?.defaultLanguage === 'en') saveSettings({ defaultLanguage: 'multi' })
+  if (!store.get('langMigrated')) {
+    store.set('langMigrated', true)
+    if (stored?.defaultLanguage === 'en') saveSettings({ defaultLanguage: 'multi' })
+  }
+  // Ensure stealth is never active by default so windows remain visible on screen share
+  if (stored?.stealthOnLaunch) {
+    saveSettings({ stealthOnLaunch: false })
+  }
 }
 
 export function getWindowBounds() {

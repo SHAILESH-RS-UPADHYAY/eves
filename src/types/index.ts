@@ -7,7 +7,7 @@ export type Urgency = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 export type MoodType = 'POSITIVE' | 'NEUTRAL' | 'TENSE' | 'MIXED' | 'PRODUCTIVE'
 export type SentimentLabel = 'POSITIVE' | 'NEUTRAL' | 'CAUTIOUS' | 'NEGATIVE'
 export type ToastType = 'success' | 'error' | 'info' | 'loading'
-export type NavPage = 'dashboard' | 'meetings' | 'transcripts' | 'integrations' | 'settings'
+export type NavPage = 'dashboard' | 'meetings' | 'transcripts' | 'repo' | 'integrations' | 'settings'
 
 export interface Word {
   word: string
@@ -172,6 +172,49 @@ export interface OverlaySession {
   utterances: Utterance[]
   audioPath: string
   audioUrl: string
+  timestamp: number
+}
+
+export interface RepoFileNode {
+  name: string
+  path: string
+  type: 'file' | 'directory'
+  children?: RepoFileNode[]
+  extension?: string
+  size?: number
+}
+
+export interface RepoInfo {
+  rootPath: string
+  name: string
+  totalFiles: number
+  totalDirectories: number
+  techStack: string[]
+  keyDependencies: string[]
+  readmeSummary?: string
+  treePreview: RepoFileNode[]
+  manifestSummary?: string
+}
+
+export interface AffectedFile {
+  path: string
+  action: 'MODIFY' | 'CREATE' | 'DELETE' | 'REFERENCE'
+  reason: string
+}
+
+export interface RepoSynthesisResult {
+  id: string
+  mainGoal: string
+  executiveSummary: string
+  repoPath: string
+  repoName: string
+  meetingTitle?: string
+  meetingId?: string
+  affectedFiles: AffectedFile[]
+  keyDecisionsAndConstraints: string[]
+  stepByStepPlan: string[]
+  cursorPrompt: string
+  suggestedBranchName?: string
   timestamp: number
 }
 

@@ -6,6 +6,7 @@ import { registerGroqHandlers } from './ipc/groq.handler'
 import { registerDriveHandlers } from './ipc/drive.handler'
 import { registerNotionHandlers } from './ipc/notion.handler'
 import { registerSettingsHandlers } from './ipc/settings.handler'
+import { registerRepoHandlers } from './ipc/repo.handler'
 import { setStealth } from './utils/stealth'
 import { getWindowBounds, saveWindowBounds, getSettings, migrateSettings } from './utils/store'
 
@@ -70,7 +71,7 @@ function createDashboardWindow(): BrowserWindow {
     }
   })
 
-  if (isStealthActive && process.platform !== 'linux') win.setContentProtection(true)
+  if (process.platform !== 'linux') win.setContentProtection(false)
 
   return win
 }
@@ -151,7 +152,7 @@ function createOverlayWindow(): BrowserWindow {
     isOverlayVisible = false
   })
 
-  if (isStealthActive && process.platform !== 'linux') win.setContentProtection(true)
+  if (process.platform !== 'linux') win.setContentProtection(false)
 
   return win
 }
@@ -165,19 +166,19 @@ function setClickThrough(enabled: boolean) {
   }
 }
 
-// ─── Stealth Toggle ─────────────────────────────────────────
+// ─── Stealth Toggle (Disabled to ensure visibility during screen share) ───
 function toggleStealth() {
-  isStealthActive = !isStealthActive
+  isStealthActive = false
   if (process.platform !== 'linux') {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
-      overlayWindow.setContentProtection(isStealthActive)
+      overlayWindow.setContentProtection(false)
     }
     if (dashboardWindow && !dashboardWindow.isDestroyed()) {
-      dashboardWindow.setContentProtection(isStealthActive)
+      dashboardWindow.setContentProtection(false)
     }
   }
   if (overlayWindow && !overlayWindow.isDestroyed()) {
-    overlayWindow.webContents.send('stealth-changed', isStealthActive)
+    overlayWindow.webContents.send('stealth-changed', false)
   }
 }
 
@@ -256,7 +257,6 @@ function registerHotkeys() {
   console.log('  Ctrl+Shift+O  → Toggle audio source')
   console.log('  Ctrl+Shift+T  → Toggle click-through')
   console.log('  Ctrl+Shift+D  → Show/Hide dashboard')
-  console.log('  Ctrl+Shift+S  → Toggle stealth')
   console.log('  Ctrl+Space    → Save session')
   console.log('  Ctrl+Shift+X  → Quit')
 }
@@ -319,18 +319,18 @@ function registerIPC() {
   ipcMain.handle('window:close', () => dashboardWindow?.hide())
   ipcMain.handle('window:showDashboard', () => showDashboard())
 
-  // Stealth
-  ipcMain.handle('stealth:toggle', (_e, enable: boolean) => {
-    isStealthActive = enable
+  // Stealth (disabled so windows remain visible during screen shares)
+  ipcMain.handle('stealth:toggle', (_e, _enable: boolean) => {
+    isStealthActive = false
     if (process.platform !== 'linux') {
-      overlayWindow?.setContentProtection(enable)
-      dashboardWindow?.setContentProtection(enable)
+      overlayWindow?.setContentProtection(false)
+      dashboardWindow?.setContentProtection(false)
     }
-    return { supported: process.platform !== 'linux', active: enable }
+    return { supported: process.platform !== 'linux', active: false }
   })
   ipcMain.handle('stealth:status', () => ({
     supported: process.platform !== 'linux',
-    active: isStealthActive
+    active: false
   }))
 
   // Launch overlay from dashboard
@@ -364,12 +364,19 @@ protocol.registerSchemesAsPrivileged([
 app.whenReady().then(() => {
   migrateSettings()
 
-  // Stealth decided before any window exists so both are born protected
-  const settings = getSettings()
-  isStealthActive = settings.stealthOnLaunch && process.platform !== 'linux'
+  // Always keep windows visible during screen share
+  isStealthActive = false
 
-  // Overlay only — dashboard opens on Ctrl+Shift+D
+  // Check if dashboard should be opened directly
+  const openDashboardDirectly = process.argv.includes('--dashboard') || process.env.EVES_OPEN_DASHBOARD === '1'
+
+  // Initialize overlay window
   overlayWindow = createOverlayWindow()
+
+  // Open dashboard immediately if requested
+  if (openDashboardDirectly) {
+    showDashboard()
+  }
 
   // Register all handlers
   registerDeepgramHandlers()
@@ -378,18 +385,17 @@ app.whenReady().then(() => {
   registerNotionHandlers()
   registerSettingsHandlers()
   registerRecorderHandlers()
+  registerRepoHandlers()
   registerIPC()
   registerHotkeys()
 
   // Tray
   try { createTray() } catch {}
 
-  if (isStealthActive) setStealth(overlayWindow, true)
-
   const recovered = recoverOrphanRecordings()
   if (recovered > 0) console.log(`Recovered ${recovered} orphaned recording(s) from a previous session`)
 
-  console.log(`EVES started — overlay only${isStealthActive ? ' (stealth ON)' : ''}`)
+  console.log('EVES started')
   console.log('Ctrl+Shift+L to listen  |  Ctrl+Shift+D for dashboard')
 })
 

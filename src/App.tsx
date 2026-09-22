@@ -9,6 +9,7 @@ import { NotionExport } from './components/integrations/NotionExport'
 import { SettingsModal } from './components/settings/SettingsModal'
 import { IntegrationsPage } from './components/integrations/IntegrationsPage'
 import { TranscriptsPage } from './components/meeting/TranscriptsPage'
+import { RepoIntelPage } from './components/repo/RepoIntelPage'
 import { ControlPanelPage } from './components/settings/ControlPanelPage'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
@@ -71,6 +72,7 @@ export function App() {
             {currentPage === 'dashboard' && <DashboardPage />}
             {currentPage === 'meetings' && <MeetingPage />}
             {currentPage === 'transcripts' && <TranscriptsPage />}
+            {currentPage === 'repo' && <RepoIntelPage />}
             {currentPage === 'integrations' && <IntegrationsPage />}
             {currentPage === 'settings' && <ControlPanelPage />}
           </motion.div>

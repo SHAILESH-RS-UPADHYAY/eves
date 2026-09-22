@@ -1,325 +1,216 @@
-<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
-<!-- ║   EVES // MEETING INTELLIGENCE SYSTEM  ·  dark-web hacker edition       ║ -->
-<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+# EVES — Meeting Intelligence & Context-to-Code Pipeline
 
 <div align="center">
 
-<img src="docs/eves-hero.svg" alt="EVES — live hacker terminal" width="100%" />
-
-<br/><br/>
-
-<img src="https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=700&size=24&duration=2600&pause=800&color=22D3EE&center=true&vCenter=true&width=820&height=46&lines=YOUR+MEETINGS.+HACKED.;Real-time+transcription+%2B+AI+intelligence;Invisible+on+screen+share.+100%25+local.;Deepgram+nova-2+%E2%86%92+Groq+LLaMA-3+70B" alt="typing" />
+![Platform](https://img.shields.io/badge/Platform-Desktop_App-0d1117?style=flat-square&color=61afef)
+![React](https://img.shields.io/badge/React-18-0d1117?style=flat-square&logo=react&logoColor=22d3ee)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-0d1117?style=flat-square&logo=typescript&logoColor=61afef)
+![Deepgram](https://img.shields.io/badge/Deepgram-nova--2-0d1117?style=flat-square&color=7ee787)
+![Groq](https://img.shields.io/badge/Groq-LLaMA--3.1--70B-0d1117?style=flat-square&color=c678dd)
+![Storage](https://img.shields.io/badge/Storage-100%25_Local-0d1117?style=flat-square&color=22d3ee)
+![License](https://img.shields.io/badge/license-MIT-0d1117?style=flat-square&color=ffcb6b)
 
 <br/>
 
-![status](https://img.shields.io/badge/status-OPERATIONAL-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
-![electron](https://img.shields.io/badge/Electron-32-0d1117?style=flat-square&logo=electron&logoColor=61afef&labelColor=0d1117)
-![react](https://img.shields.io/badge/React-18-0d1117?style=flat-square&logo=react&logoColor=22d3ee&labelColor=0d1117)
-![typescript](https://img.shields.io/badge/TypeScript-5.5-0d1117?style=flat-square&logo=typescript&logoColor=61afef&labelColor=0d1117)
-![deepgram](https://img.shields.io/badge/Deepgram-nova--2-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
-![groq](https://img.shields.io/badge/Groq-LLaMA--3.1--70B-0d1117?style=flat-square&labelColor=0d1117&color=c678dd)
-![stealth](https://img.shields.io/badge/stealth-INVISIBLE-0d1117?style=flat-square&labelColor=0d1117&color=ff5370)
-![license](https://img.shields.io/badge/license-MIT-0d1117?style=flat-square&labelColor=0d1117&color=ffcb6b)
+**A personal desktop application built with React, Node.js, and TypeScript to capture remote engineering meetings, transcribe live audio with speaker diarization, and generate actionable technical briefs and production-grade LLM prompts.**
 
 </div>
 
-```bash
-$ whoami
-> EVES — the only meeting intelligence system that sees everything,
-  and stays invisible while doing it.
+---
 
-$ ./eves --what
-> Real-time transcription + AI summarization, entirely on YOUR machine
-> Invisible on screen share  (SetWindowDisplayAffinity / content protection)
-> Captures internal loopback (system audio) AND external mic
-> Atom One Dark hacker HUD — matrix rain, scanlines, glassmorphism
-> Deepgram nova-2  →  Groq LLaMA-3.1 70B  →  local history
-> Zero cloud storage. Zero telemetry. They'll never know.
-```
+## ▌ Overview
+
+When collaborating remotely, architecture reviews and technical syncs pack a tremendous amount of context into 30-minute calls: subtle design trade-offs, constraints, explicit non-goals, and implementation nuances. 
+
+While it's easy to remember the high-level instruction, the critical engineering reasoning often gets lost between the call and the keyboard. Asking senior leads to re-explain things doesn't scale and consumes valuable engineering time.
+
+**EVES** was built to eliminate this friction. It runs locally as a companion app during technical calls, captures dual-channel audio, streams it to Deepgram for real-time diarized transcription, and leverages Groq's high-speed LLaMA-3.1 70B inference to produce structured engineering briefs and ready-to-use prompts for AI coding tools like Cursor.
 
 ---
 
-## ▌ NAVIGATION
+## ▌ Core Philosophy: "Summary is Passive, Prompt is Actionable"
 
-<details open>
-<summary><b><code>$ ls -la ./docs</code></b></summary>
+Most meeting tools generate generic prose summaries that are read once and forgotten. EVES approaches meeting context from an engineer's workflow perspective:
 
-- [`▸ LIVE ARCHITECTURE`](#-live-architecture) — the whole system, wired & flowing
-- [`▸ REAL-TIME PIPELINE`](#-real-time-pipeline) — the capture → intel sequence
-- [`▸ CORE CAPABILITIES`](#-core-capabilities) — the five modules
-- [`▸ INTERFACE`](#-interface--atom-one-dark-hud) — the hacker UI
-- [`▸ KEY BINDINGS`](#-key-bindings) — every hotkey
-- [`▸ DEPLOYMENT`](#-deployment-vectors) — install & launch
-- [`▸ PROJECT STRUCTURE`](#-project-structure) — the tree
-- [`▸ TECH SPECS`](#-technical-specifications) — the stack
+1. **Structured Engineering Brief**:
+   - **Decisions Made**: Concrete technical choices agreed upon during the call.
+   - **Deliberately Avoided**: Approaches or libraries explicitly ruled out and why.
+   - **Underlying Intent**: The motivation behind architectural requests, not just literal statements.
+   - **Action Items & Owners**: Clear, attributable deliverables with context.
 
-</details>
-
----
-
-## ▌ LIVE ARCHITECTURE
-
-> Every process wired together — watch the packets flow through the pipeline.
-
-<div align="center">
-<img src="docs/eves-architecture.svg" alt="EVES live architecture — animated data flow" width="100%" />
-</div>
-
-```
-LAUNCH ─▶ ELECTRON ─▶ AUDIO ─▶ DEEPGRAM ─▶ GROQ ─▶ DASHBOARD
-   │         │  ╲                              │        ├─▶ Notion
- vbs/hta   overlay ╲──── stealth layer ────────┘        ├─▶ Drive
- /bat        hud     (invisible to screen share)        └─▶ History
-```
+2. **Production-Grade Prompt Composition**:
+   - Automatically translates meeting context into a structured, constraint-packed prompt.
+   - Ready to drop into Cursor, Claude, or Codex.
+   - Carries architectural intent, acceptance criteria, and edge cases so the AI gets code right on the first try.
+   - Shifts the developer's role from **reconstructing requirements** to **supervising and directing implementation**.
 
 ---
 
-## ▌ REAL-TIME PIPELINE
+## ▌ Architecture & Data Flow
 
-> What happens between `Ctrl+Shift+L` and a saved, analyzed session.
+```
+┌──────────────────┐       16kHz PCM Stream       ┌──────────────────┐
+│  Audio Capture   │ ───────────────────────────> │  Deepgram Nova-2 │
+│ (Loopback + Mic) │       WebSocket API          │ (Live Diarized)  │
+└──────────────────┘                              └─────────┬────────┘
+                                                            │ Live Transcript
+                                                            ▼
+┌──────────────────┐       Fast Inference         ┌──────────────────┐
+│ Local Dashboard  │ <─────────────────────────── │  Groq LLaMA-3.1  │
+│  & History Store │   Brief + Cursor Prompt      │       70B        │
+└────────┬─────────┘                              └──────────────────┘
+         │
+         ├──▶ Notion Workspace Sync
+         └──▶ Google Drive Archive
+```
+
+### End-to-End Pipeline
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'fontFamily':'monospace','primaryColor':'#161b22','primaryTextColor':'#c9d1d9','actorBkg':'#0d1117','actorBorder':'#22d3ee','actorTextColor':'#22d3ee','signalColor':'#39d353','signalTextColor':'#c9d1d9','noteBkgColor':'#161b22','noteBorderColor':'#c678dd','noteTextColor':'#ffcb6b','labelBoxBkgColor':'#0d1117','labelBoxBorderColor':'#22d3ee'}}}%%
 sequenceDiagram
     autonumber
-    participant U as USER
-    participant OL as OVERLAY
-    participant AU as AUDIO
-    participant DG as DEEPGRAM
-    participant GQ as GROQ
-    participant DB as DASHBOARD
-    U->>OL: Ctrl+Shift+L
-    OL->>AU: start capture
-    AU->>AU: select source (INT / EXT)
-    loop live stream
-        AU->>DG: PCM chunk · 16kHz
-        DG-->>OL: interim + final transcript
+    participant Dev as Engineer
+    participant App as EVES Desktop
+    participant Audio as Web Audio Pipeline
+    participant DG as Deepgram Nova-2
+    participant GQ as Groq (LLaMA-3.1 70B)
+    participant Store as Local Storage / Cloud Sync
+
+    Dev->>App: Ctrl+Shift+L (Start Session)
+    App->>Audio: Capture System Audio + Mic
+    loop Live Audio Stream
+        Audio->>DG: 16kHz PCM chunks over WebSocket
+        DG-->>App: Real-time interim & final diarized transcripts
     end
-    Note over OL: multi-color live feed, real-time
-    U->>OL: Ctrl+Space
-    OL->>GQ: full transcript
-    GQ-->>OL: summary · intent · actions
-    OL->>DB: save session (IPC)
-    Note over DB: stored in local history
-    U->>DB: open dashboard
-    DB-->>U: transcripts · analytics · export
+    Dev->>App: Ctrl+Space (End Session & Synthesize)
+    App->>GQ: Structured transcript with speaker labels
+    GQ-->>App: Engineering Brief + Production Prompt
+    App->>Store: Persist to local dashboard, Notion & Google Drive
+    App-->>Dev: Ready-to-use prompt for Cursor / IDE
 ```
 
 ---
 
-## ▌ CORE CAPABILITIES
+## ▌ Key Capabilities
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│  MODULE_01.DLL  ◆  AI TRANSCRIPTION                                                  │
-│  ■ Deepgram nova-2 — real-time streaming WebSocket                                   │
-│  ■ 16kHz PCM audio — internal loopback + external mic                                │
-│  ■ Speaker diarization — knows who said what                                         │
-│  ■ Smart formatting — punctuation, paragraphs, numbers                               │
-│                                                                                       │
-│  MODULE_02.DLL  ◆  STEALTH MODE                                                      │
-│  ■ setContentProtection() — WDA_EXCLUDEFROMCAPTURE active                            │
-│  ■ Invisible to: OBS, Zoom, Teams, Meet, Discord, screenshots                        │
-│  ■ Removed from: taskbar, Alt+Tab, window switcher                                   │
-│  ■ setIgnoreMouseEvents() — click-through mode                                       │
-│                                                                                       │
-│  MODULE_03.DLL  ◆  AUDIO CAPTURE                                                      │
-│  ■ Internal: getDisplayMedia({ audio:'loopback' }) — system audio                    │
-│  ■ External: getUserMedia() — microphone input                                       │
-│  ■ Runtime source toggle — Ctrl+Shift+O                                              │
-│                                                                                       │
-│  MODULE_04.DLL  ◆  AI SUMMARIZATION                                                  │
-│  ■ Groq LLaMA-3.1 70B — inference engine                                             │
-│  ■ Summary — what was decided, what was avoided                                      │
-│  ■ Intent detection — hidden agendas, unspoken concerns                              │
-│  ■ Action items — who needs to do what by when                                       │
-│                                                                                       │
-│  MODULE_05.DLL  ◆  SESSION HISTORY                                                   │
-│  ■ Full transcripts saved to dashboard via IPC                                       │
-│  ■ AI summaries + intent + action items per session                                  │
-│  ■ Ctrl+Space to save — auto-syncs to dashboard                                      │
-└─────────────────────────────────────────────────────────────────────────────────────┘
-```
+- **Dual-Channel Audio Capture**: Uses the Web Audio API and desktop capture loopback to record incoming system audio (remote voices) and microphone audio simultaneously downsampled to 16kHz PCM.
+- **Streaming Transcription & Speaker Diarization**: Deepgram Nova-2 WebSocket integration streams live transcripts with low latency and tags speaker changes so you know who made each architecture decision.
+- **Sub-2-Second Groq Inference**: Groq's LPU inference engine runs LLaMA-3.1 70B at blazing speeds with pay-as-you-go pricing, making per-meeting analysis cost less than a fraction of a cent.
+- **Context-to-Code Prompt Generator**: Transforms unstructured meeting conversations into structured engineering prompts ready for IDE coding assistants.
+- **Local-First & Private**: API keys, meeting transcripts, and audio data reside locally on your workstation. No third-party servers intermediary; direct communication with Deepgram and Groq APIs.
+- **Team Knowledge Base Sync**: One-click export to Notion and Google Drive to maintain shared engineering documentation.
 
 ---
 
-## ▌ INTERFACE — ATOM ONE DARK HUD
+## ▌ Keyboard Shortcuts
 
-> A top-0.1% hacker interface: charcoal glass, neon syntax colors, everything alive.
-
-| Layer | What you get |
-|:--|:--|
-| **Theme** | Atom One Dark charcoal ramp (`#16181d → #282c34`) + neon syntax palette |
-| **Logo** | Original hex-eye sigil — negative space reads as eye **and** "E", audio-equalizer pupil, sweeping scan line, orbiting node |
-| **Backgrounds** | `CyberArt` procedural SVG — `neural · stealth · waveform · network · circuit · hexcore`. 100% self-contained, always renders (no external images) |
-| **Panels** | Glassmorphism + hover-lift glow + **click-to-expand** full-screen modals |
-| **System recon** | **Real** hardware telemetry — CPU threads, GPU, device memory, battery, network, JS heap, storage, timezone |
-| **Live ops** | Threat map · packet sniffer · nmap port scan · AES cipher stream · data ticker |
-| **FX** | Matrix rain, CRT scanlines, boot sequence, glitch text, radar sweep, live log feed |
-
-```
-  COLOR CHANNELS  ░▒▓█  cyan #22d3ee   green #7ee787   red #ff5370
-                        yellow #ffcb6b  orange #f78c6c  blue #61afef  purple #c678dd
-```
+| Shortcut | Action | Description |
+|:---|:---|:---|
+| `Ctrl + Shift + L` | **Start / Stop Listening** | Toggles real-time audio capture and streaming |
+| `Ctrl + Shift + O` | **Cycle Audio Source** | Switch between System Audio, Mic, or Both |
+| `Ctrl + Shift + D` | **Toggle Dashboard** | Open or hide the main EVES meeting history dashboard |
+| `Ctrl + Space` | **Synthesize & Save** | Generates the brief, prompt, and persists the session |
+| `Ctrl + Shift + X` | **Quit Application** | Gracefully closes all background processes |
 
 ---
 
-## ▌ KEY BINDINGS
+## ▌ Technical Stack
 
-| Keybind | Action | Effect |
-|:--|:--|:--|
-| `Ctrl + Shift + L` | Start / Stop listening | Toggles the audio capture pipeline |
-| `Ctrl + Shift + A` | Hide / Show overlay | Keeps listening while hidden |
-| `Ctrl + Shift + O` | Toggle audio source | Internal ↔ External mic |
-| `Ctrl + Shift + T` | Toggle click-through | Mouse passes through the overlay |
-| `Ctrl + Shift + D` | Show / Hide dashboard | Focus the main EVES dashboard |
-| `Ctrl + Shift + S` | Toggle stealth mode | Invisible to screen share |
-| `Ctrl + Space` | Save session to history | Transcript + summary saved |
-| `Ctrl + Shift + X` | Quit EVES | Kills all processes |
-
----
-
-## ▌ DEPLOYMENT VECTORS
-
-```bash
-# ── 1. clone ──────────────────────────────────────────────
-git clone https://github.com/SHAILESH-RS-UPADHYAY/eves.git && cd eves
-
-# ── 2. install (Electron 32, React 18, Deepgram, Groq, Zustand…) ──
-npm install
-
-# ── 3. configure keys ─────────────────────────────────────
-#     Settings → api_keys → paste Deepgram + Groq → ./save_keys
-#     Keys persist locally via Conf. Never sent anywhere but the APIs.
-
-# ── 4. launch (Dashboard + Overlay) ───────────────────────
-npm run dev
-
-# ── 5. package → standalone installer ─────────────────────
-npm run build      # → out/
-npm run package    # → electron-builder installer
-```
-
-**Launch vectors** (Windows): `start.vbs` (zero visible terminal) · `start.hta` (animated) · `start.bat` (ASCII header) · `Launch EVES.bat` (one-click) · `stop.bat` (kill all).
+| Layer | Technologies |
+|:---|:---|
+| **Desktop Shell** | Node.js · TypeScript 5.5 · Native Core |
+| **Frontend UI** | React 18 · Tailwind CSS · Framer Motion · Lucide Icons |
+| **Speech-to-Text** | Deepgram Nova-2 (`@deepgram/sdk`) streaming over WebSocket |
+| **LLM Inference** | Groq SDK (`groq-sdk`) running LLaMA-3.1 70B Versatile |
+| **State Management** | Zustand 5 (client state) · Conf (persisted preferences) |
+| **Audio Processing** | Web Audio API (`ScriptProcessorNode` / loopback capture) |
+| **Integrations** | Notion API (`@notionhq/client`) · Google Drive REST API |
 
 ---
 
-## ▌ PROJECT STRUCTURE
+## ▌ Project Structure
 
 ```
-evessys@machine:~$ tree eves/ --depth 2
-
 eves/
 ├── electron/                     # Main process
-│   ├── main.ts                   # windows, hotkeys, IPC, tray, stealth
-│   ├── preload.ts                # contextBridge → window.eves.*
-│   └── ipc/                      # deepgram · groq · drive · notion · settings
+│   ├── main.ts                   # Lifecycle, window management, hotkeys, IPC
+│   ├── preload.ts                # Context bridge (window.eves.*)
+│   ├── ipc/                      # Deepgram, Groq, Drive, Notion, Recorder handlers
+│   └── utils/                    # Local storage, audio helpers, config migration
 │
-├── overlay/                      # Overlay HUD (plain HTML/CSS/JS)
-│   ├── index.html · app.js · styles.css
+├── src/                          # Dashboard & Analytics (React + TS)
+│   ├── App.tsx                   # Main application router & layout
+│   ├── components/               # UI components (transcripts, metrics, modals)
+│   ├── hooks/                    # Audio streaming, shortcut, and LLM hooks
+│   ├── store/                    # Zustand stores (meetings, settings, ui)
+│   └── types/                    # Shared TypeScript interfaces
 │
-├── src/                          # Dashboard (React + TS)
-│   ├── App.tsx  main.tsx
-│   ├── components/
-│   │   ├── brand/                # ◆ EvesLogo.tsx  (the hex-eye sigil)
-│   │   ├── hacker/               # CyberArt · CyberKit · HackerPanels
-│   │   │                         #   MatrixRain · Scanlines · BootSequence
-│   │   │                         #   GlitchText · RadarSweep · SystemStatus
-│   │   ├── dashboard/            # DashboardPage + feeds
-│   │   ├── integrations/         # IntegrationsPage (uplink matrix)
-│   │   ├── meeting/              # TranscriptsPage (signal intercept)
-│   │   ├── settings/             # ControlPanelPage (system recon)
-│   │   ├── layout/               # Sidebar · TopBar · AppShell
-│   │   └── glass/                # glass UI primitives
-│   ├── store/                    # Zustand stores
-│   ├── styles/                   # globals.css (Atom One Dark) + animations
-│   └── types/                    # TS interfaces
-│
-├── docs/                         # ◆ animated SVGs (hero + architecture)
-├── launcher/                     # start.vbs · start.hta · *.bat
-├── package.json · README.md
+├── launcher/                     # Startup scripts
+├── package.json
+└── README.md
 ```
 
 ---
 
-## ▌ HACKER COMPONENT LIBRARY
+## ▌ Getting Started
 
-```
-src/components/brand/
-  EvesLogo.tsx       ◆ Original hex-eye sigil — gradient stroke, equalizer
-                     ◆ pupil, sweeping scan line, orbiting node, HUD ticks
+### 1. Prerequisites
 
-src/components/hacker/
-  CyberArt.tsx       ◆ Procedural animated SVG backdrops (6 variants)
-                     ◆ neural · stealth · waveform · network · circuit · hexcore
-                     ◆ zero external assets — always renders offline
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [Deepgram API Key](https://deepgram.com/) (Free tier available)
+- [Groq API Key](https://groq.com/) (Pay-as-you-go, low-cost)
 
-  CyberKit.tsx       ◆ ExpandableCard (hover-lift + click-to-enlarge modal)
-                     ◆ SystemRecon — REAL laptop telemetry (CPU/GPU/mem/net…)
-                     ◆ ConnectionMatrix · ConfigConsole · DecryptStandby
+### 2. Installation
 
-  HackerPanels.tsx   ◆ PacketSniffer · PortScan · ThreatMap
-                     ◆ CipherStream (AES) · DataTicker · AsciiBanner
+```bash
+# Clone repository
+git clone https://github.com/SHAILESH-RS-UPADHYAY/eves.git
+cd eves
 
-  MatrixRain.tsx     ◆ Canvas katakana + hex rain, green glow trails
-  Scanlines.tsx      ◆ CRT lines + moving scan beam + vignette
-  BootSequence.tsx   ◆ Full-screen terminal boot animation
-  GlitchText.tsx     ◆ RGB-split glitch headline
-  RadarSweep.tsx     ◆ Rotating radar SVG + contact blips
-  SystemStatus.tsx   ◆ Live CPU / MEM / NET / latency bars
-  LiveLogFeed.tsx    ◆ Scrolling [INFO]/[WARN]/[DEBUG] log stream
+# Install dependencies
+npm install
 ```
 
----
+### 3. Launching EVES
 
-## ▌ TECHNICAL SPECIFICATIONS
+You can launch EVES via npm or with the included launchers:
 
-| Layer | Stack |
-|:--|:--|
-| **Framework** | Electron 32 · React 18 · TypeScript 5.5 |
-| **Build** | electron-vite 2.3 → `out/` |
-| **State** | Zustand 5 (renderer) · Conf 10 (main-process store) |
-| **Animation** | Framer Motion 11 · CSS keyframes · SMIL SVG |
-| **Charts** | Recharts 2 (sparklines + stats) |
-| **Audio** | Web Audio API (ScriptProcessor) · Deepgram WebSocket SDK |
-| **AI** | Groq SDK — LLaMA-3.1 70B (summary · intent · actions) |
-| **Storage** | Conf 10 → local JSON (keys, settings, window bounds) |
-| **Stealth** | setContentProtection · skipTaskbar · WS_EX_TOOLWINDOW · click-through |
-| **Theme** | Atom One Dark — `#16181d/#21252b/#282c34` + neon syntax palette |
-| **License** | MIT |
+- **Launch Dashboard Directly**: Double-click `launcher/Launch Dashboard.bat` or run:
+  ```bash
+  npm run dashboard
+  ```
+- **Launch Standard Service**: Double-click `launcher/Launch EVES.bat` or run:
+  ```bash
+  npm start
+  ```
+- **GUI Launcher**: Double-click `launcher/start.hta` to access the interactive start menu (`./open_dashboard`, `./start_eves`, `./kill_eves`).
 
----
+### 4. Configure API Keys
 
-## ▌ DEPENDENCIES
+1. Open **Settings** (`Ctrl + Shift + D` -> Settings gear).
+2. Enter your **Deepgram API Key** and **Groq API Key**.
+3. Keys are stored locally on your machine via encrypted local store and are never transmitted to external servers except direct API calls.
 
-```
-$ npm ls --depth=0
+### 4. Build Standalone App
 
-eves@1.0.0
-├── @deepgram/sdk@^3.6.0          # transcription SDK
-├── @tanstack/react-query@^5.56   # async state
-├── conf@^10.2.0                  # persistent config store
-├── framer-motion@^11.5           # animations
-├── groq-sdk@^0.7.0               # Groq AI inference
-├── lucide-react@^0.447           # icons
-├── react@^18.3.0  react-dom      # UI
-├── react-dropzone@^14.2          # file upload
-├── react-hotkeys-hook@^4.5       # hotkeys
-├── recharts@^2.12                # charts
-├── wavesurfer.js@^7.8            # audio waveform
-└── zustand@^5.0.0                # state management
+```bash
+# Compile and build bundle
+npm run build
+
+# Generate platform-specific installer
+npm run package
 ```
 
 ---
 
-<div align="center">
+## ▌ Privacy & Security
 
-<img src="https://readme-typing-svg.demolab.com/?font=Fira+Code&size=15&duration=3500&pause=1000&color=7EE787&center=true&vCenter=true&width=600&height=30&lines=root%40eves%3A~%24+built+by+SHAILESH-RS-UPADHYAY;100%25+local+%C2%B7+zero+telemetry+%C2%B7+they'll+never+know" alt="footer" />
+- **Direct API Connections**: Audio streams directly from your client to Deepgram; text transcripts stream directly to Groq. No intermediary backend or analytics servers.
+- **Local Storage**: All session logs, audio recordings, and generated briefs are stored in your local application data directory.
+- **Team Transparency**: EVES is designed as an engineering productivity assistant. Transcripts and briefs can be reviewed and pushed to team documentation (Notion / Google Drive) for transparent team record-keeping.
 
-<br/>
+---
 
-![made-with](https://img.shields.io/badge/made_with-%E2%9A%A1_%2B_%F0%9F%96%A4-0d1117?style=flat-square&labelColor=0d1117&color=22d3ee)
-![local](https://img.shields.io/badge/data-100%25_LOCAL-0d1117?style=flat-square&labelColor=0d1117&color=7ee787)
-![telemetry](https://img.shields.io/badge/telemetry-ZERO-0d1117?style=flat-square&labelColor=0d1117&color=ff5370)
+## ▌ License
 
-</div>
+MIT License. Designed and developed by [Shailesh Upadhyay](https://github.com/SHAILESH-RS-UPADHYAY).

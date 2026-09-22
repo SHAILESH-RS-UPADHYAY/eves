@@ -25,7 +25,7 @@
         }
         .container {
             width: 360px;
-            height: 480px;
+            height: 520px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -84,11 +84,11 @@
             letter-spacing: 2px;
             z-index: 2;
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         .btn {
-            width: 200px;
-            height: 52px;
+            width: 220px;
+            height: 48px;
             border: 1px solid rgba(0, 245, 255, 0.3);
             border-radius: 8px;
             cursor: pointer;
@@ -98,10 +98,10 @@
             justify-content: center;
             position: relative;
             z-index: 2;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 1px;
             color: #00F5FF;
@@ -118,6 +118,18 @@
         .btn:active {
             transform: scale(0.98);
         }
+        .btn-dash {
+            border-color: rgba(34, 214, 140, 0.4);
+            background: rgba(34, 214, 140, 0.08);
+            color: #22D68C;
+            text-shadow: 0 0 10px rgba(34, 214, 140, 0.4);
+            box-shadow: 0 0 20px rgba(34, 214, 140, 0.08);
+        }
+        .btn-dash:hover {
+            background: rgba(34, 214, 140, 0.18);
+            border-color: rgba(34, 214, 140, 0.8);
+            box-shadow: 0 0 30px rgba(34, 214, 140, 0.3);
+        }
         .btn-stop {
             border-color: rgba(255, 0, 110, 0.2);
             background: rgba(255, 0, 110, 0.04);
@@ -133,7 +145,7 @@
         .status {
             font-size: 8px;
             color: rgba(0, 245, 255, 0.2);
-            margin-top: 16px;
+            margin-top: 14px;
             z-index: 2;
             position: relative;
             letter-spacing: 1px;
@@ -152,7 +164,7 @@
         .corners {
             position: absolute;
             width: 360px;
-            height: 480px;
+            height: 520px;
             z-index: 5;
             pointer-events: none;
         }
@@ -169,26 +181,34 @@
     </style>
     <script language="VBScript">
         Sub Window_OnLoad
-            window.resizeTo 380, 500
+            window.resizeTo 380, 540
             Dim screenWidth, screenHeight
             screenWidth = document.parentWindow.screen.availWidth
             screenHeight = document.parentWindow.screen.availHeight
-            window.moveTo (screenWidth - 380) / 2, (screenHeight - 500) / 2
+            window.moveTo (screenWidth - 380) / 2, (screenHeight - 540) / 2
+        End Sub
+
+        Sub LaunchDashboard()
+            Set WshShell = CreateObject("WScript.Shell")
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
+            WshShell.Run "cmd /c node """ & launchDir & "\runner.js"" --dashboard", 0, False
+            window.close()
         End Sub
 
         Sub LaunchEves()
             Set WshShell = CreateObject("WScript.Shell")
             Set fso = CreateObject("Scripting.FileSystemObject")
             launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
-            projectDir = fso.GetParentFolderName(launchDir)
-            WshShell.Run "cmd /c cd /d """ & projectDir & """ && npx electron-vite dev", 0, False
+            WshShell.Run "cmd /c node """ & launchDir & "\runner.js""", 0, False
             window.close()
         End Sub
 
         Sub StopEves()
             Set WshShell = CreateObject("WScript.Shell")
-            WshShell.Run "cmd /c taskkill /F /IM electron.exe /T", 0, False
-            WshShell.Run "cmd /c taskkill /F /IM node.exe /T", 0, False
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
+            WshShell.Run "cmd /c """ & launchDir & "\stop.bat""", 0, False
             window.close()
         End Sub
     </script>
@@ -207,6 +227,10 @@
 
         <div class="title">EVES</div>
         <div class="subtitle">[ MEETING INTELLIGENCE SYSTEM v2.1.0 ]</div>
+
+        <button class="btn btn-dash" onclick="VBScript:LaunchDashboard()">
+            ./open_dashboard
+        </button>
 
         <button class="btn" onclick="VBScript:LaunchEves()">
             ./start_eves

@@ -306,7 +306,6 @@ export function SettingsModal() {
               {activeTab === 'privacy' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <ToggleRow label="Delete audio after transcription" value={settings.deleteAudioAfterTranscription} onChange={(v) => updateSettings({ deleteAudioAfterTranscription: v })} />
-                  <ToggleRow label="Auto-enable stealth on launch" value={settings.stealthOnLaunch} onChange={(v) => updateSettings({ stealthOnLaunch: v })} />
                   <div>
                     <GlassButton variant="danger" size="sm" onClick={() => { if (confirm('Delete all stored data? This cannot be undone.')) { } }}>
                       Clear all stored data

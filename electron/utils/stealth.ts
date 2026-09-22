@@ -8,17 +8,17 @@ export interface StealthStatus {
 let currentActive = false
 
 export function setStealth(window: BrowserWindow, enable: boolean): StealthStatus {
-  if (process.platform === 'linux') {
-    return { supported: false, active: false }
+  // Keep window visible on screen shares/recording
+  if (process.platform !== 'linux') {
+    window.setContentProtection(false)
   }
-  window.setContentProtection(enable)
-  currentActive = enable
-  return { supported: true, active: enable }
+  currentActive = false
+  return { supported: true, active: false }
 }
 
 export function getStealthStatus(): StealthStatus {
   return {
     supported: process.platform !== 'linux',
-    active: currentActive
+    active: false
   }
 }
