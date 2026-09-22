@@ -179,38 +179,54 @@
         .corners .bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
         .corners .br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
     </style>
-    <script language="VBScript">
-        Sub Window_OnLoad
-            window.resizeTo 380, 540
-            Dim screenWidth, screenHeight
-            screenWidth = document.parentWindow.screen.availWidth
-            screenHeight = document.parentWindow.screen.availHeight
-            window.moveTo (screenWidth - 380) / 2, (screenHeight - 540) / 2
-        End Sub
+    <script type="text/javascript">
+        window.onload = function() {
+            window.resizeTo(380, 540);
+            var sw = window.screen.availWidth;
+            var sh = window.screen.availHeight;
+            window.moveTo((sw - 380) / 2, (sh - 540) / 2);
+        };
 
-        Sub LaunchDashboard()
-            Set WshShell = CreateObject("WScript.Shell")
-            Set fso = CreateObject("Scripting.FileSystemObject")
-            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
-            WshShell.Run "cmd /c node """ & launchDir & "\runner.js"" --dashboard", 0, False
-            window.close()
-        End Sub
+        function getLaunchDir() {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var raw = decodeURI(window.location.href || window.location.pathname);
+            var clean = raw.split('#')[0].split('?')[0];
+            clean = clean.replace(/^file:[\\\/]+/, "").replace(/^[\\\/]+/, "").replace(/\//g, "\\");
+            return fso.GetParentFolderName(clean);
+        }
 
-        Sub LaunchEves()
-            Set WshShell = CreateObject("WScript.Shell")
-            Set fso = CreateObject("Scripting.FileSystemObject")
-            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
-            WshShell.Run "cmd /c node """ & launchDir & "\runner.js""", 0, False
-            window.close()
-        End Sub
+        function launchDashboard() {
+            try {
+                var wsh = new ActiveXObject("WScript.Shell");
+                var dir = getLaunchDir();
+                wsh.Run('cmd /c node "' + dir + '\\runner.js" --dashboard', 0, false);
+                window.close();
+            } catch (e) {
+                alert("Error launching dashboard: " + e.message);
+            }
+        }
 
-        Sub StopEves()
-            Set WshShell = CreateObject("WScript.Shell")
-            Set fso = CreateObject("Scripting.FileSystemObject")
-            launchDir = fso.GetParentFolderName(WScript.ScriptFullName)
-            WshShell.Run "cmd /c """ & launchDir & "\stop.bat""", 0, False
-            window.close()
-        End Sub
+        function launchEves() {
+            try {
+                var wsh = new ActiveXObject("WScript.Shell");
+                var dir = getLaunchDir();
+                wsh.Run('cmd /c node "' + dir + '\\runner.js"', 0, false);
+                window.close();
+            } catch (e) {
+                alert("Error launching EVES: " + e.message);
+            }
+        }
+
+        function stopEves() {
+            try {
+                var wsh = new ActiveXObject("WScript.Shell");
+                var dir = getLaunchDir();
+                wsh.Run('cmd /c "' + dir + '\\stop.bat"', 0, false);
+                window.close();
+            } catch (e) {
+                alert("Error stopping EVES: " + e.message);
+            }
+        }
     </script>
 </head>
 <body>
@@ -228,15 +244,15 @@
         <div class="title">EVES</div>
         <div class="subtitle">[ MEETING INTELLIGENCE SYSTEM v2.1.0 ]</div>
 
-        <button class="btn btn-dash" onclick="VBScript:LaunchDashboard()">
+        <button class="btn btn-dash" onclick="launchDashboard()">
             ./open_dashboard
         </button>
 
-        <button class="btn" onclick="VBScript:LaunchEves()">
+        <button class="btn" onclick="launchEves()">
             ./start_eves
         </button>
 
-        <button class="btn btn-stop" onclick="VBScript:StopEves()">
+        <button class="btn btn-stop" onclick="stopEves()">
             ./kill_eves
         </button>
 

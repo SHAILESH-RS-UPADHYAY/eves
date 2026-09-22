@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
-import { Minus, Square, X, Shield } from 'lucide-react'
+import { Minus, Square, X } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
-import { useStealth } from '../../hooks/useStealth'
 import { EvesLogo } from '../brand/EvesLogo'
 
 const pageTitles: Record<string, string> = {
@@ -15,7 +14,6 @@ const pageTitles: Record<string, string> = {
 
 export function TopBar() {
   const currentPage = useUIStore((s) => s.currentPage)
-  const { isStealthActive, toggleStealth } = useStealth()
 
   const platform = typeof window !== 'undefined' && (window as any).eves?.platform
   const isWin = platform === 'win32'
@@ -60,45 +58,8 @@ export function TopBar() {
         <span style={{ fontSize: '9px', color: 'rgba(0, 245, 255, 0.4)' }}>NET: 16kHz</span>
       </div>
 
-      {/* Right: stealth + window controls */}
+      {/* Right: window controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' as any }}>
-        <motion.button
-          onClick={toggleStealth}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            background: isStealthActive ? 'rgba(34,214,140,0.08)' : 'rgba(255,255,255,0.02)',
-            border: isStealthActive ? '1px solid rgba(34,214,140,0.25)' : '1px solid rgba(255,255,255,0.06)',
-            color: isStealthActive ? '#22D68C' : 'rgba(255,255,255,0.5)',
-            fontSize: '9px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontFamily: '"Courier New", monospace',
-            letterSpacing: '0.5px',
-            textShadow: isStealthActive ? '0 0 8px rgba(34,214,140,0.4)' : 'none'
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.96 }}
-        >
-          {isStealthActive && (
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: '#22D68C',
-                boxShadow: '0 0 8px #22D68C',
-                animation: 'pulseDot 1.5s ease-in-out infinite'
-              }}
-            />
-          )}
-          <Shield size={11} />
-          <span>STEALTH</span>
-        </motion.button>
-
         {isWin && (
           <div style={{ display: 'flex', gap: '4px' }}>
             <button
