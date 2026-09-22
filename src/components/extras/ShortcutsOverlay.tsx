@@ -3,18 +3,18 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { useUIStore } from '../../store/ui.store'
 
 const shortcuts = [
+  { keys: 'Alt + D', action: 'Toggle Dashboard Window' },
+  { keys: 'Alt + L', action: 'Start / Stop Listening' },
+  { keys: 'Alt + Backspace', action: 'Hide / Show Overlay' },
+  { keys: 'Alt + O', action: 'Toggle Audio Source' },
+  { keys: 'Alt + Space', action: 'Synthesize & Save Session' },
+  { keys: 'Alt + Q', action: 'Quit EVES' },
   { keys: 'Ctrl/Cmd + K', action: 'Command Palette' },
   { keys: 'Ctrl/Cmd + U', action: 'Upload Recording' },
   { keys: 'Ctrl/Cmd + N', action: 'Export to Notion' },
-  { keys: 'Ctrl/Cmd + S', action: 'Save Notes' },
-  { keys: 'Ctrl/Cmd+Shift+S', action: 'Toggle Stealth' },
-  { keys: 'Ctrl/Cmd+Shift+E', action: 'Show/Hide Window' },
-  { keys: 'Ctrl/Cmd + F', action: 'Search Transcripts' },
-  { keys: 'Ctrl/Cmd + ,', action: 'Open Settings' },
-  { keys: 'Space', action: 'Play/Pause Audio' },
-  { keys: 'J / L', action: 'Seek -5s / +5s' },
+  { keys: 'Space', action: 'Play / Pause Audio' },
   { keys: 'Escape', action: 'Close Modal' },
-  { keys: '?', action: 'Show This Overlay' }
+  { keys: '?', action: 'Show Shortcuts Modal' }
 ]
 
 export function ShortcutsOverlay() {

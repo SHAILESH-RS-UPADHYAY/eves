@@ -182,10 +182,10 @@ function toggleStealth() {
   }
 }
 
-// ─── Global Hotkeys (different from Acemate) ────────────────
+// ─── Global Hotkeys (Alt-based — zero Ctrl/Shift collision with Acemate) ──
 function registerHotkeys() {
-  // Ctrl+Shift+L — Start / Stop listening
-  globalShortcut.register('CommandOrControl+Shift+L', () => {
+  // Alt+L — Start / Stop listening
+  globalShortcut.register('Alt+L', () => {
     isListening = !isListening
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.webContents.send('toggle-listening', isListening)
@@ -193,22 +193,22 @@ function registerHotkeys() {
     console.log(`Listening: ${isListening ? 'ON' : 'OFF'}`)
   })
 
-  // Ctrl+Shift+A — Hide overlay (keeps listening)
-  globalShortcut.register('CommandOrControl+Shift+A', () => {
-    if (isOverlayVisible) {
-      overlayWindow?.hide()
-      isOverlayVisible = false
-    } else {
-      overlayWindow?.show()
-      isOverlayVisible = true
-    }
+  // Alt+Backspace — Hide / Show overlay (keeps listening)
+  globalShortcut.register('Alt+Backspace', () => {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
+      if (isOverlayVisible) {
+        overlayWindow.hide()
+        isOverlayVisible = false
+      } else {
+        overlayWindow.show()
+        isOverlayVisible = true
+      }
       overlayWindow.webContents.send('visibility-changed', isOverlayVisible)
     }
   })
 
-  // Ctrl+Shift+O — Toggle audio source (internal / external)
-  globalShortcut.register('CommandOrControl+Shift+O', () => {
+  // Alt+O — Toggle audio source (internal / external)
+  globalShortcut.register('Alt+O', () => {
     currentSource = sources[(sources.indexOf(currentSource) + 1) % sources.length]
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.webContents.send('source-changed', currentSource)
@@ -216,14 +216,14 @@ function registerHotkeys() {
     console.log(`Source: ${currentSource}`)
   })
 
-  // Ctrl+Shift+T — Toggle click-through
-  globalShortcut.register('CommandOrControl+Shift+T', () => {
+  // Alt+T — Toggle click-through
+  globalShortcut.register('Alt+T', () => {
     setClickThrough(!isClickThrough)
     console.log(`Click-through: ${isClickThrough ? 'ON' : 'OFF'}`)
   })
 
-  // Ctrl+Shift+D — Show / hide dashboard (created on first use)
-  globalShortcut.register('CommandOrControl+Shift+D', () => {
+  // Alt+D — Show / hide dashboard
+  globalShortcut.register('Alt+D', () => {
     if (dashboardWindow && !dashboardWindow.isDestroyed() && dashboardWindow.isVisible()) {
       dashboardWindow.hide()
     } else {
@@ -231,34 +231,28 @@ function registerHotkeys() {
     }
   })
 
-  // Ctrl+Shift+S — Toggle stealth
-  globalShortcut.register('CommandOrControl+Shift+S', () => {
-    toggleStealth()
-    console.log(`Stealth: ${isStealthActive ? 'ON' : 'OFF'}`)
-  })
-
-  // Ctrl+Space — Save session to history
-  globalShortcut.register('CommandOrControl+Space', () => {
+  // Alt+Space — Save session to history
+  globalShortcut.register('Alt+Space', () => {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.webContents.send('save-session')
     }
     console.log('Session saved')
   })
 
-  // Ctrl+Shift+X — Quit EVES
-  globalShortcut.register('CommandOrControl+Shift+X', () => {
+  // Alt+Q — Quit EVES
+  globalShortcut.register('Alt+Q', () => {
     console.log('Quitting EVES...')
     app.quit()
   })
 
-  console.log('Hotkeys registered:')
-  console.log('  Ctrl+Shift+L  → Start/Stop listening')
-  console.log('  Ctrl+Shift+A  → Hide/Show overlay')
-  console.log('  Ctrl+Shift+O  → Toggle audio source')
-  console.log('  Ctrl+Shift+T  → Toggle click-through')
-  console.log('  Ctrl+Shift+D  → Show/Hide dashboard')
-  console.log('  Ctrl+Space    → Save session')
-  console.log('  Ctrl+Shift+X  → Quit')
+  console.log('EVES Hotkeys active (Alt-based):')
+  console.log('  Alt+L          → Start/Stop listening')
+  console.log('  Alt+Backspace  → Hide/Show overlay')
+  console.log('  Alt+D          → Show/Hide dashboard')
+  console.log('  Alt+O          → Toggle audio source')
+  console.log('  Alt+T          → Toggle click-through')
+  console.log('  Alt+Space      → Save session')
+  console.log('  Alt+Q          → Quit')
 }
 
 // ─── Tray ───────────────────────────────────────────────────
@@ -370,12 +364,12 @@ app.whenReady().then(() => {
   // Check if dashboard should be opened directly
   const openDashboardDirectly = process.argv.includes('--dashboard') || process.env.EVES_OPEN_DASHBOARD === '1'
 
-  // Initialize overlay window
-  overlayWindow = createOverlayWindow()
-
-  // Open dashboard immediately if requested
   if (openDashboardDirectly) {
+    // Launch ONLY the dashboard window — do not launch overlay
     showDashboard()
+  } else {
+    // Standard EVES launch — overlay window only
+    overlayWindow = createOverlayWindow()
   }
 
   // Register all handlers
@@ -395,8 +389,8 @@ app.whenReady().then(() => {
   const recovered = recoverOrphanRecordings()
   if (recovered > 0) console.log(`Recovered ${recovered} orphaned recording(s) from a previous session`)
 
-  console.log('EVES started')
-  console.log('Ctrl+Shift+L to listen  |  Ctrl+Shift+D for dashboard')
+  console.log('EVES Core Online')
+  console.log('Alt+L to listen  |  Alt+D for dashboard  |  Alt+Backspace to toggle overlay')
 })
 
 // Let the hide-on-close handlers know a real quit is in progress

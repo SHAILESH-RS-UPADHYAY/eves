@@ -106,11 +106,13 @@ sequenceDiagram
 
 | Shortcut | Action | Description |
 |:---|:---|:---|
-| `Ctrl + Shift + L` | **Start / Stop Listening** | Toggles real-time audio capture and streaming |
-| `Ctrl + Shift + O` | **Cycle Audio Source** | Switch between System Audio, Mic, or Both |
-| `Ctrl + Shift + D` | **Toggle Dashboard** | Open or hide the main EVES meeting history dashboard |
-| `Ctrl + Space` | **Synthesize & Save** | Generates the brief, prompt, and persists the session |
-| `Ctrl + Shift + X` | **Quit Application** | Gracefully closes all background processes |
+| `Alt + D` | **Toggle Dashboard** | Open or hide the main EVES meeting history dashboard |
+| `Alt + L` | **Start / Stop Listening** | Toggles real-time audio capture and streaming |
+| `Alt + Backspace` | **Hide / Show Overlay** | Toggles the desktop overlay HUD |
+| `Alt + O` | **Cycle Audio Source** | Switch between System Audio, Mic, or Both |
+| `Alt + T` | **Toggle Click-Through** | Enables mouse pass-through mode |
+| `Alt + Space` | **Synthesize & Save** | Generates the brief, prompt, and persists the session |
+| `Alt + Q` | **Quit Application** | Gracefully closes EVES |
 
 ---
 
