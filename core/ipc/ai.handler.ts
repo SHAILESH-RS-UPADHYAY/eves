@@ -56,7 +56,6 @@ export function registerAiHandlers() {
         meeting,
         history: req.messages,
         pill: req.pill,
-        settings,
         company: repoContext(settings.companyRepoPath, 'company', budget * 0.22, query),
         vault: repoContext(settings.referenceRepoPath, 'vault', budget * 0.14, query),
         budget

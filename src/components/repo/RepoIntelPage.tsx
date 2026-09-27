@@ -624,7 +624,7 @@ ${synthesisResult.cursorPrompt}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {synthesisResult ? (
             <>
-              {/* 1. PRIMARY DIRECTIVE CARD ("Krna Kya Hai") */}
+              {/* 1. PRIMARY DIRECTIVE CARD ("What Needs To Be Done") */}
               <div
                 style={{
                   padding: '18px 20px',

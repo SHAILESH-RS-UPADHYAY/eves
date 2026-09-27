@@ -87,7 +87,7 @@ export function talkTime(m: Meeting): Record<string, number> {
   return Object.fromEntries(Object.entries(bySpeaker).map(([s, t]) => [s, total ? Math.round((t / total) * 100) : 0]))
 }
 
-// English + Hinglish filler — what a word cloud should never show
+// English and Hindi filler words — what a word cloud should never show
 const STOP = new Set(`the and for you your not but all are was were has had have this that these those with from what when where which who how why our out
 about into then than them they their its it's i'm we let lets let's say said see make sure thing things some any very much more only now here well just like yeah
 yes okay also can will would should could there get got going know think want need one two right actually basically really because been being does did doing
@@ -107,7 +107,7 @@ const terms = (text: string) => new Set((text.toLowerCase().match(/[a-z0-9_][a-z
 const overlap = (text: string, query: Set<string>) => [...terms(text)].filter((w) => query.has(w)).length
 
 // ─── Long meetings: part-by-part digest ─────────────────────
-const DIGEST_SYSTEM = `You condense one part of a long meeting transcript into dense English notes for a later summary. The meeting may be in Hinglish (Hindi + English); translate meaning, keep names.
+const DIGEST_SYSTEM = `You condense one part of a long meeting transcript into dense English notes for a later summary. The meeting may mix Hindi and English; translate the meaning into English, keep names.
 Keep every decision, task (owner + deadline), requirement, number, and technical detail (pages, screens, APIs, files, fields, tools), every disagreement and open question — each with its [mm:ss] time and speaker (S1, S2…).
 Drop greetings and filler. At most 350 words, plain "- " bullets, no preamble.`
 
@@ -154,7 +154,7 @@ export async function meetingMaterial(m: Meeting, t: LlmTarget, budget: number, 
 }
 
 // ─── Analysis ───────────────────────────────────────────────
-const ANALYSIS_SYSTEM = `You are EVES, the meeting-intelligence engine of a software team. You read a meeting (often Hinglish — Hindi and English mixed) and return ONLY one JSON object: no markdown, no prose. Write every value in clear English.
+const ANALYSIS_SYSTEM = `You are EVES, the meeting-intelligence engine of a software team. You read a meeting (it may mix Hindi and English) and return ONLY one JSON object: no markdown, no prose. Write every value in clear English.
 {
  "mainGoal": "the single outcome the work discussed must achieve — one sentence",
  "tldr": "max 25 words",
@@ -364,10 +364,6 @@ export interface ContextBlock {
   text: string
 }
 
-const LANGUAGE = {
-  english: 'Reply in clear, simple English.',
-  hinglish: 'Reply in Hinglish — Hindi written in Roman script mixed with English, the way the user writes (e.g. "Is meeting ka main goal hai ek unified task table banana, taki har section same data save kare."). Keep headings, code, file paths and technical terms in English.'
-}
 
 /**
  * System prompt + trimmed history + the new question. Budget split: company
@@ -377,12 +373,11 @@ export function brainMessages(o: {
   meeting: Meeting
   history: ChatMessage[]
   pill?: PillId
-  settings: AppSettings
   company?: ContextBlock | null
   vault?: ContextBlock | null
   budget: number
 }): Msg[] {
-  const { meeting, settings, budget } = o
+  const { meeting, budget } = o
   const latest = o.history[o.history.length - 1]
   const ask = o.pill ? pillAsk(o.pill, !!o.vault) : latest?.text ?? ''
   const cut = (text: string, max: number) => (text.length > max ? `${text.slice(0, max)}\n…(trimmed)` : text)
@@ -400,7 +395,8 @@ export function brainMessages(o: {
 
   const meetingRoom = budget - company.length - vault.length - (budget * 0.1 - room) - 2500
   const question = `${ask}\n${meeting.analysis?.mainGoal ?? ''}`
-  const language = isToolPill(o.pill) ? 'Write the prompt in English.' : LANGUAGE[settings.brainLanguage]
+  // meetings may mix languages; EVES always answers in English
+  const language = isToolPill(o.pill) ? 'Write the prompt in English.' : 'Reply in clear, simple English, even if the question or the meeting mixes in other languages.'
 
   const system = [
     `You are EVES BRAIN — the user's senior engineering copilot at their company. You know three things: the recorded meeting below (speakers S1, S2…, times [mm:ss]), the company repository index, and the user's skill vault.`,

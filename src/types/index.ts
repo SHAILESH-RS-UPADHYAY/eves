@@ -9,7 +9,6 @@ export type SentimentLabel = 'POSITIVE' | 'NEUTRAL' | 'CAUTIOUS' | 'NEGATIVE'
 export type ToastType = 'success' | 'error' | 'info' | 'loading'
 export type NavPage = 'dashboard' | 'meetings' | 'transcripts' | 'brain' | 'repo' | 'integrations' | 'settings'
 export type AiProvider = 'groq' | 'gemini' | 'openai'
-export type BrainLanguage = 'english' | 'hinglish'
 export type PathStyle = 'wsl' | 'windows'
 export type PillId = 'goal' | 'how' | 'codex' | 'claude' | 'cursor' | 'frontend' | 'actions' | 'risks'
 
@@ -169,8 +168,6 @@ export interface AppSettings {
   enableDiarization: boolean
   autoTranscribe: boolean
   autoAnalyze: boolean
-  /** Language EVES explains in (prompts for coding tools are always English) */
-  brainLanguage: BrainLanguage
   /** Path format written into generated prompts */
   promptPathStyle: PathStyle
   companyRepoPath: string

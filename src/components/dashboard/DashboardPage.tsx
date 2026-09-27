@@ -27,7 +27,7 @@ const features: {
     icon: Brain,
     color: '#22d3ee',
     title: 'AI TRANSCRIPTION',
-    desc: 'Deepgram nova-3 engine. Hinglish code-switching. Real-time streaming with speaker diarization.',
+    desc: 'Deepgram nova-3 engine. Multilingual code-switching. Real-time streaming with speaker diarization.',
     variant: 'neural',
     topLabel: '> MODULE_01.DLL'
   },

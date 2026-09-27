@@ -69,7 +69,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   enableDiarization: true,
   autoTranscribe: true,
   autoAnalyze: true,
-  brainLanguage: 'english',
   promptPathStyle: 'wsl',
   companyRepoPath: '',
   referenceRepoPath: ''

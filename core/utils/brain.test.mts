@@ -11,8 +11,7 @@ import type { AppSettings, Meeting, Utterance } from '../../src/types'
 const settings = {
   promptPathStyle: 'wsl',
   companyRepoPath: 'C:\\Users\\DELL\\webvory_project\\Product_Management_dashboard_db',
-  referenceRepoPath: 'C:\\Users\\DELL\\Favorites\\github_skills',
-  brainLanguage: 'english'
+  referenceRepoPath: 'C:\\Users\\DELL\\Favorites\\github_skills'
 } as AppSettings
 
 const turn = (i: number, speaker: number, text: string): Utterance => ({ speaker, start: i * 30, end: i * 30 + 25, transcript: text, words: [] })
@@ -43,11 +42,11 @@ assert.ok(!toolPromptHeader('cursor', meeting([]), { ...settings, referenceRepoP
 // transcript shape + local facts
 assert.equal(clock(3725), '1:02:05')
 assert.equal(clock(65), '01:05')
-const small = meeting([turn(0, 0, 'Rahul, build the wholesale orders page.'), turn(1, 1, 'Haan theek hai, filter drawer bhi add karna hai.')])
-assert.deepEqual(transcriptLines(small), ['[00:00] S1: Rahul, build the wholesale orders page.', '[00:30] S2: Haan theek hai, filter drawer bhi add karna hai.'])
+const small = meeting([turn(0, 0, 'Rahul, build the wholesale orders page.'), turn(1, 1, 'Okay, and add the filter drawer too.')])
+assert.deepEqual(transcriptLines(small), ['[00:00] S1: Rahul, build the wholesale orders page.', '[00:30] S2: Okay, and add the filter drawer too.'])
 assert.deepEqual(talkTime(small), { S1: 50, S2: 50 })
 const freq = wordFrequency(small)
-assert.ok(freq.wholesale === 1 && freq.drawer === 1 && !('hai' in freq) && !('the' in freq), JSON.stringify(freq))
+assert.ok(freq.wholesale === 1 && freq.drawer === 1 && !('okay' in freq) && !('the' in freq), JSON.stringify(freq))
 
 // chunking keeps order and size, never drops a line
 const chunks = chunkLines(['a'.repeat(40), 'b'.repeat(40), 'c'.repeat(150)], 100)
@@ -104,7 +103,6 @@ const msgs = brainMessages({
   meeting: withNotes,
   history: [{ id: '1', role: 'user', text: 'CODEX PROMPT', pill: 'codex', at: 0 }],
   pill: 'codex',
-  settings,
   company: { title: 'COMPANY REPO', text: 'x'.repeat(50_000) },
   vault: { title: 'SKILL VAULT', text: 'INDEX.md …' },
   budget: 16_000

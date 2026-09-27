@@ -11,7 +11,7 @@ interface Live {
 }
 
 /**
- * Click-to-talk dictation for the brain composer (Deepgram live, Hinglish-aware).
+ * Click-to-talk dictation for the brain composer (Deepgram live, multilingual).
  * `onDone` receives the final text when the user stops talking.
  */
 export function useVoiceInput(onDone: (text: string) => void) {

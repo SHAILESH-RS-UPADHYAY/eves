@@ -12,7 +12,7 @@
 
 <br/>
 
-**A personal desktop application built with React, Node.js, and TypeScript that records long engineering meetings, transcribes them live (Hinglish included), and turns them into a mission brief, a chat you can question, and production-grade prompts for Codex, Claude Code and Cursor.**
+**A personal desktop application built with React, Node.js, and TypeScript that records long engineering meetings, transcribes them live (mixed Hindi-English included), and turns them into a mission brief, a chat you can question, and production-grade prompts for Codex, Claude Code and Cursor.**
 
 </div>
 
@@ -33,7 +33,7 @@ While it's easy to remember the high-level instruction, the critical engineering
 Most meeting tools generate generic prose summaries that are read once and forgotten. EVES approaches meeting context from an engineer's workflow perspective:
 
 1. **Structured Engineering Brief**:
-   - **Main Goal**: the one outcome the meeting is really about ("krna kya hai").
+   - **Main Goal**: the one outcome the meeting is really about ("what exactly needs to be done").
    - **Decisions Made**: Concrete technical choices agreed upon during the call, with timestamps.
    - **Deliberately Avoided**: Approaches or libraries explicitly ruled out and why.
    - **Action Items & Owners**: Clear, attributable deliverables with deadlines.
@@ -51,7 +51,7 @@ Most meeting tools generate generic prose summaries that are read once and forgo
 1. **Record** — `Alt + L` in the EVES popup (INT = meeting audio, EXT = your mic, BOTH = both). The recording is written to disk every 5 s and the transcript streams live.
 2. **Save** — stop with `Alt + L` / `Alt + Space`. The popup offers **OPEN IN BRAIN ›**. With auto-analyze on, the summary starts immediately.
 3. **Listen back** — Meetings page: instant waveform, any speed from 0.5× to 3× (pitch preserved), click a word to jump there.
-4. **Ask** — EVES Brain page: attach your **company repo** and **skill vault** once (they're remembered), then chat in English or Hinglish, by typing or by voice.
+4. **Ask** — EVES Brain page: attach your **company repo** and **skill vault** once (they're remembered), then chat with it, by typing or by voice.
 5. **Pills** — MAIN GOAL · HOW TO BUILD · CODEX PROMPT · CLAUDE CODE PROMPT · CURSOR PROMPT · FRONTEND PREVIEW · ACTION PLAN · RISKS & QUESTIONS. Click one or just say it ("codex prompt").
 6. **Paste** — copy the prompt capsule into your tool. FRONTEND PREVIEW also renders a live mock of the finished screen.
 
@@ -63,7 +63,7 @@ Most meeting tools generate generic prose summaries that are read once and forgo
 ┌──────────────────┐   16kHz PCM (WebSocket)   ┌──────────────────────┐
 │   EVES Popup     │ ────────────────────────> │ Deepgram nova-3      │
 │ Loopback + Mic   │                           │ live, diarized,      │
-│ 32 kbps Opus rec │                           │ Hinglish-aware       │
+│ 32 kbps Opus rec │                           │ multilingual         │
 └────────┬─────────┘                           └──────────┬───────────┘
          │ recording + transcript + peaks                  │ turns [mm:ss] S1…
          ▼                                                 ▼
@@ -115,7 +115,7 @@ sequenceDiagram
 - **Streaming Transcription & Speaker Diarization**: Deepgram nova-3 `multi` handles Hindi ↔ English in one sentence; speaker turns are merged cleanly and timestamped.
 - **Any-Speed Playback**: Recorded meetings open instantly from captured peaks and stream with HTTP range seeks; 0.5×–3× with pitch preserved; keyboard: Space, ←/→, `[`/`]`.
 - **Three Brains**: Groq (fastest), Gemini (1M-token context — best for very long meetings), OpenAI (Codex family). One client, live model lists, automatic switch when a provider retires a model.
-- **EVES Brain Chat**: Answers grounded in the transcript, the company repo index (stack, scripts, agent rules, relevant files) and the skill vault catalog; cites `[mm:ss]`; English or Hinglish.
+- **EVES Brain Chat**: Answers grounded in the transcript, the company repo index (stack, scripts, agent rules, relevant files) and the skill vault catalog; cites `[mm:ss]`; always answers in English.
 - **Spatial Prompt Pills**: Eight neon glass pills with 3D tilt, one tap or one spoken phrase each.
 - **Skill Vault**: Attach a reference repo (e.g. `github_skills`); its `INDEX.md` is read on every prompt and the right skill paths are named for the coding agent.
 - **Local-First & Private**: Keys, transcripts and audio stay on your machine; calls go directly to Deepgram and your chosen provider.
@@ -216,7 +216,7 @@ You can launch EVES via npm or with the included launchers:
 
 1. Open **Settings** (dashboard `api_keys`, or Control Panel → `EDIT_CONFIG`).
 2. **API Keys**: paste Deepgram + at least one AI key; **Test** checks each for real.
-3. **Brain**: pick the provider, language (English / Hinglish) and prompt path format (WSL / Windows).
+3. **Brain**: pick the provider and prompt path format (WSL / Windows).
 4. **EVES Brain page**: attach your company repo and your skill vault — both are remembered.
 
 ### 5. Checks and Build

@@ -141,7 +141,7 @@ export function BrainPage() {
 
   useEffect(() => window.eves?.onAiProgress((p) => { if (p.key === meeting?.id) setStage(p.stage) }), [meeting?.id])
 
-  // speak a pill ("codex prompt", "main goal kya hai") or a whole question
+  // speak a pill ("codex prompt", "main goal") or a whole question
   const voice = useVoiceInput((text) => {
     const pill = pillFromSpeech(text)
     if (pill) chat.send('', pill)
@@ -177,7 +177,6 @@ export function BrainPage() {
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: brain ? C.green : C.red, boxShadow: `0 0 6px ${brain ? C.green : C.red}`, animation: 'pulseDot 1.6s ease-in-out infinite' }} />
               {brain ? `${PROVIDERS[brain].label} · ${settings.aiModels[brain]}` : 'NO AI KEY — OPEN SETTINGS'}
             </button>
-            <Toggle value={settings.brainLanguage} options={[['english', 'EN'], ['hinglish', 'HINGLISH']]} onChange={(v) => updateSettings({ brainLanguage: v })} />
             <Toggle value={settings.promptPathStyle} options={[['wsl', 'WSL'], ['windows', 'WIN']]} onChange={(v) => updateSettings({ promptPathStyle: v })} />
           </div>
         }
@@ -219,7 +218,7 @@ export function BrainPage() {
                 <div style={{ margin: 'auto', maxWidth: '520px', textAlign: 'center', fontFamily: mono, color: C.mut, fontSize: '11px', lineHeight: 1.8 }}>
                   <div style={{ color: C.cyan, fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>▸ NEURAL LINK READY</div>
                   Ask anything about this meeting — EVES answers from the transcript, your company repo and your skill vault.<br />
-                  Try <span style={{ color: C.yellow }}>“main goal kya hai?”</span> · <span style={{ color: C.green }}>“which files change?”</span> · or tap / say a pill like <span style={{ color: C.cyan }}>“codex prompt”</span>.
+                  Try <span style={{ color: C.yellow }}>“what is the main goal?”</span> · <span style={{ color: C.green }}>“which files change?”</span> · or tap / say a pill like <span style={{ color: C.cyan }}>“codex prompt”</span>.
                 </div>
               }
             />
@@ -238,7 +237,7 @@ export function BrainPage() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() } }}
-                  placeholder={blocked ? 'Add a Groq, Gemini or OpenAI key in Settings to wake the brain…' : 'Ask EVES — English or Hinglish. Enter to send, Shift+Enter for a new line'}
+                  placeholder={blocked ? 'Add a Groq, Gemini or OpenAI key in Settings to wake the brain…' : 'Ask EVES anything about this meeting. Enter to send, Shift+Enter for a new line'}
                   disabled={blocked}
                   rows={1}
                   style={{ flex: 1, resize: 'none', minHeight: '32px', maxHeight: '140px', padding: '7px 4px', background: 'transparent', border: 'none', outline: 'none', color: '#e6edf3', fontFamily: mono, fontSize: '12.5px', lineHeight: 1.5, userSelect: 'text' }}

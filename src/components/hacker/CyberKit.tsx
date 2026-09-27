@@ -287,7 +287,6 @@ export function ConfigConsole() {
       {line('provider', brain ? PROVIDERS[brain].label : 'NO_KEY', brain ? C.cyan : C.red)}
       {line('model', brain ? settings.aiModels[brain] : '—', C.cyan)}
       {line('auto_analyze', String(settings.autoAnalyze), settings.autoAnalyze ? C.green : C.red)}
-      {line('reply_language', settings.brainLanguage, C.yellow)}
       {sec('workspace')}
       {line('company_repo', settings.companyRepoPath || 'NOT_ATTACHED', settings.companyRepoPath ? C.green : C.yellow)}
       {line('skill_vault', settings.referenceRepoPath || 'NOT_ATTACHED', settings.referenceRepoPath ? C.green : C.yellow)}

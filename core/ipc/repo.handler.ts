@@ -280,7 +280,7 @@ export function registerRepoHandlers() {
       const system = `You are a Principal Software Architect bridging an engineering meeting and an existing codebase.
 Return ONLY one JSON object — no markdown fences, no prose:
 {
-  "mainGoal": "1-2 crisp sentences: what has to be done (krna kya hai)",
+  "mainGoal": "1-2 crisp sentences: exactly what has to be done",
   "executiveSummary": "the problem, why the change is needed, and the approach",
   "affectedFiles": [{"path": "relative path from the repository index, or a proposed new path", "action": "MODIFY|CREATE|DELETE|REFERENCE", "reason": "why, based on the meeting"}],
   "keyDecisionsAndConstraints": ["decisions, constraints, explicitly avoided approaches"],
@@ -288,7 +288,7 @@ Return ONLY one JSON object — no markdown fences, no prose:
   "suggestedBranchName": "feat/... or fix/...",
   "cursorPrompt": "sections 2+ of a production-grade prompt for Cursor / Claude Code / Codex: mission, meeting context, skills to load (exact vault paths if a vault is given), codebase map, plan, expected result on screen, acceptance criteria with verification commands, rules"
 }
-Use only paths that exist in the repository index unless marked CREATE. Meetings may be Hinglish; write English.
+Use only paths that exist in the repository index unless marked CREATE. Meetings may mix Hindi and English; write English.
 
 === ${company?.title ?? 'COMPANY REPOSITORY'} ===
 ${company?.text ?? ''}

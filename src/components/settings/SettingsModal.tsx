@@ -22,7 +22,7 @@ type KeyField = 'deepgramApiKey' | 'groqApiKey' | 'geminiApiKey' | 'openaiApiKey
 type TestState = { busy: boolean; ok?: boolean; text?: string }
 
 const KEY_CARDS: { field: KeyField; label: string; color: string; hint: string; placeholder: string; provider?: AiProvider }[] = [
-  { field: 'deepgramApiKey', label: 'DEEPGRAM API KEY', color: '#00F5FF', hint: 'Get key: https://console.deepgram.com  |  nova-3 multilingual (Hinglish) live + file transcription', placeholder: 'dg_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' },
+  { field: 'deepgramApiKey', label: 'DEEPGRAM API KEY', color: '#00F5FF', hint: 'Get key: https://console.deepgram.com  |  nova-3 multilingual live + file transcription', placeholder: 'dg_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' },
   ...PROVIDER_IDS.map((p) => ({
     field: PROVIDERS[p].keyField,
     label: `${PROVIDERS[p].label} API KEY`,
@@ -283,14 +283,6 @@ export function SettingsModal() {
                   </div>
 
                   <Segmented
-                    label="EVES EXPLAINS IN"
-                    value={settings.brainLanguage}
-                    options={[['english', 'English'], ['hinglish', 'Hinglish']]}
-                    onChange={(v) => updateSettings({ brainLanguage: v })}
-                    note="Prompts for Codex / Claude Code / Cursor are always written in English."
-                  />
-
-                  <Segmented
                     label="PATHS IN GENERATED PROMPTS"
                     value={settings.promptPathStyle}
                     options={[['wsl', 'WSL  /mnt/c/…'], ['windows', 'Windows  C:\\…']]}
@@ -311,7 +303,7 @@ export function SettingsModal() {
                       onChange={(e) => updateSettings({ defaultLanguage: e.target.value })}
                       style={inputStyle}
                     >
-                      {['multi', 'en', 'hi', 'es', 'fr', 'de', 'ja', 'zh'].map((l) => <option key={l} value={l} style={{ background: '#08080f' }}>{l === 'multi' ? 'multi — hinglish / code-switching' : l}</option>)}
+                      {['multi', 'en', 'hi', 'es', 'fr', 'de', 'ja', 'zh'].map((l) => <option key={l} value={l} style={{ background: '#08080f' }}>{l === 'multi' ? 'multi — mixed-language / code-switching' : l}</option>)}
                     </select>
                   </div>
                   <ToggleRow label="Enable Diarization (speaker detection)" value={settings.enableDiarization} onChange={(v) => updateSettings({ enableDiarization: v })} />

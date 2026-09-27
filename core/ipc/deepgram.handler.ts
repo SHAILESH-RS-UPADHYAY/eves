@@ -27,7 +27,7 @@ export function registerDeepgramHandlers() {
 
     try {
       const settings = getSettings()
-      // 'multi' needs nova-3 — that's the combination that handles Hinglish
+      // 'multi' needs nova-3 — that's the combination that handles mixed Hindi-English speech
       const language = args.language || settings.defaultLanguage || 'multi'
       progress(10)
       // Streamed from disk — a multi-hour recording never sits in memory as one buffer

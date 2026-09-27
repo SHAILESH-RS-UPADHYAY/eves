@@ -8,19 +8,19 @@ export interface PillSpec {
   hint: string
   color: string
   Icon: LucideIcon
-  /** spoken phrases (English / Hinglish) that trigger this pill */
+  /** spoken phrases that trigger this pill */
   voice: RegExp
 }
 
 export const PILLS: PillSpec[] = [
-  { id: 'goal', label: 'MAIN GOAL', hint: 'what the meeting really wants', color: '#ffcb6b', Icon: Target, voice: /main goal|goal kya|mission|(krna|karna) kya/ },
-  { id: 'how', label: 'HOW TO BUILD', hint: 'exact files, steps, checks', color: '#7ee787', Icon: Route, voice: /kaise (kare|karu|banaye|banau|karna)|how (to|do i) (build|do|implement)|implement/ },
+  { id: 'goal', label: 'MAIN GOAL', hint: 'what the meeting really wants', color: '#ffcb6b', Icon: Target, voice: /main goal|mission|what (do|should) (we|i) (build|do)/ },
+  { id: 'how', label: 'HOW TO BUILD', hint: 'exact files, steps, checks', color: '#7ee787', Icon: Route, voice: /how (to|do i|should i) (build|do|implement)|implement/ },
   { id: 'codex', label: 'CODEX PROMPT', hint: 'paste-ready for Codex', color: '#22d3ee', Icon: Terminal, voice: /\bcodex\b/ },
   { id: 'claude', label: 'CLAUDE CODE PROMPT', hint: 'paste-ready for Claude Code', color: '#f78c6c', Icon: Sparkles, voice: /\bclaude\b|cloud code/ },
   { id: 'cursor', label: 'CURSOR PROMPT', hint: 'paste-ready for Cursor', color: '#61afef', Icon: MousePointer2, voice: /\bcursor\b/ },
-  { id: 'frontend', label: 'FRONTEND PREVIEW', hint: 'what the screen will look like', color: '#c678dd', Icon: LayoutTemplate, voice: /front ?end|kaisa dikh|kaise dikh|preview|screen/ },
-  { id: 'actions', label: 'ACTION PLAN', hint: 'who does what, by when', color: '#ff79c6', Icon: ListChecks, voice: /action (items?|plan)|tasks? kya|to ?do/ },
-  { id: 'risks', label: 'RISKS & QUESTIONS', hint: 'what to clarify before building', color: '#ff5370', Icon: ShieldAlert, voice: /risk|doubt|questions? (kya|to ask)/ }
+  { id: 'frontend', label: 'FRONTEND PREVIEW', hint: 'what the screen will look like', color: '#c678dd', Icon: LayoutTemplate, voice: /front ?end|preview|screen|look like/ },
+  { id: 'actions', label: 'ACTION PLAN', hint: 'who does what, by when', color: '#ff79c6', Icon: ListChecks, voice: /action (items?|plan)|tasks|to ?do/ },
+  { id: 'risks', label: 'RISKS & QUESTIONS', hint: 'what to clarify before building', color: '#ff5370', Icon: ShieldAlert, voice: /risk|doubt|questions? to ask|open questions?/ }
 ]
 
 export const pillById = (id?: PillId) => PILLS.find((p) => p.id === id)

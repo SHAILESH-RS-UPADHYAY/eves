@@ -1,7 +1,7 @@
 // Deepgram live-streaming helpers shared by the EVES popup (meeting capture) and
 // the brain's voice composer.
 
-/** 'multi' = nova-3 code-switching (Hindi ↔ English in one sentence) — Hinglish. */
+/** 'multi' = nova-3 code-switching (Hindi ↔ English in one sentence). */
 export function deepgramUrl(o: { language?: string; diarize?: boolean; keyterms?: string[] } = {}) {
   const language = o.language || 'multi'
   const params = new URLSearchParams({
