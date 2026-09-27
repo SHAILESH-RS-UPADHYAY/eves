@@ -4,7 +4,7 @@ import type { BrowserWindowConstructorOptions, Rectangle } from './runtime'
 import { registerRecorderHandlers, recoverOrphanRecordings } from './ipc/recorder.handler'
 import { registerMeetingHandlers } from './ipc/meetings.handler'
 import { registerDeepgramHandlers } from './ipc/deepgram.handler'
-import { registerGroqHandlers } from './ipc/groq.handler'
+import { registerAiHandlers } from './ipc/ai.handler'
 import { registerDriveHandlers } from './ipc/drive.handler'
 import { registerNotionHandlers } from './ipc/notion.handler'
 import { registerSettingsHandlers } from './ipc/settings.handler'
@@ -235,7 +235,7 @@ app.whenReady().then(() => {
   registerMediaPermissions()
 
   registerDeepgramHandlers()
-  registerGroqHandlers()
+  registerAiHandlers()
   registerDriveHandlers()
   registerNotionHandlers()
   registerSettingsHandlers()

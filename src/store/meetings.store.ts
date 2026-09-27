@@ -10,7 +10,11 @@ interface MeetingsStore {
   /** New meeting created in the dashboard (uploads) — memory + disk */
   createMeeting: (meeting: Meeting) => void
   updateMeeting: (id: string, partial: Partial<Meeting>) => void
+  /** Memory only — for fields main already wrote to disk (analysis, digest) */
+  applyLocal: (id: string, partial: Partial<Meeting>) => void
   deleteMeeting: (id: string) => void
+  /** Write pending edits now — before main reads the meeting from disk */
+  flushMeeting: (id: string) => Promise<unknown>
   addTag: (meetingId: string, tag: Tag) => void
   removeTag: (meetingId: string, tagId: string) => void
   updateNotes: (meetingId: string, notes: string) => void
@@ -23,17 +27,20 @@ const TRANSIENT = new Set<keyof Meeting>(['isTranscribing', 'isAnalyzing', 'tran
 const pending = new Map<string, Partial<Meeting>>()
 const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
+function flush(id: string) {
+  clearTimeout(timers.get(id))
+  timers.delete(id)
+  const patch = pending.get(id)
+  pending.delete(id)
+  return patch ? window.eves?.patchMeeting(id, patch) : Promise.resolve()
+}
+
 function persist(id: string, partial: Partial<Meeting>) {
   const fields = Object.fromEntries(Object.entries(partial).filter(([k]) => !TRANSIENT.has(k as keyof Meeting)))
   if (!Object.keys(fields).length) return
   pending.set(id, { ...pending.get(id), ...fields })
   clearTimeout(timers.get(id))
-  timers.set(id, setTimeout(() => {
-    const patch = pending.get(id)
-    pending.delete(id)
-    timers.delete(id)
-    if (patch) window.eves?.patchMeeting(id, patch)
-  }, 400))
+  timers.set(id, setTimeout(() => flush(id), 400))
 }
 
 export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
@@ -54,9 +61,12 @@ export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
   },
 
   updateMeeting: (id, partial) => {
-    set((state) => ({ meetings: state.meetings.map((m) => (m.id === id ? { ...m, ...partial } : m)) }))
+    get().applyLocal(id, partial)
     persist(id, partial)
   },
+
+  applyLocal: (id, partial) =>
+    set((state) => ({ meetings: state.meetings.map((m) => (m.id === id ? { ...m, ...partial } : m)) })),
 
   deleteMeeting: (id) => {
     clearTimeout(timers.get(id))
@@ -65,6 +75,8 @@ export const useMeetingsStore = create<MeetingsStore>((set, get) => ({
     // main removes the file and — if it is an EVES recording — the audio
     window.eves?.deleteMeeting(id)
   },
+
+  flushMeeting: (id) => Promise.resolve(flush(id)),
 
   addTag: (meetingId, tag) => {
     const m = get().meetings.find((x) => x.id === meetingId)

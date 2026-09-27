@@ -28,6 +28,9 @@ import { useRepoStore } from '../../store/repo.store'
 import { useMeetingsStore } from '../../store/meetings.store'
 import { useSettingsStore } from '../../store/settings.store'
 import { useUIStore } from '../../store/ui.store'
+import { useRepoLink } from '../../hooks/useRepoLink'
+import { RepoSlot } from './RepoSlot'
+import { PROVIDERS, activeProvider } from '../../lib/providers'
 import type { RepoFileNode, AffectedFile } from '../../types'
 
 const mono = '"Courier New", Consolas, monospace'
@@ -130,26 +133,24 @@ function ActionBadge({ action }: { action: AffectedFile['action'] }) {
 
 export function RepoIntelPage() {
   const {
-    attachedRepoPath,
-    repoInfo,
     selectedMeetingId,
     customTranscript,
-    isScanning,
     isSynthesizing,
     synthesisResult,
-    setAttachedRepoPath,
-    setRepoInfo,
     setSelectedMeetingId,
     setCustomTranscript,
-    setScanning,
     setSynthesizing,
-    setSynthesisResult,
-    addHistory
+    setSynthesisResult
   } = useRepoStore()
+  const company = useRepoLink('company')
+  const attachedRepoPath = company.path
+  const repoInfo = company.info
+  const isScanning = company.scanning
 
   const meetings = useMeetingsStore((s) => s.meetings)
   const settings = useSettingsStore((s) => s.settings)
   const addToast = useUIStore((s) => s.addToast)
+  const removeToast = useUIStore((s) => s.removeToast)
 
   const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [copiedBranch, setCopiedBranch] = useState(false)
@@ -169,103 +170,44 @@ export function RepoIntelPage() {
     return activeMeeting?.transcription?.transcript || ''
   }, [useCustomInput, customTranscript, activeMeeting])
 
-  // Select Folder Handler
-  const handleSelectFolder = async () => {
-    if (!window.eves?.selectRepoFolder) {
-      addToast({ type: 'error', title: 'Desktop API unavailable', message: 'Folder picker needs the EVES desktop app' })
-      return
-    }
+  const handleSelectFolder = company.attach
+  const handleRefreshScan = company.rescan
 
-    try {
-      const res = await window.eves.selectRepoFolder()
-      if (res.success && res.data) {
-        setAttachedRepoPath(res.data)
-        setScanning(true)
-        addToast({ type: 'loading', title: 'Scanning repository...', message: res.data })
-
-        const scanRes = await window.eves.scanRepoFolder(res.data)
-        setScanning(false)
-
-        if (scanRes.success && scanRes.data) {
-          setRepoInfo(scanRes.data)
-          addToast({
-            type: 'success',
-            title: 'Repository Attached',
-            message: `${scanRes.data.name} • ${scanRes.data.totalFiles} files detected`
-          })
-        } else {
-          addToast({ type: 'error', title: 'Scan Failed', message: scanRes.error })
-        }
-      }
-    } catch (err: any) {
-      setScanning(false)
-      addToast({ type: 'error', title: 'Folder Selection Failed', message: err.message })
-    }
-  }
-
-  // Refresh Scan Handler
-  const handleRefreshScan = async () => {
-    if (!attachedRepoPath || !window.eves?.scanRepoFolder) return
-    setScanning(true)
-    addToast({ type: 'loading', title: 'Rescanning...', message: attachedRepoPath })
-
-    const scanRes = await window.eves.scanRepoFolder(attachedRepoPath)
-    setScanning(false)
-    if (scanRes.success && scanRes.data) {
-      setRepoInfo(scanRes.data)
-      addToast({ type: 'success', title: 'Repository Updated', message: `${scanRes.data.totalFiles} files indexed` })
-    }
-  }
-
-  // Synthesis Execution Handler
+  // Synthesis: main reads the meeting (condensing long ones), the repo index and the skill vault
   const handleSynthesize = async () => {
-    if (!settings.groqApiKey) {
-      addToast({ type: 'error', title: 'Groq API Key Required', message: 'Add your Groq API key in Settings → API Keys' })
+    const brain = activeProvider(settings)
+    if (!brain) {
+      addToast({ type: 'error', title: 'AI key required', message: 'Add a Groq, Gemini or OpenAI key in Settings → API Keys' })
       return
     }
-
-    if (!repoInfo || !attachedRepoPath) {
+    if (!attachedRepoPath) {
       addToast({ type: 'error', title: 'No Repository Attached', message: 'Attach your company repo folder first' })
       return
     }
-
-    if (!effectiveTranscript || effectiveTranscript.trim().length === 0) {
+    if (!effectiveTranscript.trim()) {
       addToast({ type: 'error', title: 'No Transcript Context', message: 'Select a recorded meeting or paste meeting notes' })
       return
     }
 
     setSynthesizing(true)
-    addToast({
+    const toast = addToast({
       type: 'loading',
       title: 'Synthesizing Architecture & Meeting...',
-      message: 'Mapping utterances to repository modules with Groq LLaMA-3.1 70B'
+      message: `Mapping the meeting onto repository modules with ${PROVIDERS[brain].label} · ${settings.aiModels[brain]}`
     })
-
     try {
-      const res = await window.eves?.synthesizeRepoDirective({
-        repoInfo,
-        transcript: effectiveTranscript,
-        meetingTitle: activeMeeting?.title || 'Engineering Session',
-        meetingId: activeMeeting?.id,
-        apiKey: settings.groqApiKey
-      })
-
-      setSynthesizing(false)
-
-      if (res && res.success && res.data) {
+      const res = await window.eves?.synthesizeRepoDirective(useCustomInput
+        ? { transcript: effectiveTranscript, meetingTitle: 'Pasted notes' }
+        : { meetingId: activeMeeting?.id, meetingTitle: activeMeeting?.title })
+      if (res?.success && res.data) {
         setSynthesisResult(res.data)
-        addHistory(res.data)
-        addToast({
-          type: 'success',
-          title: 'Directive Synthesized!',
-          message: `${res.data.affectedFiles.length} files targeted • Cursor prompt ready`
-        })
+        addToast({ type: 'success', title: 'Directive Synthesized!', message: `${res.data.affectedFiles.length} files targeted • prompt ready` })
       } else {
-        addToast({ type: 'error', title: 'Synthesis Failed', message: res?.error || 'Unknown error during inference' })
+        addToast({ type: 'error', title: 'Synthesis Failed', message: res?.error || 'Unknown error during inference', duration: 8000 })
       }
-    } catch (err: any) {
+    } finally {
+      removeToast(toast)
       setSynthesizing(false)
-      addToast({ type: 'error', title: 'Synthesis Error', message: err.message })
     }
   }
 
@@ -574,7 +516,10 @@ ${synthesisResult.cursorPrompt}
             </div>
           </ExpandableCard>
 
-          {/* Card 2: Meeting Context Source */}
+          {/* Card 2: Skill vault (reference repo) — its catalog feeds every generated prompt */}
+          <RepoSlot role="vault" />
+
+          {/* Card 3: Meeting Context Source */}
           <ExpandableCard
             title="MEETING_CONTEXT"
             accent={C.green}

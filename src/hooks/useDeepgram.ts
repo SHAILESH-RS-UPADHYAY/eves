@@ -7,6 +7,7 @@ import type { TranscriptionResult } from '../types'
 export function useDeepgram() {
   const updateMeeting = useMeetingsStore((s) => s.updateMeeting)
   const addToast = useUIStore((s) => s.addToast)
+  const removeToast = useUIStore((s) => s.removeToast)
 
   const transcribe = useCallback(
     async (meetingId: string, filePath: string): Promise<TranscriptionResult | null> => {
@@ -18,7 +19,7 @@ export function useDeepgram() {
       if (!window.eves) return null
 
       updateMeeting(meetingId, { isTranscribing: true, transcriptionProgress: 0 })
-      addToast({ type: 'loading', title: 'Transcribing...', message: 'Deepgram is processing the recording' })
+      const toast = addToast({ type: 'loading', title: 'Transcribing...', message: 'Deepgram is processing the recording' })
       const stopProgress = window.eves.onTranscribeProgress((pct) => updateMeeting(meetingId, { transcriptionProgress: pct }))
       try {
         const result = await window.eves.transcribe({ filePath, apiKey: deepgramApiKey, language: defaultLanguage })
@@ -37,9 +38,10 @@ export function useDeepgram() {
         return null
       } finally {
         stopProgress()
+        removeToast(toast)
       }
     },
-    [updateMeeting, addToast]
+    [updateMeeting, addToast, removeToast]
   )
 
   return { transcribe }

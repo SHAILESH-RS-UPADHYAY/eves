@@ -1,16 +1,6 @@
 import { create } from 'zustand'
 import type { AppSettings } from '../types'
-
-const defaultSettings: AppSettings = {
-  deepgramApiKey: '',
-  groqApiKey: '',
-  defaultLanguage: 'multi',
-  enableDiarization: true,
-  autoTranscribe: true,
-  autoAnalyze: true,
-  analysisModel: 'llama-3.1-70b-versatile',
-  deleteAudioAfterTranscription: false
-}
+import { DEFAULT_SETTINGS } from '../lib/providers'
 
 interface SettingsStore {
   settings: AppSettings
@@ -20,24 +10,16 @@ interface SettingsStore {
 }
 
 export const useSettingsStore = create<SettingsStore>((set, get) => ({
-  settings: defaultSettings,
+  settings: DEFAULT_SETTINGS,
   isLoaded: false,
 
   loadSettings: async () => {
-    if (typeof window !== 'undefined' && window.eves) {
-      const s = await window.eves.getSettings()
-      set({ settings: { ...defaultSettings, ...s }, isLoaded: true })
-    } else {
-      set({ isLoaded: true })
-    }
+    const saved = await window.eves?.getSettings()
+    set({ settings: { ...DEFAULT_SETTINGS, ...saved }, isLoaded: true })
   },
 
   updateSettings: async (partial) => {
-    const current = get().settings
-    const updated = { ...current, ...partial }
-    set({ settings: updated })
-    if (typeof window !== 'undefined' && window.eves) {
-      await window.eves.saveSettings(partial)
-    }
+    set({ settings: { ...get().settings, ...partial } })
+    await window.eves?.saveSettings(partial)
   }
 }))

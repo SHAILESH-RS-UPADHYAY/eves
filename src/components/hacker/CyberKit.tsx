@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Maximize2, X, Cpu, Wifi, HardDrive, Activity, Radio, Lock, Signal, Gauge } from 'lucide-react'
+import { Maximize2, X, Cpu, Wifi, HardDrive, Activity, Radio, Lock, Signal, Gauge, Sparkles, Brain } from 'lucide-react'
 import { EvesLogo } from '../brand/EvesLogo'
 import { CyberArt } from './CyberArt'
 import { useSettingsStore } from '../../store/settings.store'
 import { useUIStore } from '../../store/ui.store'
+import { PROVIDERS, activeProvider } from '../../lib/providers'
 
 const C = {
   cyan: '#22d3ee', green: '#7ee787', red: '#ff5370', yellow: '#ffcb6b',
@@ -205,7 +206,9 @@ export function ConnectionMatrix() {
   const [ping, setPing] = useState<Record<string, number>>({})
   const links = [
     { name: 'DEEPGRAM', ep: 'wss://api.deepgram.com/v1/listen', on: !!settings.deepgramApiKey, note: 'nova-2 · transcription', c: C.cyan, Icon: Radio },
-    { name: 'GROQ', ep: 'https://api.groq.com/openai/v1', on: !!settings.groqApiKey, note: settings.analysisModel, c: C.purple, Icon: Cpu },
+    { name: 'GROQ', ep: PROVIDERS.groq.base, on: !!settings.groqApiKey, note: settings.aiModels.groq, c: C.green, Icon: Cpu },
+    { name: 'GEMINI', ep: PROVIDERS.gemini.base, on: !!settings.geminiApiKey, note: settings.aiModels.gemini, c: C.blue, Icon: Sparkles },
+    { name: 'OPENAI', ep: PROVIDERS.openai.base, on: !!settings.openaiApiKey, note: settings.aiModels.openai, c: C.purple, Icon: Brain },
     { name: 'GOOGLE_DRIVE', ep: 'drive.googleapis.com/v3', on: false, note: 'audio archive sync', c: C.green, Icon: HardDrive },
     { name: 'NOTION', ep: 'api.notion.com/v1/pages', on: !!settings.notionDatabaseId, note: 'insight export', c: C.orange, Icon: Signal },
   ]
@@ -218,7 +221,7 @@ export function ConnectionMatrix() {
     }, 1200)
     return () => clearInterval(iv)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.deepgramApiKey, settings.groqApiKey, settings.notionDatabaseId])
+  }, [settings.deepgramApiKey, settings.groqApiKey, settings.geminiApiKey, settings.openaiApiKey, settings.notionDatabaseId])
 
   return (
     <div style={{ fontFamily: mono }}>
@@ -263,11 +266,12 @@ export function ConfigConsole() {
   const settings = useSettingsStore((s) => s.settings)
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen)
   const mask = (k: string) => (k ? `set · ****${k.slice(-4)}` : 'NOT_SET')
+  const brain = activeProvider(settings)
   const line = (k: string, v: string, c: string) => (
     <div style={{ display: 'flex', fontSize: '10.5px', lineHeight: 1.9 }}>
       <span style={{ color: C.blue, width: '150px', flexShrink: 0 }}>{k}</span>
       <span style={{ color: C.mut }}>= </span>
-      <span style={{ color: c }}>{v}</span>
+      <span style={{ color: c, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v}>{v}</span>
     </div>
   )
   const sec = (t: string) => <div style={{ color: C.purple, fontSize: '10px', marginTop: '10px', letterSpacing: '1px' }}>[{t}]</div>
@@ -279,13 +283,20 @@ export function ConfigConsole() {
       {line('language', settings.defaultLanguage, C.yellow)}
       {line('diarization', String(settings.enableDiarization), settings.enableDiarization ? C.green : C.red)}
       {line('auto_transcribe', String(settings.autoTranscribe), settings.autoTranscribe ? C.green : C.red)}
-      {sec('inference')}
-      {line('model', settings.analysisModel, C.cyan)}
+      {sec('brain')}
+      {line('provider', brain ? PROVIDERS[brain].label : 'NO_KEY', brain ? C.cyan : C.red)}
+      {line('model', brain ? settings.aiModels[brain] : '—', C.cyan)}
       {line('auto_analyze', String(settings.autoAnalyze), settings.autoAnalyze ? C.green : C.red)}
+      {line('reply_language', settings.brainLanguage, C.yellow)}
+      {sec('workspace')}
+      {line('company_repo', settings.companyRepoPath || 'NOT_ATTACHED', settings.companyRepoPath ? C.green : C.yellow)}
+      {line('skill_vault', settings.referenceRepoPath || 'NOT_ATTACHED', settings.referenceRepoPath ? C.green : C.yellow)}
+      {line('prompt_paths', settings.promptPathStyle, C.purple)}
       {sec('security')}
-      {line('delete_audio', String(settings.deleteAudioAfterTranscription), C.yellow)}
       {line('deepgram_key', mask(settings.deepgramApiKey), settings.deepgramApiKey ? C.green : C.red)}
       {line('groq_key', mask(settings.groqApiKey), settings.groqApiKey ? C.green : C.red)}
+      {line('gemini_key', mask(settings.geminiApiKey), settings.geminiApiKey ? C.green : C.red)}
+      {line('openai_key', mask(settings.openaiApiKey), settings.openaiApiKey ? C.green : C.red)}
       <button onClick={() => setSettingsOpen(true)} style={{ marginTop: '14px', padding: '8px 16px', background: `${C.cyan}14`, border: `1px solid ${C.cyan}44`, borderRadius: '6px', color: C.cyan, fontFamily: mono, fontSize: '11px', fontWeight: 700, letterSpacing: '1px', cursor: 'pointer', textShadow: `0 0 8px ${C.cyan}55`, display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
         <Lock size={12} /> ▸ edit_config
       </button>

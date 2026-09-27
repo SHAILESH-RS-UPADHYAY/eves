@@ -1,52 +1,37 @@
 import { create } from 'zustand'
 import type { RepoInfo, RepoSynthesisResult } from '../types'
 
+/** company = the repo you work on · vault = the reference repo (skills, standards) */
+export type RepoRole = 'company' | 'vault'
+
 interface RepoStore {
-  attachedRepoPath: string | null
-  repoInfo: RepoInfo | null
+  info: Record<RepoRole, RepoInfo | null>
+  scanning: Record<RepoRole, boolean>
   selectedMeetingId: string | null
   customTranscript: string
-  isScanning: boolean
   isSynthesizing: boolean
   synthesisResult: RepoSynthesisResult | null
-  history: RepoSynthesisResult[]
 
-  setAttachedRepoPath: (path: string | null) => void
-  setRepoInfo: (info: RepoInfo | null) => void
+  setInfo: (role: RepoRole, info: RepoInfo | null) => void
+  setScanning: (role: RepoRole, scanning: boolean) => void
   setSelectedMeetingId: (id: string | null) => void
   setCustomTranscript: (text: string) => void
-  setScanning: (scanning: boolean) => void
   setSynthesizing: (synthesizing: boolean) => void
   setSynthesisResult: (result: RepoSynthesisResult | null) => void
-  addHistory: (result: RepoSynthesisResult) => void
-  clearRepo: () => void
 }
 
 export const useRepoStore = create<RepoStore>((set) => ({
-  attachedRepoPath: null,
-  repoInfo: null,
+  info: { company: null, vault: null },
+  scanning: { company: false, vault: false },
   selectedMeetingId: null,
   customTranscript: '',
-  isScanning: false,
   isSynthesizing: false,
   synthesisResult: null,
-  history: [],
 
-  setAttachedRepoPath: (path) => set({ attachedRepoPath: path }),
-  setRepoInfo: (info) => set({ repoInfo: info }),
+  setInfo: (role, info) => set((s) => ({ info: { ...s.info, [role]: info } })),
+  setScanning: (role, scanning) => set((s) => ({ scanning: { ...s.scanning, [role]: scanning } })),
   setSelectedMeetingId: (id) => set({ selectedMeetingId: id }),
   setCustomTranscript: (text) => set({ customTranscript: text }),
-  setScanning: (scanning) => set({ isScanning: scanning }),
   setSynthesizing: (synthesizing) => set({ isSynthesizing: synthesizing }),
-  setSynthesisResult: (result) => set({ synthesisResult: result }),
-  addHistory: (result) =>
-    set((state) => ({
-      history: [result, ...state.history.filter((h) => h.id !== result.id)].slice(0, 10)
-    })),
-  clearRepo: () =>
-    set({
-      attachedRepoPath: null,
-      repoInfo: null,
-      synthesisResult: null
-    })
+  setSynthesisResult: (result) => set({ synthesisResult: result })
 }))

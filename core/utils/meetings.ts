@@ -10,7 +10,7 @@ import type { Meeting } from '../../src/types'
 // transcript); load transcripts lazily if the archive grows into the hundreds.
 
 let root: string | null = null
-function meetingsDir() {
+export function meetingsDir() {
   if (!root) {
     root = path.join(app.getPath('userData'), 'meetings')
     fs.mkdirSync(root, { recursive: true })

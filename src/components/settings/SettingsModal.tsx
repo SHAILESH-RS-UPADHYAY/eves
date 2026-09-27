@@ -1,56 +1,89 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eye, EyeOff, Loader2, CheckCircle, XCircle, Save, Terminal, Key } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Save, Terminal, FolderOpen, RotateCcw } from 'lucide-react'
 import { GlassButton } from '../glass/GlassButton'
 import { useUIStore } from '../../store/ui.store'
 import { useSettingsStore } from '../../store/settings.store'
+import { PROVIDERS, PROVIDER_IDS, activeProvider } from '../../lib/providers'
+import { stylePath } from '../../lib/paths'
+import type { AiProvider, AppSettings, StorageInfo } from '../../types'
 
-type Tab = 'apiKeys' | 'transcription' | 'analysis' | 'integrations' | 'privacy'
+type Tab = 'apiKeys' | 'brain' | 'transcription' | 'integrations' | 'storage'
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'apiKeys', label: 'API Keys' },
+  { id: 'brain', label: 'Brain' },
   { id: 'transcription', label: 'Transcription' },
-  { id: 'analysis', label: 'Analysis' },
   { id: 'integrations', label: 'Integrations' },
-  { id: 'privacy', label: 'Privacy' }
+  { id: 'storage', label: 'Storage' }
 ]
+
+type KeyField = 'deepgramApiKey' | 'groqApiKey' | 'geminiApiKey' | 'openaiApiKey'
+type TestState = { busy: boolean; ok?: boolean; text?: string }
+
+const KEY_CARDS: { field: KeyField; label: string; color: string; hint: string; placeholder: string; provider?: AiProvider }[] = [
+  { field: 'deepgramApiKey', label: 'DEEPGRAM API KEY', color: '#00F5FF', hint: 'Get key: https://console.deepgram.com  |  nova-3 multilingual (Hinglish) live + file transcription', placeholder: 'dg_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' },
+  ...PROVIDER_IDS.map((p) => ({
+    field: PROVIDERS[p].keyField,
+    label: `${PROVIDERS[p].label} API KEY`,
+    color: PROVIDERS[p].color,
+    hint: `Get key: ${PROVIDERS[p].keyUrl}  |  ${PROVIDERS[p].pitch}`,
+    placeholder: `${PROVIDERS[p].keyHint}xxxxxxxxxxxxxxxxxxxxxxxx`,
+    provider: p
+  }))
+]
+
+const mono = '"Courier New", monospace'
+const fmtBytes = (b: number) => (b > 1e9 ? `${(b / 1e9).toFixed(2)} GB` : `${(b / 1e6).toFixed(1)} MB`)
 
 export function SettingsModal() {
   const isOpen = useUIStore((s) => s.isSettingsOpen)
   const setOpen = useUIStore((s) => s.setSettingsOpen)
   const { settings, updateSettings } = useSettingsStore()
   const [activeTab, setActiveTab] = useState<Tab>('apiKeys')
-  const [showDeepgramKey, setShowDeepgramKey] = useState(false)
-  const [showGroqKey, setShowGroqKey] = useState(false)
-  const [testingDeepgram, setTestingDeepgram] = useState(false)
-  const [deepgramResult, setDeepgramResult] = useState<'success' | 'error' | null>(null)
-  const [deepgramSaved, setDeepgramSaved] = useState(false)
-  const [groqSaved, setGroqSaved] = useState(false)
-  const [localDeepgramKey, setLocalDeepgramKey] = useState(settings.deepgramApiKey)
-  const [localGroqKey, setLocalGroqKey] = useState(settings.groqApiKey)
+  const [keys, setKeys] = useState<Record<KeyField, string>>(pickKeys(settings))
+  const [shown, setShown] = useState<Partial<Record<KeyField, boolean>>>({})
+  const [tests, setTests] = useState<Partial<Record<KeyField, TestState>>>({})
+  const [saved, setSaved] = useState(false)
+  const [models, setModels] = useState<Partial<Record<AiProvider, string[]>>>({})
+  const [storage, setStorage] = useState<StorageInfo | null>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      setLocalDeepgramKey(settings.deepgramApiKey)
-      setLocalGroqKey(settings.groqApiKey)
-    }
+    if (!isOpen) return
+    setKeys(pickKeys(settings))
+    setTests({})
+    window.eves?.storageInfo().then(setStorage)
   }, [isOpen])
 
   const saveApiKeys = () => {
-    updateSettings({ deepgramApiKey: localDeepgramKey, groqApiKey: localGroqKey })
-    setDeepgramSaved(true)
-    setGroqSaved(true)
-    setTimeout(() => { setDeepgramSaved(false); setGroqSaved(false) }, 3000)
+    updateSettings(keys)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
   }
 
-  const testDeepgram = async () => {
-    setTestingDeepgram(true)
-    setDeepgramResult(null)
-    setTimeout(() => {
-      setTestingDeepgram(false)
-      setDeepgramResult(localDeepgramKey ? 'success' : 'error')
-    }, 2000)
+  // Real checks: Deepgram lists projects, the LLM providers list their models
+  const testKey = async (card: (typeof KEY_CARDS)[number]) => {
+    const key = keys[card.field].trim()
+    if (!key) return setTests((t) => ({ ...t, [card.field]: { busy: false, ok: false, text: 'No key entered' } }))
+    setTests((t) => ({ ...t, [card.field]: { busy: true } }))
+    if (card.provider) {
+      const res = await window.eves?.listModels(card.provider, key)
+      if (res?.success && res.data) setModels((m) => ({ ...m, [card.provider!]: res.data }))
+      setTests((t) => ({ ...t, [card.field]: { busy: false, ok: !!res?.success, text: res?.success ? `Connected — ${res.data?.length ?? 0} models available` : res?.error } }))
+    } else {
+      const res = await window.eves?.testDeepgram(key)
+      setTests((t) => ({ ...t, [card.field]: { busy: false, ok: !!res?.success, text: res?.success ? 'Connected' : res?.error } }))
+    }
   }
+
+  const loadModels = async (p: AiProvider) => {
+    const key = settings[PROVIDERS[p].keyField]
+    if (!key) return
+    const res = await window.eves?.listModels(p, key)
+    if (res?.success && res.data) setModels((m) => ({ ...m, [p]: res.data }))
+  }
+
+  const brain = activeProvider(settings)
 
   const tabStyle = (tab: Tab): React.CSSProperties => ({
     padding: '6px 14px',
@@ -61,7 +94,7 @@ export function SettingsModal() {
     color: activeTab === tab ? '#00F5FF' : 'rgba(255,255,255,0.3)',
     fontSize: '11px',
     fontWeight: 600,
-    fontFamily: '"Courier New", monospace',
+    fontFamily: mono,
     letterSpacing: '0.5px',
     cursor: 'pointer',
     transition: 'all 0.2s ease'
@@ -71,7 +104,7 @@ export function SettingsModal() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9994, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Courier New", monospace' }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9994, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: mono }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -82,8 +115,8 @@ export function SettingsModal() {
 
           <motion.div
             style={{
-              width: '680px',
-              maxHeight: '80vh',
+              width: '720px',
+              maxHeight: '84vh',
               display: 'flex',
               flexDirection: 'column',
               background: 'rgba(8, 10, 20, 0.95)',
@@ -112,7 +145,7 @@ export function SettingsModal() {
                 <Terminal size={16} style={{ color: '#00F5FF' }} />
                 <span style={{ fontSize: '15px', fontWeight: 700, color: '#00F5FF', letterSpacing: '1px', textShadow: '0 0 8px rgba(0,245,255,0.3)' }}>▸ SETTINGS</span>
               </div>
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '5px', color: 'rgba(255,255,255,0.3)', fontSize: '16px', cursor: 'pointer', padding: '2px 8px', fontFamily: '"Courier New", monospace' }}>✕</button>
+              <button onClick={() => setOpen(false)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '5px', color: 'rgba(255,255,255,0.3)', fontSize: '16px', cursor: 'pointer', padding: '2px 8px', fontFamily: mono }}>✕</button>
             </div>
 
             {/* Tabs */}
@@ -127,111 +160,52 @@ export function SettingsModal() {
             {/* Content */}
             <div style={{ flex: 1, overflow: 'auto', padding: '24px' }} className="glass-scrollbar">
               {activeTab === 'apiKeys' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {/* Deepgram */}
-                  <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(0,245,255,0.08)', borderRadius: '8px', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00F5FF', boxShadow: '0 0 6px #00F5FF' }} />
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#00F5FF', letterSpacing: '0.5px' }}>DEEPGRAM API KEY</label>
-                    </div>
-                    <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Get key: https://console.deepgram.com  |  Model: nova-2 (real-time streaming)</p>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        type={showDeepgramKey ? 'text' : 'password'}
-                        value={localDeepgramKey}
-                        onChange={(e) => setLocalDeepgramKey(e.target.value)}
-                        style={{
-                          flex: 1,
-                          padding: '10px 14px',
-                          background: 'rgba(0,0,0,0.4)',
-                          border: '1px solid rgba(0,245,255,0.12)',
-                          borderRadius: '6px',
-                          color: '#00F5FF',
-                          fontSize: '12px',
-                          fontFamily: '"Courier New", monospace',
-                          outline: 'none',
-                          letterSpacing: '0.5px'
-                        }}
-                        placeholder="dg_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      />
-                      <button onClick={() => setShowDeepgramKey(!showDeepgramKey)} style={{
-                        width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,245,255,0.12)', borderRadius: '6px',
-                        color: 'rgba(255,255,255,0.3)', cursor: 'pointer'
-                      }}>
-                        {showDeepgramKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
-                      <GlassButton size="sm" onClick={testDeepgram} disabled={testingDeepgram}>
-                        {testingDeepgram ? <Loader2 size={12} className="animate-spin" /> : 'Test'}
-                      </GlassButton>
-                      {deepgramResult === 'success' && <span style={{ fontSize: '10px', color: '#10B981' }}>[OK] Connected</span>}
-                      {deepgramResult === 'error' && <span style={{ fontSize: '10px', color: '#FF006E' }}>[FAIL] No key</span>}
-                      {deepgramSaved && <span style={{ fontSize: '10px', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}><Save size={10} /> Saved</span>}
-                    </div>
-                  </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {KEY_CARDS.map((card) => {
+                    const test = tests[card.field]
+                    return (
+                      <div key={card.field} style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${card.color}14`, borderRadius: '8px', padding: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: card.color, boxShadow: `0 0 6px ${card.color}` }} />
+                          <label style={{ fontSize: '11px', fontWeight: 700, color: card.color, letterSpacing: '0.5px' }}>{card.label}</label>
+                          {card.provider && card.provider === brain && (
+                            <span style={{ marginLeft: 'auto', fontSize: '8px', fontWeight: 700, letterSpacing: '1px', color: card.color, border: `1px solid ${card.color}55`, borderRadius: '999px', padding: '1px 8px' }}>ACTIVE BRAIN</span>
+                          )}
+                        </div>
+                        <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>{card.hint}</p>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <input
+                            type={shown[card.field] ? 'text' : 'password'}
+                            value={keys[card.field]}
+                            onChange={(e) => setKeys((k) => ({ ...k, [card.field]: e.target.value }))}
+                            placeholder={card.placeholder}
+                            style={{ flex: 1, padding: '10px 14px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${card.color}22`, borderRadius: '6px', color: card.color, fontSize: '12px', fontFamily: mono, outline: 'none', letterSpacing: '0.5px' }}
+                          />
+                          <button
+                            onClick={() => setShown((s) => ({ ...s, [card.field]: !s[card.field] }))}
+                            aria-label={shown[card.field] ? 'Hide key' : 'Show key'}
+                            style={{ width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', border: `1px solid ${card.color}22`, borderRadius: '6px', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}
+                          >
+                            {shown[card.field] ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', minHeight: '26px' }}>
+                          <GlassButton size="sm" onClick={() => testKey(card)} disabled={test?.busy}>
+                            {test?.busy ? <Loader2 size={12} className="animate-spin" /> : 'Test'}
+                          </GlassButton>
+                          {test?.text && (
+                            <span style={{ fontSize: '10px', color: test.ok ? '#10B981' : '#FF006E' }}>{test.ok ? '[OK]' : '[FAIL]'} {test.text}</span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
 
-                  {/* Groq */}
-                  <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(16,185,129,0.08)', borderRadius: '8px', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981' }} />
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#10B981', letterSpacing: '0.5px' }}>GROQ API KEY</label>
-                    </div>
-                    <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Get key: https://console.groq.com  |  Model: LLaMA-3.1 70B (AI summarization)</p>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        type={showGroqKey ? 'text' : 'password'}
-                        value={localGroqKey}
-                        onChange={(e) => setLocalGroqKey(e.target.value)}
-                        style={{
-                          flex: 1,
-                          padding: '10px 14px',
-                          background: 'rgba(0,0,0,0.4)',
-                          border: '1px solid rgba(16,185,129,0.12)',
-                          borderRadius: '6px',
-                          color: '#10B981',
-                          fontSize: '12px',
-                          fontFamily: '"Courier New", monospace',
-                          outline: 'none',
-                          letterSpacing: '0.5px'
-                        }}
-                        placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      />
-                      <button onClick={() => setShowGroqKey(!showGroqKey)} style={{
-                        width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(16,185,129,0.12)', borderRadius: '6px',
-                        color: 'rgba(255,255,255,0.3)', cursor: 'pointer'
-                      }}>
-                        {showGroqKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
-                      {groqSaved && <span style={{ fontSize: '10px', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}><Save size={10} /> Saved</span>}
-                    </div>
-                  </div>
-
-                  {/* Save All Button */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
+                    {saved && <span style={{ fontSize: '10px', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}><Save size={10} /> Saved</span>}
                     <button
                       onClick={saveApiKeys}
-                      style={{
-                        padding: '10px 24px',
-                        background: 'rgba(0, 245, 255, 0.1)',
-                        border: '1px solid rgba(0, 245, 255, 0.3)',
-                        borderRadius: '6px',
-                        color: '#00F5FF',
-                        fontFamily: '"Courier New", monospace',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        letterSpacing: '1px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        textShadow: '0 0 8px rgba(0,245,255,0.3)',
-                        transition: 'all 0.3s ease'
-                      }}
+                      style={{ padding: '10px 24px', background: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '6px', color: '#00F5FF', fontFamily: mono, fontSize: '12px', fontWeight: 700, letterSpacing: '1px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', textShadow: '0 0 8px rgba(0,245,255,0.3)', transition: 'all 0.3s ease' }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0, 245, 255, 0.2)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0,245,255,0.15)' }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0, 245, 255, 0.1)'; e.currentTarget.style.boxShadow = 'none' }}
                     >
@@ -240,15 +214,98 @@ export function SettingsModal() {
                   </div>
 
                   <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>
-                    Keys are stored encrypted locally. Never sent anywhere except their respective APIs.
+                    Keys are stored locally on this machine and are only ever sent to their own provider.
                   </p>
+                </div>
+              )}
+
+              {activeTab === 'brain' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                  <div>
+                    <label style={labelStyle}>ACTIVE BRAIN</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                      {PROVIDER_IDS.map((p) => {
+                        const spec = PROVIDERS[p]
+                        const hasKey = !!settings[spec.keyField]
+                        const on = settings.aiProvider === p
+                        return (
+                          <motion.button
+                            key={p}
+                            onClick={() => updateSettings({ aiProvider: p })}
+                            whileHover={{ y: -2 }}
+                            whileTap={{ scale: 0.97 }}
+                            style={{ textAlign: 'left', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontFamily: mono, background: on ? `${spec.color}14` : 'rgba(0,0,0,0.3)', border: `1px solid ${on ? spec.color : `${spec.color}22`}`, boxShadow: on ? `0 0 18px ${spec.color}22` : 'none' }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: hasKey ? '#10B981' : '#FF006E', boxShadow: `0 0 6px ${hasKey ? '#10B981' : '#FF006E'}` }} />
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: spec.color, letterSpacing: '1px' }}>{spec.label}</span>
+                            </div>
+                            <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{spec.pitch}</div>
+                            {!hasKey && <div style={{ fontSize: '9px', color: '#FF006E', marginTop: '4px' }}>no key — add it in API Keys</div>}
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+                    {brain && brain !== settings.aiProvider && (
+                      <p style={{ fontSize: '10px', color: '#FCD34D', marginTop: '8px' }}>
+                        {PROVIDERS[settings.aiProvider].label} has no key, so EVES is using {PROVIDERS[brain].label} for now.
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>MODELS</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {PROVIDER_IDS.map((p) => (
+                        <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ width: '64px', fontSize: '10px', fontWeight: 700, color: PROVIDERS[p].color }}>{PROVIDERS[p].label}</span>
+                          <input
+                            list={`models-${p}`}
+                            value={settings.aiModels[p]}
+                            onFocus={() => !models[p] && loadModels(p)}
+                            onChange={(e) => updateSettings({ aiModels: { ...settings.aiModels, [p]: e.target.value } })}
+                            style={{ ...inputStyle, flex: 1, color: PROVIDERS[p].color }}
+                          />
+                          <datalist id={`models-${p}`}>
+                            {(models[p] ?? []).map((m) => <option key={m} value={m} />)}
+                          </datalist>
+                          <button
+                            title={`Reset to ${PROVIDERS[p].model}`}
+                            onClick={() => updateSettings({ aiModels: { ...settings.aiModels, [p]: PROVIDERS[p].model } })}
+                            style={{ width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,245,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.35)', cursor: 'pointer' }}
+                          >
+                            <RotateCcw size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.25)', marginTop: '6px' }}>Focus a field to load the models your key can use. Providers retire models — change it here if one stops answering.</p>
+                  </div>
+
+                  <Segmented
+                    label="EVES EXPLAINS IN"
+                    value={settings.brainLanguage}
+                    options={[['english', 'English'], ['hinglish', 'Hinglish']]}
+                    onChange={(v) => updateSettings({ brainLanguage: v })}
+                    note="Prompts for Codex / Claude Code / Cursor are always written in English."
+                  />
+
+                  <Segmented
+                    label="PATHS IN GENERATED PROMPTS"
+                    value={settings.promptPathStyle}
+                    options={[['wsl', 'WSL  /mnt/c/…'], ['windows', 'Windows  C:\\…']]}
+                    onChange={(v) => updateSettings({ promptPathStyle: v })}
+                    note={`e.g. ${stylePath(settings.referenceRepoPath || settings.companyRepoPath || 'C:\\Users\\you\\repo', settings.promptPathStyle)}`}
+                  />
+
+                  <ToggleRow label="Auto-analyze meetings after recording / transcription" value={settings.autoAnalyze} onChange={(v) => updateSettings({ autoAnalyze: v })} />
                 </div>
               )}
 
               {activeTab === 'transcription' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div>
-                    <label style={{ ...labelStyle, color: '#00F5FF' }}>DEFAULT LANGUAGE</label>
+                    <label style={labelStyle}>DEFAULT LANGUAGE</label>
                     <select
                       value={settings.defaultLanguage}
                       onChange={(e) => updateSettings({ defaultLanguage: e.target.value })}
@@ -262,31 +319,11 @@ export function SettingsModal() {
                 </div>
               )}
 
-              {activeTab === 'analysis' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <ToggleRow label="Auto-analyze after transcription" value={settings.autoAnalyze} onChange={(v) => updateSettings({ autoAnalyze: v })} />
-                  <div>
-                    <label style={{ ...labelStyle, color: '#00F5FF' }}>ANALYSIS MODEL</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {[
-                        { id: 'llama-3.1-70b-versatile' as const, label: 'llama-3.1-70b-versatile (Recommended, slower)' },
-                        { id: 'mixtral-8x7b-32768' as const, label: 'mixtral-8x7b-32768 (Faster, less detailed)' }
-                      ].map((m) => (
-                        <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12px', fontFamily: '"Courier New", monospace', color: 'rgba(255,255,255,0.5)' }}>
-                          <input type="radio" checked={settings.analysisModel === m.id} onChange={() => updateSettings({ analysisModel: m.id })} style={{ accentColor: '#00F5FF' }} />
-                          {m.label}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {activeTab === 'integrations' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(0,245,255,0.08)', borderRadius: '8px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: '"Courier New", monospace', color: '#00F5FF' }}>Google Drive MCP</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: mono, color: '#00F5FF' }}>Google Drive MCP</span>
                       <span style={{ fontSize: '10px', color: '#F59E0B' }}>[NOT_CONFIGURED]</span>
                     </div>
                     <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Endpoint: https://drivemcp.googleapis.com/mcp/v1</p>
@@ -294,7 +331,7 @@ export function SettingsModal() {
                   </div>
                   <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(0,245,255,0.08)', borderRadius: '8px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: '"Courier New", monospace', color: '#00F5FF' }}>Notion MCP</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, fontFamily: mono, color: '#00F5FF' }}>Notion MCP</span>
                       <span style={{ fontSize: '10px', color: '#F59E0B' }}>[NOT_CONFIGURED]</span>
                     </div>
                     <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Endpoint: https://mcp.notion.com/mcp</p>
@@ -303,15 +340,24 @@ export function SettingsModal() {
                 </div>
               )}
 
-              {activeTab === 'privacy' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <ToggleRow label="Delete audio after transcription" value={settings.deleteAudioAfterTranscription} onChange={(v) => updateSettings({ deleteAudioAfterTranscription: v })} />
-                  <div>
-                    <GlassButton variant="danger" size="sm" onClick={() => { if (confirm('Delete all stored data? This cannot be undone.')) { } }}>
-                      Clear all stored data
-                    </GlassButton>
-                  </div>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)', fontFamily: '"Courier New", monospace' }}>EVES v2.1.0 — Personal Edition</p>
+              {activeTab === 'storage' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+                    Everything stays on this machine. Recordings are kept until you delete their meeting.
+                  </p>
+                  {storage && ([
+                    ['recordings', 'RECORDINGS', `${storage.recordingCount} files · ${fmtBytes(storage.recordingBytes)}`, storage.recordings],
+                    ['meetings', 'MEETINGS', 'one JSON file per meeting', storage.meetings]
+                  ] as const).map(([id, label, meta, dir]) => (
+                    <div key={id} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(0,245,255,0.08)', borderRadius: '8px', padding: '12px 14px' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#00F5FF', letterSpacing: '0.5px' }}>{label} <span style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>· {meta}</span></div>
+                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={dir}>{dir}</div>
+                      </div>
+                      <GlassButton size="sm" onClick={() => window.eves?.openDataFolder(id)}><FolderOpen size={12} style={{ marginRight: 6 }} />Open</GlassButton>
+                    </div>
+                  ))}
+                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)', fontFamily: mono }}>EVES v2.2.0 — Personal Edition</p>
                 </div>
               )}
             </div>
@@ -322,15 +368,41 @@ export function SettingsModal() {
   )
 }
 
-const labelStyle: React.CSSProperties = { display: 'block', fontSize: '11px', fontWeight: 700, fontFamily: '"Courier New", monospace', color: '#00F5FF', marginBottom: '6px', letterSpacing: '0.5px' }
-const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,245,255,0.1)', borderRadius: '6px', color: '#00F5FF', fontSize: '12px', fontFamily: '"Courier New", monospace', outline: 'none' }
+function pickKeys(s: AppSettings): Record<KeyField, string> {
+  return { deepgramApiKey: s.deepgramApiKey, groqApiKey: s.groqApiKey, geminiApiKey: s.geminiApiKey, openaiApiKey: s.openaiApiKey }
+}
+
+const labelStyle: React.CSSProperties = { display: 'block', fontSize: '11px', fontWeight: 700, fontFamily: mono, color: '#00F5FF', marginBottom: '8px', letterSpacing: '0.5px' }
+const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,245,255,0.1)', borderRadius: '6px', color: '#00F5FF', fontSize: '12px', fontFamily: mono, outline: 'none' }
+
+function Segmented<T extends string>({ label, value, options, onChange, note }: { label: string; value: T; options: readonly (readonly [T, string])[]; onChange: (v: T) => void; note?: string }) {
+  return (
+    <div>
+      <label style={labelStyle}>{label}</label>
+      <div style={{ display: 'inline-flex', gap: '3px', padding: '3px', borderRadius: '8px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(0,245,255,0.08)' }}>
+        {options.map(([v, text]) => (
+          <button
+            key={v}
+            onClick={() => onChange(v)}
+            style={{ padding: '6px 14px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontFamily: mono, fontSize: '11px', fontWeight: 700, background: value === v ? 'rgba(0,245,255,0.14)' : 'transparent', color: value === v ? '#00F5FF' : 'rgba(255,255,255,0.35)', textShadow: value === v ? '0 0 6px rgba(0,245,255,0.3)' : 'none' }}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+      {note && <p style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', marginTop: '6px' }}>{note}</p>}
+    </div>
+  )
+}
 
 function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-      <span style={{ fontSize: '11px', fontFamily: '"Courier New", monospace', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.3px' }}>{'> '}{label}</span>
+      <span style={{ fontSize: '11px', fontFamily: mono, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.3px' }}>{'> '}{label}</span>
       <button
         onClick={() => onChange(!value)}
+        role="switch"
+        aria-checked={value}
         style={{
           width: '36px', height: '20px', borderRadius: '10px', border: value ? 'none' : '1px solid rgba(255,255,255,0.1)',
           background: value ? 'rgba(0,245,255,0.3)' : 'rgba(255,255,255,0.05)',

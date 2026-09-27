@@ -3,6 +3,7 @@ import { SectionDivider, ExpandableCard, SystemRecon, ConfigConsole } from '../h
 import { useMeetingsStore } from '../../store/meetings.store'
 import { useSettingsStore } from '../../store/settings.store'
 import { useUIStore } from '../../store/ui.store'
+import { activeProvider } from '../../lib/providers'
 
 const mono = '"Courier New", Consolas, monospace'
 
@@ -11,12 +12,14 @@ export function ControlPanelPage() {
   const settings = useSettingsStore((s) => s.settings)
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen)
 
-  const keys = [settings.deepgramApiKey, settings.groqApiKey].filter(Boolean).length
+  const keys = [settings.deepgramApiKey, settings.groqApiKey, settings.geminiApiKey, settings.openaiApiKey].filter(Boolean).length
+  // ready = can transcribe and has a brain
+  const ready = !!settings.deepgramApiKey && !!activeProvider(settings)
   const stats: { label: string; value: string; c: string }[] = [
     { label: 'SESSIONS', value: String(meetings.length), c: '#22d3ee' },
     { label: 'TRANSCRIBED', value: String(meetings.filter((m) => m.transcription).length), c: '#7ee787' },
     { label: 'ANALYZED', value: String(meetings.filter((m) => m.analysis).length), c: '#c678dd' },
-    { label: 'API_KEYS', value: `${keys}/2`, c: keys === 2 ? '#7ee787' : '#ff5370' },
+    { label: 'API_KEYS', value: `${keys}/4`, c: ready ? '#7ee787' : '#ff5370' },
   ]
 
   return (

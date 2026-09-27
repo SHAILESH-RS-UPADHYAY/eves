@@ -11,7 +11,8 @@ import { ControlPanelPage } from './components/settings/ControlPanelPage'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { useSettingsStore } from './store/settings.store'
-import { useGroq } from './hooks/useGroq'
+import { useAnalyze } from './hooks/useAnalyze'
+import { activeProvider } from './lib/providers'
 import type { Meeting } from './types'
 
 export function App() {
@@ -20,7 +21,7 @@ export function App() {
   const loadMeetings = useMeetingsStore((s) => s.loadMeetings)
   const addToast = useUIStore((s) => s.addToast)
   const loadSettings = useSettingsStore((s) => s.loadSettings)
-  const { analyze } = useGroq()
+  const analyze = useAnalyze()
   const analyzeRef = useRef(analyze)
   analyzeRef.current = analyze
 
@@ -42,11 +43,9 @@ export function App() {
         message: `${Math.round(meeting.duration / 60)}min • ${meeting.source} audio${meeting.audioPath ? ' • audio saved' : ''}`
       })
 
-      // Pull out action items straight away — the reason you recorded it
-      const transcript = meeting.transcription?.transcript
-      if (transcript && useSettingsStore.getState().settings.autoAnalyze) {
-        analyzeRef.current(meeting.id, transcript)
-      }
+      // Pull out the summary and action items straight away — the reason you recorded it
+      const { settings } = useSettingsStore.getState()
+      if (meeting.transcription && settings.autoAnalyze && activeProvider(settings)) analyzeRef.current(meeting.id)
     })
   }, [])
 

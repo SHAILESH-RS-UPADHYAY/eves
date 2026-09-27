@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from './runtime'
 import type { IpcRendererEvent } from './runtime'
-import type { AppSettings, DashboardRoute, Meeting, MeetingAnalysis, IpcResult, PopupSession, RepoInfo, RepoSynthesisResult, TranscriptionResult } from '../src/types'
+import type { AiProvider, AppSettings, BrainRequest, DashboardRoute, DataFolder, StorageInfo, Meeting, MeetingAnalysis, IpcResult, PopupSession, RepoInfo, RepoSynthesisResult, TranscriptionResult } from '../src/types'
 
 /** Subscribe helper — every listener hands back its own unsubscribe. */
 const on = <A extends unknown[] = []>(channel: string) => (callback: (...args: A) => void) => {
@@ -16,18 +16,13 @@ const api = {
   onTranscribeProgress: on<[pct: number]>('deepgram:progress'),
   testDeepgram: (apiKey: string) => ipcRenderer.invoke('deepgram:test', apiKey) as Promise<IpcResult<string>>,
 
-  // ─── Repository Intel ───────────────────────────────────
-  selectRepoFolder: () =>
-    ipcRenderer.invoke('repo:select-folder') as Promise<IpcResult<string>>,
+  // ─── Repository intel ───────────────────────────────────
+  selectRepoFolder: (title?: string) =>
+    ipcRenderer.invoke('repo:select-folder', title) as Promise<IpcResult<string>>,
   scanRepoFolder: (folderPath: string) =>
     ipcRenderer.invoke('repo:scan-folder', folderPath) as Promise<IpcResult<RepoInfo>>,
-  synthesizeRepoDirective: (args: {
-    repoInfo: RepoInfo
-    transcript: string
-    meetingTitle?: string
-    meetingId?: string
-    apiKey: string
-  }) => ipcRenderer.invoke('repo:synthesize', args) as Promise<IpcResult<RepoSynthesisResult>>,
+  synthesizeRepoDirective: (args: { meetingId?: string; transcript?: string; meetingTitle?: string }) =>
+    ipcRenderer.invoke('repo:synthesize', args) as Promise<IpcResult<RepoSynthesisResult>>,
 
   // ─── Recording (popup) ──────────────────────────────────
   appendRecording: (args: { id: string; data: ArrayBuffer }) =>
@@ -43,9 +38,13 @@ const api = {
   /** Real path of a dropped/uploaded file (File.path no longer exists) */
   pathForFile: (file: File) => webUtils.getPathForFile(file),
 
-  // ─── Analysis ───────────────────────────────────────────
-  analyze: (args: { transcript: string; apiKey: string }) =>
-    ipcRenderer.invoke('groq:analyze', args),
+  // ─── AI brain (Groq / Gemini / OpenAI) ─────────────────
+  analyze: (meetingId: string) => ipcRenderer.invoke('ai:analyze', meetingId) as Promise<IpcResult<MeetingAnalysis>>,
+  chat: (req: BrainRequest) => ipcRenderer.invoke('ai:chat', req) as Promise<IpcResult<{ text: string; model: string }>>,
+  cancelChat: (requestId: string) => ipcRenderer.invoke('ai:cancel', requestId),
+  listModels: (provider: AiProvider, key: string) => ipcRenderer.invoke('ai:models', provider, key) as Promise<IpcResult<string[]>>,
+  onAiDelta: on<[chunk: { requestId: string; text: string }]>('ai:delta'),
+  onAiProgress: on<[progress: { key: string; stage: string }]>('ai:progress'),
 
   // ─── Google Drive ───────────────────────────────────────
   driveListFiles: () => ipcRenderer.invoke('drive:list'),
@@ -64,6 +63,8 @@ const api = {
   getSettings: () => ipcRenderer.invoke('settings:get') as Promise<AppSettings>,
   saveSettings: (settings: Partial<AppSettings>) =>
     ipcRenderer.invoke('settings:save', settings),
+  storageInfo: () => ipcRenderer.invoke('app:storage') as Promise<StorageInfo>,
+  openDataFolder: (which: DataFolder) => ipcRenderer.invoke('app:open-folder', which),
 
   // ─── Windows ────────────────────────────────────────────
   minimize: () => ipcRenderer.invoke('window:minimize'),

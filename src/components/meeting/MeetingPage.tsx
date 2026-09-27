@@ -12,7 +12,7 @@ import { GlassCard } from '../glass/GlassCard'
 import { useMeetingsStore } from '../../store/meetings.store'
 import { useUIStore } from '../../store/ui.store'
 import { useDeepgram } from '../../hooks/useDeepgram'
-import { useGroq } from '../../hooks/useGroq'
+import { useAnalyze } from '../../hooks/useAnalyze'
 import { useSettingsStore } from '../../store/settings.store'
 import { format } from 'date-fns'
 import { audioUrl } from '../../../core/utils/audioUrl'
@@ -26,7 +26,7 @@ export function MeetingPage() {
   const removeTag = useMeetingsStore((s) => s.removeTag)
   const updateNotes = useMeetingsStore((s) => s.updateNotes)
   const { transcribe } = useDeepgram()
-  const { analyze } = useGroq()
+  const analyze = useAnalyze()
   const settings = useSettingsStore((s) => s.settings)
   const [seekTo, setSeekTo] = useState<number | null>(null)
 
@@ -58,9 +58,7 @@ export function MeetingPage() {
 
     if (settings.autoTranscribe) {
       const result = await transcribe(id, filePath)
-      if (result && settings.autoAnalyze) {
-        await analyze(id, result.transcript)
-      }
+      if (result && settings.autoAnalyze) await analyze(id)
     }
   }, [createMeeting, transcribe, analyze, settings])
 
@@ -69,7 +67,7 @@ export function MeetingPage() {
   // Transcribe a recording that already exists on disk
   const handleTranscribeExisting = useCallback(async (id: string, filePath: string) => {
     const result = await transcribe(id, filePath)
-    if (result && settings.autoAnalyze) await analyze(id, result.transcript)
+    if (result && settings.autoAnalyze) await analyze(id)
   }, [transcribe, analyze, settings.autoAnalyze])
 
   if (!activeMeeting && meetings.length === 0) {
@@ -135,6 +133,27 @@ export function MeetingPage() {
                 }}
               >
                 ./transcribe_audio
+              </button>
+            )}
+            {activeMeeting.transcription && !activeMeeting.isAnalyzing && (
+              <button
+                onClick={() => analyze(activeMeeting.id)}
+                title="Summary, decisions and action items with the EVES brain"
+                style={{
+                  padding: '10px 20px',
+                  background: 'rgba(126, 231, 135, 0.08)',
+                  border: '1px solid rgba(126, 231, 135, 0.4)',
+                  borderRadius: '6px',
+                  color: '#7ee787',
+                  fontFamily: '"Courier New", monospace',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '1px',
+                  cursor: 'pointer',
+                  textShadow: '0 0 8px rgba(126, 231, 135, 0.5)'
+                }}
+              >
+                {activeMeeting.analysis ? './re_analyze' : './analyze_meeting'}
               </button>
             )}
           </div>

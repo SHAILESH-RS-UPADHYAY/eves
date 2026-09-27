@@ -1,7 +1,7 @@
 {
   "name": "eves",
   "version": "1.0.0",
-  "description": "EVES \u2014 Meeting Intelligence Dashboard",
+  "description": "EVES — Meeting Intelligence Dashboard",
   "main": "out/main/index.js",
   "scripts": {
     "start": "node launcher/runner.js",
@@ -10,7 +10,7 @@
     "build": "electron-vite build -c eves.config.ts",
     "package": "npm run build && electron-builder --config packager.yml",
     "preview": "electron-vite preview -c eves.config.ts",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON core/utils/audioUrl.test.mts"
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON core/utils/audioUrl.test.mts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON core/utils/llm.test.mts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON core/utils/brain.test.mts"
   },
   "dependencies": {
     "@deepgram/sdk": "^3.6.0",
@@ -18,7 +18,6 @@
     "conf": "^10.2.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.5.0",
-    "groq-sdk": "^0.7.0",
     "lucide-react": "^0.447.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

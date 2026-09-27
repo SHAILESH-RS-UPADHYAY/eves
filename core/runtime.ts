@@ -20,7 +20,7 @@ export {
   Tray,
   webUtils
 } from 'electron'
-export type { BrowserWindowConstructorOptions, IpcRendererEvent, Rectangle } from 'electron'
+export type { BrowserWindowConstructorOptions, IpcRendererEvent, Rectangle, WebContents } from 'electron'
 
 /** Dev server URL injected by the build tool; undefined in a packaged build. */
 export const devServerUrl = process.env['ELECTRON_RENDERER_URL']

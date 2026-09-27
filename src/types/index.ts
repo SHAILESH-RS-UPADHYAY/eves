@@ -7,7 +7,11 @@ export type Urgency = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 export type MoodType = 'POSITIVE' | 'NEUTRAL' | 'TENSE' | 'MIXED' | 'PRODUCTIVE'
 export type SentimentLabel = 'POSITIVE' | 'NEUTRAL' | 'CAUTIOUS' | 'NEGATIVE'
 export type ToastType = 'success' | 'error' | 'info' | 'loading'
-export type NavPage = 'dashboard' | 'meetings' | 'transcripts' | 'repo' | 'integrations' | 'settings'
+export type NavPage = 'dashboard' | 'meetings' | 'transcripts' | 'brain' | 'repo' | 'integrations' | 'settings'
+export type AiProvider = 'groq' | 'gemini' | 'openai'
+export type BrainLanguage = 'english' | 'hinglish'
+export type PathStyle = 'wsl' | 'windows'
+export type PillId = 'goal' | 'how' | 'codex' | 'claude' | 'cursor' | 'frontend' | 'actions' | 'risks'
 
 export interface Word {
   word: string
@@ -76,6 +80,8 @@ export interface SpeakerProfile {
 }
 
 export interface MeetingAnalysis {
+  /** The one outcome the meeting is really about */
+  mainGoal?: string
   summary: string
   tldr: string
   keyDecisions: Decision[]
@@ -115,6 +121,10 @@ export interface Meeting {
   peaks?: number[]
   transcription?: TranscriptionResult
   analysis?: MeetingAnalysis
+  /** Part-by-part notes for transcripts longer than the active model's context */
+  digest?: MeetingDigest
+  /** EVES brain conversation about this meeting */
+  chat?: ChatMessage[]
   tags: Tag[]
   notes: string
   isTranscribing: boolean
@@ -122,16 +132,57 @@ export interface Meeting {
   transcriptionProgress: number
 }
 
+export interface MeetingDigest {
+  /** transcript length the parts were made from — a re-transcription invalidates them */
+  sourceChars: number
+  parts: string[]
+}
+
+export interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  text: string
+  pill?: PillId
+  at: number
+  error?: boolean
+}
+
+export interface BrainRequest {
+  requestId: string
+  meetingId: string
+  messages: ChatMessage[]
+  pill?: PillId
+}
+
 export interface AppSettings {
   deepgramApiKey: string
   groqApiKey: string
+  geminiApiKey: string
+  openaiApiKey: string
+  /** Which provider is EVES's brain */
+  aiProvider: AiProvider
+  /** Model per provider — editable because providers retire models */
+  aiModels: Record<AiProvider, string>
   defaultLanguage: string
   enableDiarization: boolean
   autoTranscribe: boolean
   autoAnalyze: boolean
-  analysisModel: 'llama-3.1-70b-versatile' | 'mixtral-8x7b-32768'
-  deleteAudioAfterTranscription: boolean
+  /** Language EVES explains in (prompts for coding tools are always English) */
+  brainLanguage: BrainLanguage
+  /** Path format written into generated prompts */
+  promptPathStyle: PathStyle
+  companyRepoPath: string
+  referenceRepoPath: string
   notionDatabaseId?: string
+}
+
+export type DataFolder = 'recordings' | 'meetings'
+
+export interface StorageInfo {
+  recordings: string
+  meetings: string
+  recordingCount: number
+  recordingBytes: number
 }
 
 export interface Toast {
@@ -197,6 +248,9 @@ export interface RepoInfo {
   readmeSummary?: string
   treePreview: RepoFileNode[]
   manifestSummary?: string
+  /** Catalog file at the root (INDEX.md / CATALOG.md / README.md) — how a skill vault is read */
+  catalog?: string
+  skillCount?: number
 }
 
 export interface AffectedFile {
