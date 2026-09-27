@@ -382,3 +382,7 @@ html, body, #root {
   from { width: 0; }
   to   { width: 100%; }
 }
+
+/* Transcript words: one delegated click handler, hover in CSS (thousands of words per meeting) */
+.tx-word { cursor: pointer; border-radius: 2px; transition: background 0.2s; }
+.tx-word:hover { background: rgba(124, 58, 237, 0.1); }

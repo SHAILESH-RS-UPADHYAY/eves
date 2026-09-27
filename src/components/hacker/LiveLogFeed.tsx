@@ -18,7 +18,7 @@ const logTemplates = [
   { level: 'INFO', msg: 'Audio source switched: internal -> external' },
   { level: 'INFO', msg: 'Session saved: 14:32:08 / 45min / 2 speakers' },
   { level: 'DEBUG', msg: 'Memory pool: 48.3MB / 512MB — healthy' },
-  { level: 'INFO', msg: 'Hotkey registered: Ctrl+Shift+L -> toggle-listening' },
+  { level: 'INFO', msg: 'Hotkey registered: Alt+L -> toggle-listening' },
 ]
 
 function getTimestamp() {

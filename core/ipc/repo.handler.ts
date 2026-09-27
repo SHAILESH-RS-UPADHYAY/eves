@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog } from '../runtime'
 import * as fs from 'fs'
 import * as path from 'path'
 import Groq from 'groq-sdk'
@@ -135,14 +135,13 @@ function detectTechStack(rootPath: string): { techStack: string[]; keyDependenci
       if (allDeps['typescript'] || fs.existsSync(path.join(rootPath, 'tsconfig.json'))) stack.add('TypeScript')
       if (allDeps['react'] || allDeps['react-dom']) stack.add('React')
       if (allDeps['next']) stack.add('Next.js')
-      if (allDeps['electron']) stack.add('Electron')
       if (allDeps['vue']) stack.add('Vue.js')
       if (allDeps['@angular/core']) stack.add('Angular')
       if (allDeps['svelte']) stack.add('Svelte')
       if (allDeps['tailwindcss']) stack.add('Tailwind CSS')
       if (allDeps['express'] || allDeps['fastify'] || allDeps['koa'] || allDeps['@nestjs/core']) stack.add('Backend API')
       if (allDeps['zustand'] || allDeps['redux'] || allDeps['@reduxjs/toolkit']) stack.add('State Management')
-      if (allDeps['vite'] || allDeps['electron-vite']) stack.add('Vite')
+      if (depNames.some((d) => d === 'vite' || d.endsWith('-vite'))) stack.add('Vite')
 
       keyDeps.push(...depNames.slice(0, 15))
       manifestSummary = `Project: ${pkg.name || 'unnamed'} v${pkg.version || '1.0.0'} | Scripts: ${Object.keys(pkg.scripts || {}).join(', ')} | Main Deps: ${keyDeps.slice(0, 8).join(', ')}`

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { UploadCloud, Shield, FileText, Settings, RefreshCw, Columns2, Trash2, Search } from 'lucide-react'
+import { UploadCloud, FileText, Settings, RefreshCw, Trash2, Search } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
 import { useMeetingsStore } from '../../store/meetings.store'
 
@@ -26,20 +26,19 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   useHotkeys('ctrl+k, cmd+k', (e) => { e.preventDefault(); setOpen(!isOpen) })
-  useHotkeys('escape', () => setOpen(false), { enableOnTags: ['INPUT'] })
+  useHotkeys('escape', () => setOpen(false), { enableOnFormTags: ['INPUT'] })
 
   const commands: Command[] = useMemo(() => {
     const base: Command[] = [
       { id: 'upload', label: 'Upload new recording', icon: UploadCloud, shortcut: '⌘U', section: 'Actions', action: () => { setPage('meetings'); setOpen(false) } },
-      { id: 'stealth', label: 'Toggle stealth mode', icon: Shield, shortcut: '⌘⇧S', section: 'Actions', action: () => { setOpen(false) } },
       { id: 'notion', label: 'Export to Notion', icon: FileText, shortcut: '⌘N', section: 'Actions', action: () => { setPage('integrations'); setOpen(false) } },
       { id: 'settings', label: 'Open settings', icon: Settings, shortcut: '⌘,', section: 'Actions', action: () => { setSettingsOpen(true); setOpen(false) } },
       { id: 'drive', label: 'Sync from Drive', icon: RefreshCw, section: 'Actions', action: () => { setPage('integrations'); setOpen(false) } },
-      { id: 'compare', label: 'Compare two meetings', icon: Columns2, section: 'Actions', action: () => { setOpen(false) } },
-      { id: 'clear', label: 'Clear all data', icon: Trash2, section: 'Actions', danger: true, action: () => { meetings.forEach((m) => deleteMeeting(m.id)); setOpen(false) } },
+      { id: 'clear', label: 'Clear all data', icon: Trash2, section: 'Actions', danger: true, action: () => { if (confirm(`Delete all ${meetings.length} meetings and their recordings?`)) meetings.forEach((m) => deleteMeeting(m.id)); setOpen(false) } },
       { id: 'nav-dashboard', label: 'Go to Dashboard', icon: Search, section: 'Navigation', action: () => { setPage('dashboard'); setOpen(false) } },
       { id: 'nav-meetings', label: 'Go to Meetings', icon: Search, section: 'Navigation', action: () => { setPage('meetings'); setOpen(false) } },
       { id: 'nav-transcripts', label: 'Go to Transcripts', icon: Search, section: 'Navigation', action: () => { setPage('transcripts'); setOpen(false) } },
+      { id: 'nav-repo', label: 'Go to Repo Intel', icon: Search, section: 'Navigation', action: () => { setPage('repo'); setOpen(false) } },
       { id: 'nav-integrations', label: 'Go to Integrations', icon: Search, section: 'Navigation', action: () => { setPage('integrations'); setOpen(false) } }
     ]
     if (!query) return base

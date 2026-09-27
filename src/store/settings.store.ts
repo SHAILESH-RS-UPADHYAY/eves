@@ -9,11 +9,7 @@ const defaultSettings: AppSettings = {
   autoTranscribe: true,
   autoAnalyze: true,
   analysisModel: 'llama-3.1-70b-versatile',
-  deleteAudioAfterTranscription: false,
-  stealthOnLaunch: false,
-  accentColor: '#7C3AED',
-  orbIntensity: 0.13,
-  reduceMotion: false
+  deleteAudioAfterTranscription: false
 }
 
 interface SettingsStore {

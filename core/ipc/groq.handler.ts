@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain } from '../runtime'
 import Groq from 'groq-sdk'
 import type { MeetingAnalysis, IpcResult } from '../../src/types'
 

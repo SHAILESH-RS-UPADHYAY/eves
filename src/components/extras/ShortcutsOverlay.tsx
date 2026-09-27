@@ -5,14 +5,17 @@ import { useUIStore } from '../../store/ui.store'
 const shortcuts = [
   { keys: 'Alt + D', action: 'Toggle Dashboard Window' },
   { keys: 'Alt + L', action: 'Start / Stop Listening' },
-  { keys: 'Alt + Backspace', action: 'Hide / Show Overlay' },
-  { keys: 'Alt + O', action: 'Toggle Audio Source' },
-  { keys: 'Alt + Space', action: 'Synthesize & Save Session' },
+  { keys: 'Alt + Backspace', action: 'Hide / Show EVES Popup' },
+  { keys: 'Alt + O', action: 'Cycle Audio Source' },
+  { keys: 'Alt + T', action: 'Toggle Click-Through' },
+  { keys: 'Alt + Space', action: 'Stop + Save Session' },
   { keys: 'Alt + Q', action: 'Quit EVES' },
   { keys: 'Ctrl/Cmd + K', action: 'Command Palette' },
   { keys: 'Ctrl/Cmd + U', action: 'Upload Recording' },
   { keys: 'Ctrl/Cmd + N', action: 'Export to Notion' },
   { keys: 'Space', action: 'Play / Pause Audio' },
+  { keys: '← / →', action: 'Seek ±10s' },
+  { keys: '[ / ]', action: 'Playback Speed ∓0.25' },
   { keys: 'Escape', action: 'Close Modal' },
   { keys: '?', action: 'Show Shortcuts Modal' }
 ]

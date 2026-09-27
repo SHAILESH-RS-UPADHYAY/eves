@@ -22,10 +22,10 @@ echo.
 echo Shortcuts (Alt-based — Zero Acemate collision):
 echo   Alt + D          ^| Toggle Dashboard
 echo   Alt + L          ^| Start / Stop listening
-echo   Alt + Backspace  ^| Hide / Show Overlay
-echo   Alt + O          ^| Toggle audio source (loopback / mic)
+echo   Alt + Backspace  ^| Hide / Show EVES popup
+echo   Alt + O          ^| Cycle audio source (INT / EXT / BOTH)
 echo   Alt + T          ^| Toggle click-through mode
-echo   Alt + Space      ^| Synthesize session
+echo   Alt + Space      ^| Stop + save session
 echo   Alt + Q          ^| Quit EVES
 echo.
 echo ===================================================

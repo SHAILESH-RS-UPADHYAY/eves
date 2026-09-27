@@ -283,7 +283,6 @@ export function ConfigConsole() {
       {line('model', settings.analysisModel, C.cyan)}
       {line('auto_analyze', String(settings.autoAnalyze), settings.autoAnalyze ? C.green : C.red)}
       {sec('security')}
-      {line('stealth_on_launch', String(settings.stealthOnLaunch), settings.stealthOnLaunch ? C.green : C.yellow)}
       {line('delete_audio', String(settings.deleteAudioAfterTranscription), C.yellow)}
       {line('deepgram_key', mask(settings.deepgramApiKey), settings.deepgramApiKey ? C.green : C.red)}
       {line('groq_key', mask(settings.groqApiKey), settings.groqApiKey ? C.green : C.red)}
@@ -324,7 +323,7 @@ export function DecryptStandby({ archived = 0 }: { archived?: number }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '10px', color: C.mut }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Gauge size={12} style={{ color: C.yellow }} /> archive: <span style={{ color: C.yellow }}>{archived} sessions</span></span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Wifi size={12} style={{ color: C.green }} /> press <span style={{ color: C.green }}>Ctrl+Shift+L</span> to intercept</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Wifi size={12} style={{ color: C.green }} /> press <span style={{ color: C.green }}>Alt+L</span> to intercept</span>
         </div>
       </div>
     </div>

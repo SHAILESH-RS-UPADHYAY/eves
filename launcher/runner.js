@@ -1,59 +1,36 @@
+// Runs package.json's "dev" script straight through its CLI (no npm shell).
+// The build tool's info chatter is silenced (--logLevel warn) and any line that
+// still carries the runtime's brand is rewritten, so the console reads as EVES.
 const { spawn } = require('child_process')
 const path = require('path')
 
-const projectRoot = path.resolve(__dirname, '..')
-const viteBin = path.resolve(projectRoot, 'node_modules', 'electron-vite', 'bin', 'electron-vite.js')
+const root = path.resolve(__dirname, '..')
+const [tool, ...args] = require(path.join(root, 'package.json')).scripts.dev.split(/\s+/)
+const toolDir = path.join(root, 'node_modules', tool)
+const { bin } = require(path.join(toolDir, 'package.json'))
+const brand = new RegExp(tool.split('-')[0] + '(\\.exe)?', 'gi')
 
 const env = { ...process.env }
-if (process.argv.includes('--dashboard')) {
-  env.EVES_OPEN_DASHBOARD = '1'
-}
+if (process.argv.includes('--dashboard')) env.EVES_OPEN_DASHBOARD = '1'
 
-const child = spawn(process.execPath, [viteBin, 'dev'], {
-  cwd: projectRoot,
-  env,
-  stdio: ['inherit', 'pipe', 'pipe']
-})
+console.log('[SYS] EVES core starting...')
+const child = spawn(
+  process.execPath,
+  [path.join(toolDir, typeof bin === 'string' ? bin : bin[tool]), ...args, '--logLevel', 'warn'],
+  { cwd: root, env, stdio: ['inherit', 'pipe', 'pipe'] }
+)
 
-function filterLine(line) {
-  return line
-    .replace(/build the electron main process successfully/gi, '[OK] EVES core process ready')
-    .replace(/build the electron preload files successfully/gi, '[OK] EVES system bridge ready')
-    .replace(/dev server running for the electron renderer process at:/gi, '[INFO] EVES interface ready at:')
-    .replace(/start electron app\.\.\./gi, '[SYS] EVES desktop service active')
-    .replace(/electron-vite/gi, 'eves-core')
-    .replace(/electron-builder/gi, 'eves-packager')
-    .replace(/electron\.exe/gi, 'eves.exe')
-    .replace(/\belectron\b/gi, 'EVES')
-}
-
-function processStream(stream, outStream) {
+function relay(stream, out) {
   let buffer = ''
-  stream.on('data', (data) => {
-    buffer += data.toString()
-    const lines = buffer.split('\n')
+  stream.on('data', (chunk) => {
+    const lines = (buffer + chunk).split('\n')
     buffer = lines.pop()
-    for (const l of lines) {
-      outStream.write(filterLine(l) + '\n')
-    }
+    for (const line of lines) out.write(line.replace(brand, 'EVES') + '\n')
   })
-  stream.on('end', () => {
-    if (buffer) {
-      outStream.write(filterLine(buffer) + '\n')
-    }
-  })
+  stream.on('end', () => buffer && out.write(buffer.replace(brand, 'EVES') + '\n'))
 }
+relay(child.stdout, process.stdout)
+relay(child.stderr, process.stderr)
 
-processStream(child.stdout, process.stdout)
-processStream(child.stderr, process.stderr)
-
-child.on('close', (code) => {
-  process.exit(code || 0)
-})
-
-process.on('SIGINT', () => {
-  child.kill('SIGINT')
-})
-process.on('SIGTERM', () => {
-  child.kill('SIGTERM')
-})
+child.on('close', (code) => process.exit(code || 0))
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => child.kill(sig))

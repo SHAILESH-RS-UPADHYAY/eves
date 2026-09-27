@@ -15,8 +15,7 @@ const pageTitles: Record<string, string> = {
 export function TopBar() {
   const currentPage = useUIStore((s) => s.currentPage)
 
-  const platform = typeof window !== 'undefined' && (window as any).eves?.platform
-  const isWin = platform === 'win32'
+  const isWin = window.eves?.platform === 'win32'
 
   return (
     <div
@@ -29,7 +28,7 @@ export function TopBar() {
         background: 'rgba(3, 3, 6, 0.8)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(0, 245, 255, 0.08)',
-        WebkitAppRegion: 'drag' as any,
+        WebkitAppRegion: 'drag',
         flexShrink: 0,
         zIndex: 10,
         fontFamily: '"Courier New", monospace',
@@ -59,11 +58,11 @@ export function TopBar() {
       </div>
 
       {/* Right: window controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' as any }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' }}>
         {isWin && (
           <div style={{ display: 'flex', gap: '4px' }}>
             <button
-              onClick={() => (window as any).eves?.minimize()}
+              onClick={() => window.eves?.minimize()}
               style={winBtnStyle}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -71,7 +70,7 @@ export function TopBar() {
               <Minus size={12} />
             </button>
             <button
-              onClick={() => (window as any).eves?.maximize()}
+              onClick={() => window.eves?.maximize()}
               style={winBtnStyle}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,245,255,0.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -79,7 +78,7 @@ export function TopBar() {
               <Square size={10} />
             </button>
             <button
-              onClick={() => (window as any).eves?.close()}
+              onClick={() => window.eves?.close()}
               style={winBtnStyle}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,0,110,0.2)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}

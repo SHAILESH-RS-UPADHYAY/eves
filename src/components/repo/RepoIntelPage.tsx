@@ -172,7 +172,7 @@ export function RepoIntelPage() {
   // Select Folder Handler
   const handleSelectFolder = async () => {
     if (!window.eves?.selectRepoFolder) {
-      addToast({ type: 'error', title: 'Desktop API unavailable', message: 'Folder picker requires Electron' })
+      addToast({ type: 'error', title: 'Desktop API unavailable', message: 'Folder picker needs the EVES desktop app' })
       return
     }
 
@@ -220,7 +220,7 @@ export function RepoIntelPage() {
   // Synthesis Execution Handler
   const handleSynthesize = async () => {
     if (!settings.groqApiKey) {
-      addToast({ type: 'error', title: 'Groq API Key Required', message: 'Add your Groq API key in Settings (Ctrl+Shift+D)' })
+      addToast({ type: 'error', title: 'Groq API Key Required', message: 'Add your Groq API key in Settings → API Keys' })
       return
     }
 

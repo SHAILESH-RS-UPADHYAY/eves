@@ -68,9 +68,9 @@
     <!-- LAUNCH -->
     <circle cx="70" cy="160" r="15" fill="#7ee78722" class="glow"/><circle cx="70" cy="160" r="7" fill="#0d1117" stroke="#7ee787" stroke-width="1.6" class="pulse"/>
     <text x="70" y="196" fill="#7ee787">LAUNCH</text>
-    <!-- ELECTRON -->
+    <!-- EVES CORE -->
     <circle cx="220" cy="160" r="15" fill="#22d3ee22" class="glow"/><circle cx="220" cy="160" r="7" fill="#0d1117" stroke="#22d3ee" stroke-width="1.6" class="pulse2"/>
-    <text x="220" y="196" fill="#22d3ee">ELECTRON</text>
+    <text x="220" y="196" fill="#22d3ee">EVES CORE</text>
     <!-- AUDIO -->
     <circle cx="380" cy="160" r="15" fill="#7ee78722" class="glow"/><circle cx="380" cy="160" r="7" fill="#0d1117" stroke="#7ee787" stroke-width="1.6" class="pulse3"/>
     <text x="380" y="196" fill="#7ee787">AUDIO</text>
@@ -79,7 +79,7 @@
     <text x="530" y="196" fill="#22d3ee">DEEPGRAM</text>
     <!-- GROQ -->
     <circle cx="680" cy="160" r="15" fill="#c678dd22" class="glow"/><circle cx="680" cy="160" r="8" fill="#0d1117" stroke="#c678dd" stroke-width="1.8" class="pulse2"/>
-    <text x="680" y="196" fill="#c678dd">GROQ · 70B</text>
+    <text x="680" y="196" fill="#c678dd">AI BRAIN</text>
     <!-- DASHBOARD -->
     <circle cx="840" cy="160" r="15" fill="#22d3ee22" class="glow"/><circle cx="840" cy="160" r="7" fill="#0d1117" stroke="#22d3ee" stroke-width="1.6" class="pulse3"/>
     <text x="840" y="196" fill="#22d3ee">DASHBOARD</text>

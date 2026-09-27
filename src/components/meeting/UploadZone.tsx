@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { motion } from 'framer-motion'
 import { UploadCloud } from 'lucide-react'
 
@@ -22,15 +23,16 @@ export function UploadZone({ onFile }: UploadZoneProps) {
     if (accepted.length > 0) onFile(accepted[0])
   }, [onFile])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: acceptedFormats,
     maxFiles: 1
   })
+  useHotkeys('ctrl+u, meta+u', (e) => { e.preventDefault(); open() })
 
   return (
+    <div {...getRootProps()}>
     <motion.div
-      {...getRootProps()}
       style={{
         border: `2px dashed ${isDragActive ? 'var(--accent-violet)' : 'rgba(255,255,255,0.1)'}`,
         borderRadius: '16px',
@@ -78,5 +80,6 @@ export function UploadZone({ onFile }: UploadZoneProps) {
         </div>
       )}
     </motion.div>
+    </div>
   )
 }

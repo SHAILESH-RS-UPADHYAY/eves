@@ -17,12 +17,10 @@ const moodColors: Record<MoodType, string> = {
 
 export function MeetingFeed() {
   const meetings = useMeetingsStore((s) => s.meetings)
-  const setActiveMeeting = useMeetingsStore((s) => s.setActiveMeeting)
   const setPage = useUIStore((s) => s.setPage)
   const setActiveMeetingId = useUIStore((s) => s.setActiveMeeting)
 
   const handleOpen = (id: string) => {
-    setActiveMeeting(id)
     setActiveMeetingId(id)
     setPage('meetings')
   }

@@ -7,7 +7,6 @@ interface UIStore {
   isCommandPaletteOpen: boolean
   isSettingsOpen: boolean
   isShortcutsOpen: boolean
-  isStealthActive: boolean
   toasts: Toast[]
 
   setPage: (page: NavPage) => void
@@ -15,7 +14,6 @@ interface UIStore {
   setCommandPaletteOpen: (open: boolean) => void
   setSettingsOpen: (open: boolean) => void
   setShortcutsOpen: (open: boolean) => void
-  setStealthActive: (active: boolean) => void
   addToast: (toast: Omit<Toast, 'id'>) => void
   removeToast: (id: string) => void
 }
@@ -26,7 +24,6 @@ export const useUIStore = create<UIStore>((set) => ({
   isCommandPaletteOpen: false,
   isSettingsOpen: false,
   isShortcutsOpen: false,
-  isStealthActive: false,
   toasts: [],
 
   setPage: (page) => set({ currentPage: page }),
@@ -34,7 +31,6 @@ export const useUIStore = create<UIStore>((set) => ({
   setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
   setSettingsOpen: (open) => set({ isSettingsOpen: open }),
   setShortcutsOpen: (open) => set({ isShortcutsOpen: open }),
-  setStealthActive: (active) => set({ isStealthActive: active }),
 
   addToast: (toast) =>
     set((state) => {

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { useHotkeys } from 'react-hotkeys-hook'
 import { UploadZone } from './UploadZone'
 import { AudioPlayer } from './AudioPlayer'
 import { TranscriptView } from './TranscriptView'
@@ -16,11 +15,12 @@ import { useDeepgram } from '../../hooks/useDeepgram'
 import { useGroq } from '../../hooks/useGroq'
 import { useSettingsStore } from '../../store/settings.store'
 import { format } from 'date-fns'
+import { audioUrl } from '../../../core/utils/audioUrl'
 
 export function MeetingPage() {
   const meetings = useMeetingsStore((s) => s.meetings)
   const activeMeetingId = useUIStore((s) => s.activeMeetingId)
-  const addMeeting = useMeetingsStore((s) => s.addMeeting)
+  const createMeeting = useMeetingsStore((s) => s.createMeeting)
   const updateMeeting = useMeetingsStore((s) => s.updateMeeting)
   const addTag = useMeetingsStore((s) => s.addTag)
   const removeTag = useMeetingsStore((s) => s.removeTag)
@@ -32,24 +32,28 @@ export function MeetingPage() {
 
   const activeMeeting = meetings.find((m) => m.id === activeMeetingId)
 
-  useHotkeys('ctrl+u, cmd+u', (e) => { e.preventDefault(); /* trigger upload zone click */ })
-
   const handleFile = useCallback(async (file: File) => {
-    const filePath = (file as any).path ?? file.name
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    const meeting = {
+    // File.path is gone from the runtime; the bridge resolves the real path
+    const filePath = window.eves?.pathForFile(file)
+    if (!filePath) {
+      useUIStore.getState().addToast({ type: 'error', title: 'Upload failed', message: 'Could not resolve the file location' })
+      return
+    }
+    const id = `upload-${Date.now()}`
+    createMeeting({
       id,
       title: file.name.replace(/\.[^.]+$/, ''),
       date: new Date().toISOString(),
       duration: 0,
       audioPath: filePath,
+      audioUrl: audioUrl(filePath),
+      source: 'upload',
       tags: [],
       notes: '',
       isTranscribing: false,
       isAnalyzing: false,
       transcriptionProgress: 0
-    }
-    addMeeting(meeting)
+    })
     useUIStore.getState().setActiveMeeting(id)
 
     if (settings.autoTranscribe) {
@@ -58,7 +62,7 @@ export function MeetingPage() {
         await analyze(id, result.transcript)
       }
     }
-  }, [addMeeting, transcribe, analyze, settings])
+  }, [createMeeting, transcribe, analyze, settings])
 
   const handleWordClick = (time: number) => setSeekTo(time)
 
@@ -138,9 +142,11 @@ export function MeetingPage() {
           {/* Audio player */}
           {(activeMeeting.audioUrl || activeMeeting.audioPath) && (
           <AudioPlayer
-            audioPath={activeMeeting.audioUrl || activeMeeting.audioPath}
+            src={activeMeeting.audioUrl || audioUrl(activeMeeting.audioPath)}
+            peaks={activeMeeting.peaks}
+            knownDuration={activeMeeting.duration}
             transcription={activeMeeting.transcription}
-            onReady={(dur) => updateMeeting(activeMeeting.id, { duration: dur })}
+            onReady={(dur) => { if (Math.abs(dur - activeMeeting.duration) > 1) updateMeeting(activeMeeting.id, { duration: dur }) }}
             seekTo={seekTo}
           />
           )}

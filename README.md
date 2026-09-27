@@ -134,7 +134,7 @@ sequenceDiagram
 
 ```
 eves/
-├── electron/                     # Main process
+├── core/                         # Desktop core process
 │   ├── main.ts                   # Lifecycle, window management, hotkeys, IPC
 │   ├── preload.ts                # Context bridge (window.eves.*)
 │   ├── ipc/                      # Deepgram, Groq, Drive, Notion, Recorder handlers

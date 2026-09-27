@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain } from '../runtime'
 import { getSettings, saveSettings } from '../utils/store'
 
 export function registerSettingsHandlers() {

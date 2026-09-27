@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { GlassCard } from '../glass/GlassCard'
 import { SpeakerAvatar } from '../extras/SpeakerAvatar'
+import { formatClock } from './AudioPlayer'
 import type { TranscriptionResult } from '../../types'
 
 const speakerNames = ['Speaker A', 'Speaker B', 'Speaker C', 'Speaker D', 'Speaker E', 'Speaker F']
@@ -68,12 +69,20 @@ export function TranscriptView({ transcription, onWordClick, standalone }: Trans
       </div>
 
       {/* Transcript body */}
-      <div ref={scrollRef} style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }} className="glass-scrollbar">
+      <div
+        ref={scrollRef}
+        style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}
+        className="glass-scrollbar"
+        onClick={(e) => {
+          const t = (e.target as HTMLElement).dataset.t
+          if (t) onWordClick?.(Number(t))
+        }}
+      >
         {filteredUtterances.map((u, i) => (
           <motion.div
-            key={i}
+            key={`${u.start}-${i}`}
             style={{ display: 'flex', gap: '10px', padding: '10px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)' }}
-            initial={{ opacity: 0, y: 10 }}
+            initial={i < 24 ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.02 }}
           >
@@ -81,17 +90,11 @@ export function TranscriptView({ transcription, onWordClick, standalone }: Trans
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>{speakerNames[u.speaker] ?? `Speaker ${u.speaker}`}</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{Math.floor(u.start / 60)}:{Math.floor(u.start % 60).toString().padStart(2, '0')}</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{formatClock(u.start)}</span>
               </div>
               <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)' }}>
                 {u.words.map((w, wi) => (
-                  <span
-                    key={wi}
-                    onClick={() => onWordClick?.(w.start)}
-                    style={{ cursor: 'pointer', borderRadius: '2px', transition: 'background 0.2s' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(124,58,237,0.1)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                  >
+                  <span key={wi} className="tx-word" data-t={w.start}>
                     {w.punctuated_word ?? w.word}{' '}
                   </span>
                 ))}

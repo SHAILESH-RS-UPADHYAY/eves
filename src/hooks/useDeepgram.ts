@@ -7,42 +7,39 @@ import type { TranscriptionResult } from '../types'
 export function useDeepgram() {
   const updateMeeting = useMeetingsStore((s) => s.updateMeeting)
   const addToast = useUIStore((s) => s.addToast)
-  const settings = useSettingsStore((s) => s.settings)
 
   const transcribe = useCallback(
-    async (meetingId: string, filePath: string) => {
-      if (!settings.deepgramApiKey) {
+    async (meetingId: string, filePath: string): Promise<TranscriptionResult | null> => {
+      const { deepgramApiKey, defaultLanguage } = useSettingsStore.getState().settings
+      if (!deepgramApiKey) {
         addToast({ type: 'error', title: 'No API Key', message: 'Add your Deepgram API key in Settings' })
-        return
+        return null
       }
+      if (!window.eves) return null
 
       updateMeeting(meetingId, { isTranscribing: true, transcriptionProgress: 0 })
-      addToast({ type: 'loading', title: 'Transcribing...', message: 'Processing audio with Deepgram nova-2' })
-
-      if (typeof window !== 'undefined' && window.eves) {
-        window.eves.onTranscribeProgress((pct) => {
-          updateMeeting(meetingId, { transcriptionProgress: pct })
-        })
-
-        const result = await window.eves.transcribe({ filePath, apiKey: settings.deepgramApiKey, language: settings.defaultLanguage })
-
+      addToast({ type: 'loading', title: 'Transcribing...', message: 'Deepgram is processing the recording' })
+      const stopProgress = window.eves.onTranscribeProgress((pct) => updateMeeting(meetingId, { transcriptionProgress: pct }))
+      try {
+        const result = await window.eves.transcribe({ filePath, apiKey: deepgramApiKey, language: defaultLanguage })
         if (result.success && result.data) {
           updateMeeting(meetingId, {
-            transcription: result.data as TranscriptionResult,
+            transcription: result.data,
             isTranscribing: false,
             transcriptionProgress: 100,
-            duration: (result.data as TranscriptionResult).duration
+            duration: result.data.duration
           })
-          addToast({ type: 'success', title: 'Transcription Complete', message: `${(result.data as TranscriptionResult).speakers} speakers detected` })
-          return result.data as TranscriptionResult
-        } else {
-          updateMeeting(meetingId, { isTranscribing: false, transcriptionProgress: 0 })
-          addToast({ type: 'error', title: 'Transcription Failed', message: result.error })
+          addToast({ type: 'success', title: 'Transcription Complete', message: `${result.data.speakers} speakers detected` })
+          return result.data
         }
+        updateMeeting(meetingId, { isTranscribing: false, transcriptionProgress: 0 })
+        addToast({ type: 'error', title: 'Transcription Failed', message: result.error })
+        return null
+      } finally {
+        stopProgress()
       }
-      return null
     },
-    [updateMeeting, addToast, settings.deepgramApiKey]
+    [updateMeeting, addToast]
   )
 
   return { transcribe }

@@ -1,4 +1,5 @@
 import Conf from 'conf'
+import type { Rectangle } from '../runtime'
 import type { AppSettings } from '../../src/types'
 
 export const store = new Conf({
@@ -13,11 +14,7 @@ export const defaultSettings: AppSettings = {
   autoTranscribe: true,
   autoAnalyze: true,
   analysisModel: 'llama-3.1-70b-versatile',
-  deleteAudioAfterTranscription: false,
-  stealthOnLaunch: false,
-  accentColor: '#7C3AED',
-  orbIntensity: 0.13,
-  reduceMotion: false
+  deleteAudioAfterTranscription: false
 }
 
 export function getSettings(): AppSettings {
@@ -39,16 +36,9 @@ export function migrateSettings() {
     store.set('langMigrated', true)
     if (stored?.defaultLanguage === 'en') saveSettings({ defaultLanguage: 'multi' })
   }
-  // Ensure stealth is never active by default so windows remain visible on screen share
-  if (stored?.stealthOnLaunch) {
-    saveSettings({ stealthOnLaunch: false })
-  }
 }
 
-export function getWindowBounds() {
-  return store.get('windowBounds') as { x: number; y: number; width: number; height: number } | undefined
-}
-
-export function saveWindowBounds(bounds: { x: number; y: number; width: number; height: number }) {
-  store.set('windowBounds', bounds)
-}
+/** Saved window geometry — 'windowBounds' is the dashboard (key predates the popup). */
+type BoundsKey = 'windowBounds' | 'popupBounds'
+export const getBounds = (key: BoundsKey) => store.get(key) as Rectangle | undefined
+export const saveBounds = (key: BoundsKey, bounds: Rectangle) => store.set(key, bounds)

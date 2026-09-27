@@ -3,9 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AppShell } from './components/layout/AppShell'
 import { DashboardPage } from './components/dashboard/DashboardPage'
 import { MeetingPage } from './components/meeting/MeetingPage'
-import { TranscriptView } from './components/meeting/TranscriptView'
-import { DriveSync } from './components/integrations/DriveSync'
-import { NotionExport } from './components/integrations/NotionExport'
 import { SettingsModal } from './components/settings/SettingsModal'
 import { IntegrationsPage } from './components/integrations/IntegrationsPage'
 import { TranscriptsPage } from './components/meeting/TranscriptsPage'
@@ -15,15 +12,11 @@ import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { useSettingsStore } from './store/settings.store'
 import { useGroq } from './hooks/useGroq'
-import { EmptyState } from './components/extras/EmptyState'
 import type { Meeting } from './types'
 
 export function App() {
   const currentPage = useUIStore((s) => s.currentPage)
-  const meetings = useMeetingsStore((s) => s.meetings)
-  const activeMeetingId = useUIStore((s) => s.activeMeetingId)
-  const activeMeeting = meetings.find((m) => m.id === activeMeetingId)
-  const addMeeting = useMeetingsStore((s) => s.addMeeting)
+  const upsertMeeting = useMeetingsStore((s) => s.upsertMeeting)
   const loadMeetings = useMeetingsStore((s) => s.loadMeetings)
   const addToast = useUIStore((s) => s.addToast)
   const loadSettings = useSettingsStore((s) => s.loadSettings)
@@ -37,12 +30,12 @@ export function App() {
     loadMeetings()
   }, [loadSettings, loadMeetings])
 
-  // Listen for recorded sessions handed over from the overlay.
+  // Listen for recorded sessions handed over from the popup.
   // Registered once — a second listener would duplicate every meeting.
   useEffect(() => {
     // Main already mapped + persisted it — the dashboard just catches up
-    window.eves?.onSessionSaved((meeting: Meeting) => {
-      addMeeting(meeting)
+    return window.eves?.onSessionSaved((meeting: Meeting) => {
+      upsertMeeting(meeting)
       addToast({
         type: 'success',
         title: 'Meeting recorded',

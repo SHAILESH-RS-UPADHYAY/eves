@@ -32,8 +32,6 @@ export interface TranscriptionResult {
   duration: number
   speakers: number
   confidence: number
-  words: Word[]
-  paragraphs?: { paragraph: string; start: number; end: number }[]
 }
 
 export interface Decision {
@@ -113,6 +111,8 @@ export interface Meeting {
   /** protocol url for playback (recorded sessions); falls back to audioPath */
   audioUrl?: string
   source?: 'internal' | 'external' | 'both' | 'upload'
+  /** Waveform peaks captured while recording — instant player for long meetings */
+  peaks?: number[]
   transcription?: TranscriptionResult
   analysis?: MeetingAnalysis
   tags: Tag[]
@@ -131,10 +131,6 @@ export interface AppSettings {
   autoAnalyze: boolean
   analysisModel: 'llama-3.1-70b-versatile' | 'mixtral-8x7b-32768'
   deleteAudioAfterTranscription: boolean
-  stealthOnLaunch: boolean
-  accentColor: string
-  orbIntensity: number
-  reduceMotion: boolean
   notionDatabaseId?: string
 }
 
@@ -161,8 +157,14 @@ export interface IpcResult<T> {
   error?: string
 }
 
-/** Session handed over from the overlay window */
-export interface OverlaySession {
+/** Where the dashboard should land when opened from the popup or tray */
+export interface DashboardRoute {
+  page?: NavPage
+  meetingId?: string
+}
+
+/** Session handed over from the EVES popup */
+export interface PopupSession {
   id: string
   title: string
   date: string
@@ -172,7 +174,8 @@ export interface OverlaySession {
   utterances: Utterance[]
   audioPath: string
   audioUrl: string
-  timestamp: number
+  /** Waveform peaks (0..1), two per second — lets the player skip decoding long recordings */
+  peaks?: number[]
 }
 
 export interface RepoFileNode {
@@ -218,8 +221,14 @@ export interface RepoSynthesisResult {
   timestamp: number
 }
 
+declare module 'react' {
+  interface CSSProperties {
+    WebkitAppRegion?: 'drag' | 'no-drag'
+  }
+}
+
 declare global {
   interface Window {
-    eves?: import('../../electron/preload').EvesAPI
+    eves?: import('../../core/preload').EvesAPI
   }
 }

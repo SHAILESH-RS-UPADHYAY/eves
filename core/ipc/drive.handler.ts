@@ -1,4 +1,4 @@
-import { ipcMain, app } from 'electron'
+import { ipcMain, app } from '../runtime'
 import * as fs from 'fs'
 import * as path from 'path'
 import type { DriveFile, IpcResult } from '../../src/types'

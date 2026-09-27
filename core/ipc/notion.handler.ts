@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain } from '../runtime'
 import type { Meeting, MeetingAnalysis, IpcResult } from '../../src/types'
 
 const NOTION_MCP_URL = 'https://mcp.notion.com/mcp'

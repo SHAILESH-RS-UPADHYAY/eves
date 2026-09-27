@@ -21,11 +21,11 @@ echo [SYS] Starting Service...
 echo.
 echo Shortcuts (Alt-based — Zero Acemate collision):
 echo   Alt + L          ^| Start / Stop listening
-echo   Alt + Backspace  ^| Hide / Show Overlay
+echo   Alt + Backspace  ^| Hide / Show EVES popup
 echo   Alt + D          ^| Open / Close Dashboard
-echo   Alt + O          ^| Toggle audio source
+echo   Alt + O          ^| Cycle audio source (INT / EXT / BOTH)
 echo   Alt + T          ^| Toggle click-through mode
-echo   Alt + Space      ^| Synthesize session
+echo   Alt + Space      ^| Stop + save session
 echo   Alt + Q          ^| Quit EVES
 echo.
 echo ===================================================

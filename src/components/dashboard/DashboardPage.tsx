@@ -62,14 +62,13 @@ const features: {
 ]
 
 const hotkeys = [
-  { keys: 'Ctrl+Shift+L', action: 'Start / Stop Listening', color: '#00F5FF' },
-  { keys: 'Ctrl+Shift+A', action: 'Hide/Show Overlay', color: '#A78BFA' },
-  { keys: 'Ctrl+Shift+O', action: 'Toggle Audio Source', color: '#FCD34D' },
-  { keys: 'Ctrl+Shift+T', action: 'Toggle Click-Through', color: '#22D68C' },
-  { keys: 'Ctrl+Shift+D', action: 'Show / Hide Dashboard', color: '#00F5FF' },
-  { keys: 'Ctrl+Space', action: 'Save Session to History', color: '#FF006E' },
-  { keys: 'Ctrl+Shift+S', action: 'Toggle Stealth Mode', color: '#22D68C' },
-  { keys: 'Ctrl+Shift+X', action: 'Quit EVES', color: '#FF006E' },
+  { keys: 'Alt+L', action: 'Start / Stop Listening', color: '#00F5FF' },
+  { keys: 'Alt+Backspace', action: 'Hide / Show EVES Popup', color: '#A78BFA' },
+  { keys: 'Alt+O', action: 'Cycle Audio Source', color: '#FCD34D' },
+  { keys: 'Alt+T', action: 'Toggle Click-Through', color: '#22D68C' },
+  { keys: 'Alt+D', action: 'Show / Hide Dashboard', color: '#00F5FF' },
+  { keys: 'Alt+Space', action: 'Stop + Save Session', color: '#FF006E' },
+  { keys: 'Alt+Q', action: 'Quit EVES', color: '#FF006E' },
 ]
 
 function HackerHeader() {
@@ -130,11 +129,7 @@ export function DashboardPage() {
     meetings.filter((m) => m.analysis).flatMap((m) => m.analysis!.speakerProfiles.map((s) => s.name))
   ).size
 
-  const handleLaunchEves = () => {
-    if (typeof window !== 'undefined' && (window as any).eves?.launchOverlay) {
-      ;(window as any).eves.launchOverlay()
-    }
-  }
+  const handleLaunchEves = () => window.eves?.launchPopup()
 
   // The cyber landing page IS the dashboard — it renders whether or not meetings
   // exist. Saved sessions appear in the archive section at the bottom, so having
@@ -373,7 +368,7 @@ export function DashboardPage() {
                     <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Deepgram nova-2 WebSocket ready</span></div>
                     <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Stealth layer active (WDA_EXCLUDEFROMCAPTURE)</span></div>
                     <div><span style={{ color: '#FCD34D' }}>[WARN]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>No API keys configured — press </span><span style={{ color: '#FCD34D' }}>api_keys</span></div>
-                    <div><span style={{ color: '#00F5FF' }}>[INFO]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Press </span><span style={{ color: '#00F5FF' }}>Ctrl+Shift+L</span><span style={{ color: 'rgba(255,255,255,0.5)' }}> to start listening</span><span style={{ color: '#00F5FF', animation: 'cursorBlink 1s step-end infinite' }}>▊</span></div>
+                    <div><span style={{ color: '#00F5FF' }}>[INFO]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Press </span><span style={{ color: '#00F5FF' }}>Alt+L</span><span style={{ color: 'rgba(255,255,255,0.5)' }}> to start listening</span><span style={{ color: '#00F5FF', animation: 'cursorBlink 1s step-end infinite' }}>▊</span></div>
                   </div>
                 </div>
 
@@ -516,8 +511,8 @@ export function DashboardPage() {
 
                 {[
                   { step: '$', text: './launch_eves --stealth', color: '#00F5FF' },
-                  { step: '>', text: 'Press Ctrl+Shift+L to start listening', color: 'rgba(255,255,255,0.6)' },
-                  { step: '>', text: 'Toggle audio source with Ctrl+Shift+O', color: 'rgba(255,255,255,0.6)' },
+                  { step: '>', text: 'Press Alt+L to start listening', color: 'rgba(255,255,255,0.6)' },
+                  { step: '>', text: 'Toggle audio source with Alt+O', color: 'rgba(255,255,255,0.6)' },
                   { step: '>', text: 'Save session with Ctrl+Space', color: 'rgba(255,255,255,0.6)' },
                   { step: '>', text: 'Review transcripts in dashboard history', color: 'rgba(255,255,255,0.6)' },
                 ].map((s, i) => (

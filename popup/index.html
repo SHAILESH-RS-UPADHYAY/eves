@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://api.deepgram.com; media-src 'self' blob:;">
+  <title>EVES</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="popup">
+    <div class="scanlines"></div>
+    <div class="scan-sweep"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+
+    <!-- Title bar — the drag handle -->
+    <header id="titlebar">
+      <div id="logo-wrap">
+        <div id="logo-orb"></div>
+        <span id="logo-text" data-text="EVES">EVES</span>
+        <span class="logo-ver">v2.2</span>
+      </div>
+      <div id="rec-chip" class="hidden" title="Recording">
+        <span class="rec-dot"></span><span>REC</span>
+      </div>
+      <div class="win-btns">
+        <button id="btn-dashboard" title="Open dashboard (Alt+D)" aria-label="Open dashboard">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        </button>
+        <button id="btn-hide" title="Hide — keeps listening (Alt+Backspace)" aria-label="Hide">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="hex-deco">0x45564553 0x4D495320 0x56322E32 // CH:0x1A4F</div>
+
+    <main id="body">
+      <!-- Status -->
+      <section id="status-section">
+        <div id="status-orb">
+          <div id="orb-ring"></div>
+          <div id="orb-core"></div>
+          <div id="orb-pulse"></div>
+        </div>
+        <div id="status-text">
+          <span id="status-label">STANDBY</span>
+          <span id="status-time">00:00</span>
+        </div>
+        <canvas id="wave" aria-hidden="true"></canvas>
+      </section>
+
+      <!-- Audio source -->
+      <section id="source-section">
+        <div class="section-label">▸ AUDIO_SOURCE</div>
+        <div id="source-toggle">
+          <span id="source-glider"></span>
+          <button class="source-btn active" data-source="internal" title="System audio (meeting app)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
+            <span>INT</span>
+          </button>
+          <button class="source-btn" data-source="external" title="Your microphone">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            <span>EXT</span>
+          </button>
+          <button class="source-btn" data-source="both" title="System audio + your mic">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="2" y="2" width="6" height="5" rx="1"/></svg>
+            <span>BOTH</span>
+          </button>
+        </div>
+        <select id="device-select" class="hidden" aria-label="Microphone"></select>
+      </section>
+
+      <!-- Listen -->
+      <button id="listen-btn">
+        <div id="btn-glow"></div>
+        <div id="btn-sheen"></div>
+        <div id="btn-content">
+          <div id="btn-icon"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+          <span id="btn-text">▶ EXECUTE_LISTEN</span>
+        </div>
+      </button>
+
+      <!-- Live transcript -->
+      <section id="transcript-preview">
+        <div class="section-label">▸ LIVE_FEED <span class="dim">[COLOR]</span><span id="word-count"></span></div>
+        <div id="transcript-text"></div>
+        <span id="transcript-cursor">▊</span>
+      </section>
+
+      <div id="notice" class="hidden"></div>
+
+      <footer id="bottom-bar">
+        <div id="hotkey-hints">
+          <kbd>Alt+L</kbd> listen <kbd>Alt+⌫</kbd> hide <kbd>Alt+␣</kbd> save
+        </div>
+        <button id="history-arrow" title="Session log">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+      </footer>
+    </main>
+
+    <!-- Session log drawer -->
+    <aside id="log-drawer" aria-hidden="true">
+      <div id="log-header">
+        <span>▸ SESSION_LOG</span>
+        <button id="history-close" aria-label="Close log">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="history-list"></div>
+    </aside>
+
+    <div class="hex-deco hex-bottom">SECURE_CHANNEL // ENC: AES-256 // PID: 0x1A4F</div>
+    <div id="resize-handle" title="Resize"></div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

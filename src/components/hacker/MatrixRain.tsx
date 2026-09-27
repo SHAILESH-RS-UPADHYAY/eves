@@ -8,8 +8,9 @@ export function MatrixRain({ opacity = 0.06, color = '#00F5FF', speed = 1 }: {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const el = canvasRef.current
+    if (!el) return
+    const canvas: HTMLCanvasElement = el
     const ctx = canvas.getContext('2d')!
 
     let animationId: number
