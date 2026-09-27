@@ -12,7 +12,7 @@ const logTemplates = [
   { level: 'INFO', msg: 'Session auto-saved to local store' },
   { level: 'INFO', msg: 'Neural model accuracy: 96.2% confidence' },
   { level: 'DEBUG', msg: 'setIgnoreMouseEvents(true) — clickthrough active' },
-  { level: 'INFO', msg: 'Stealth mode: WDA_EXCLUDEFROMCAPTURE confirmed' },
+  { level: 'INFO', msg: 'Sentinel mode: local vault sealed' },
   { level: 'WARN', msg: 'Network latency spike: 78ms — stabilizing' },
   { level: 'DEBUG', msg: 'IPC message: overlay -> main [toggle-listening]' },
   { level: 'INFO', msg: 'Audio source switched: internal -> external' },

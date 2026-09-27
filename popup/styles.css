@@ -6,9 +6,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  /* near-solid: a transparent window can't blur what's behind it, so glass = alpha only */
-  --bg-panel: rgba(5, 7, 13, 0.985);
-  --bg-inset: rgba(0, 0, 0, 0.38);
+  /* fully solid: nothing behind the popup ever shows through */
+  --bg-panel: #05070d;
+  --bg-inset: #020306;
   --border-glass: rgba(0, 245, 255, 0.1);
   --border-bright: rgba(0, 245, 255, 0.3);
   --border-active: rgba(0, 245, 255, 0.6);
@@ -132,6 +132,29 @@ button { font-family: var(--mono); }
 .corner.tr { top: 5px; right: 5px; border-top-width: 2px; border-right-width: 2px; }
 .corner.bl { bottom: 5px; left: 5px; border-bottom-width: 2px; border-left-width: 2px; }
 .corner.br { bottom: 5px; right: 5px; border-bottom-width: 2px; border-right-width: 2px; }
+#popup.listening .corner { border-color: var(--green); animation: cornerPulse 1.6s ease-in-out infinite; }
+@keyframes cornerPulse { 50% { opacity: 0.35; filter: drop-shadow(0 0 4px var(--green)); } }
+
+/* live hex stream under the title bar */
+#hex-stream { color: rgba(0, 245, 255, 0.2); }
+#popup.listening #hex-stream { color: rgba(34, 214, 140, 0.3); }
+
+/* boot sequence overlay (launch only) */
+#boot {
+  position: absolute;
+  inset: 38px 0 0 0;
+  z-index: 90;
+  padding: 16px 16px;
+  background: var(--bg-panel);
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--green);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+#boot.done { opacity: 0; }
+#boot .ok { color: var(--cyan); }
+#boot .caret { animation: cursorBlink 0.8s step-end infinite; }
 
 /* ─── Scanlines + sweep ────────────────────────────────────── */
 .scanlines {
@@ -351,6 +374,30 @@ button { font-family: var(--mono); }
 
 #orb-pulse { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; }
 
+/* radar sweep inside the orb — slow on standby, fast while listening */
+#orb-radar {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 70%, rgba(0, 245, 255, 0.35) 95%, rgba(0, 245, 255, 0.7));
+  -webkit-mask: radial-gradient(circle, transparent 38%, #000 40%);
+  animation: rotateGlow 4.5s linear infinite;
+}
+#status-orb.listening #orb-radar {
+  background: conic-gradient(from 0deg, transparent 0 65%, rgba(34, 214, 140, 0.45) 92%, rgba(34, 214, 140, 0.9));
+  animation-duration: 1.4s;
+}
+
+/* status text glitches in whenever it changes */
+#status-label.glitch-in { animation: glitchIn 0.45s steps(1) both; }
+@keyframes glitchIn {
+  0% { opacity: 0; transform: translateX(-3px); text-shadow: 2px 0 var(--rose), -2px 0 var(--cyan); }
+  25% { opacity: 1; transform: translateX(2px); }
+  50% { transform: translateX(-1px); text-shadow: -2px 0 var(--rose), 2px 0 var(--green); }
+  75% { transform: none; text-shadow: 1px 0 var(--cyan); }
+  100% { transform: none; }
+}
+
 #status-orb.listening #orb-ring { border-color: var(--green); border-style: dashed; animation: rotateGlow 3s linear infinite; }
 #status-orb.listening #orb-core { background: var(--green); box-shadow: 0 0 20px var(--green-glow); }
 #status-orb.listening #orb-pulse { border-color: var(--green); animation: pulseExpand 2s ease-out infinite; }
@@ -515,6 +562,17 @@ button { font-family: var(--mono); }
   flex-direction: column;
   gap: 5px;
 }
+
+/* while listening: a faint grid drifts behind the words */
+#popup.listening #transcript-preview {
+  border-color: rgba(34, 214, 140, 0.14);
+  background-image:
+    linear-gradient(rgba(34, 214, 140, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 214, 140, 0.04) 1px, transparent 1px);
+  background-size: 18px 18px;
+  animation: gridDrift 6s linear infinite;
+}
+@keyframes gridDrift { to { background-position: 0 18px, 18px 0; } }
 
 #transcript-text { font-size: 11px; line-height: 1.6; word-wrap: break-word; }
 #transcript-text:empty::before { content: '> awaiting audio input...'; color: var(--text-muted); }

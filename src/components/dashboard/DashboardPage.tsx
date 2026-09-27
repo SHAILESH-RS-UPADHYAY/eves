@@ -34,9 +34,9 @@ const features: {
   {
     icon: Shield,
     color: '#7ee787',
-    title: 'STEALTH MODE',
-    desc: 'Invisible to screen share, OBS, screenshots. WDA_EXCLUDEFROMCAPTURE active. Zero footprint.',
-    variant: 'stealth',
+    title: 'SENTINEL MODE',
+    desc: 'Local-first vault. Keys, audio and transcripts never leave this machine. Zero cloud footprint.',
+    variant: 'sentinel',
     topLabel: '> MODULE_02.DLL'
   },
   {
@@ -362,7 +362,7 @@ export function DashboardPage() {
                   }}>
                     <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Neural core initialized</span></div>
                     <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Deepgram nova-2 WebSocket ready</span></div>
-                    <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Stealth layer active (WDA_EXCLUDEFROMCAPTURE)</span></div>
+                    <div><span style={{ color: '#22D68C' }}>[OK]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Sentinel layer active (local vault sealed)</span></div>
                     <div><span style={{ color: '#FCD34D' }}>[WARN]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>No API keys configured — press </span><span style={{ color: '#FCD34D' }}>api_keys</span></div>
                     <div><span style={{ color: '#00F5FF' }}>[INFO]</span> <span style={{ color: 'rgba(255,255,255,0.5)' }}>Press </span><span style={{ color: '#00F5FF' }}>Alt+L</span><span style={{ color: 'rgba(255,255,255,0.5)' }}> to start listening</span><span style={{ color: '#00F5FF', animation: 'cursorBlink 1s step-end infinite' }}>▊</span></div>
                   </div>
@@ -506,7 +506,7 @@ export function DashboardPage() {
                 </div>
 
                 {[
-                  { step: '$', text: './launch_eves --stealth', color: '#00F5FF' },
+                  { step: '$', text: './launch_eves --secure', color: '#00F5FF' },
                   { step: '>', text: 'Press Alt+L to start listening', color: 'rgba(255,255,255,0.6)' },
                   { step: '>', text: 'Toggle audio source with Alt+O', color: 'rgba(255,255,255,0.6)' },
                   { step: '>', text: 'Save session with Ctrl+Space', color: 'rgba(255,255,255,0.6)' },
@@ -612,7 +612,7 @@ export function DashboardPage() {
               {[
                 { label: 'NEURAL_CORE', value: 'ONLINE', color: '#22D68C' },
                 { label: 'AUDIO_PIPELINE', value: '16kHz PCM', color: '#00F5FF' },
-                { label: 'STEALTH_LAYER', value: 'ACTIVE', color: '#22D68C' },
+                { label: 'SENTINEL_LAYER', value: 'ACTIVE', color: '#22D68C' },
                 { label: 'ENCRYPTION', value: 'AES-256', color: '#FCD34D' },
                 { label: 'AI_ENGINE', value: 'LLaMA-3.1', color: '#A78BFA' },
                 { label: 'STATUS', value: 'READY', color: '#00F5FF' },

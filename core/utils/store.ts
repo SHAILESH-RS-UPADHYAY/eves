@@ -27,7 +27,7 @@ export const modelSwitcher = (sender: WebContents, provider: AiProvider) => (mod
 }
 
 /** Fields older builds stored that nothing reads any more. */
-const RETIRED = ['analysisModel', 'deleteAudioAfterTranscription', 'stealthOnLaunch', 'accentColor', 'orbIntensity', 'reduceMotion']
+const RETIRED = ['analysisModel', 'deleteAudioAfterTranscription', 'accentColor', 'orbIntensity', 'reduceMotion']
 
 /** One-time migrations and safety defaults. */
 export function migrateSettings() {

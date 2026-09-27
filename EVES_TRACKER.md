@@ -36,7 +36,7 @@ Turn EVES from "record + transcribe" into a full meeting-to-mission workflow for
 | 5 | Repo intelligence: company repo + reference (skills) repo, persisted attachments | ✅ done |
 | 6 | BRAIN page: chat, spatial prompt pills, voice input, frontend preview | ✅ done |
 | 7 | Settings (keys, provider, models, language, path style) + panel/status updates | ✅ done |
-| 8 | Verification, README, final audit | ⏳ |
+| 8 | Verification, README, final audit | ✅ done |
 
 ## Phase 0 — Baseline audit (2026-09-27)
 
@@ -185,3 +185,40 @@ New sidebar item **EVES Brain** (`brain.sh`, top bar `NEURAL_CORE`, command pale
 | STORAGE tab | same, `core/ipc/settings.handler.ts` (`app:storage`, `app:open-folder`) | Replaces a "delete audio" toggle and a "clear all data" button that did nothing: shows where recordings and meetings live, recording count/size, and opens the folders. |
 | Removed dead model radio | same | Both listed Groq models are decommissioned. |
 | Hacker panels | `CyberKit.tsx` (ConnectionMatrix, ConfigConsole), `ControlPanelPage.tsx` | GEMINI and OPENAI uplinks added; config console shows `[brain]` provider/model/auto-analyze/reply-language, `[workspace]` company repo / skill vault / prompt paths, all four keys; API_KEYS stat counts 4 and turns green when transcription + a brain are ready. Same styling. |
+
+### Phase 8 — Final audit, docs, verification (✅)
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| Unused code gate | `tsconfig.json` (`noUnusedLocals`, `noUnusedParameters`) | Swept leftover unused imports/vars from 13 older components (ActionItems, InsightPanel, IntentRadar, KeyMoments, DashboardPage, GlassCard, DriveSync, Sidebar, TopBar, TranscriptView, TranscriptsPage, RepoIntelPage) and made it a compile error from now on. |
+| Popup truly opaque | `popup/styles.css` | Measured ~9 % see-through on the real screen. Panel alpha 0.95 → 0.985; removed `backdrop-filter` (a transparent window can't blur other apps — it was pure overhead); entrance animation uses `backwards` so its `filter` doesn't keep a permanent compositing layer for hours. |
+| Stale copy | `DashboardPage.tsx` feature cards | "nova-2" / "Groq LLaMA-3 70B" → nova-3 Hinglish / Groq · Gemini · OpenAI brain. Text only. |
+| README | `README.md` | Meeting → Mission workflow, three brains, pills, skill vault, Alt shortcuts, new structure, `npm test`, repository-safety note. |
+
+**Final state:** `tsc` (strict unused) 0 errors · `npm test` → audioUrl, llm, brain, markdown all ok · `npm run build` ok · normal launch boots clean (only EVES lines in the console) · keyword left only in `package.json`/lockfile, `core/runtime.ts`, `eves.config.ts`.
+
+## Known limits / next steps
+
+- The dashboard loads every meeting fully at startup (~1–2 MB per 2 h transcript). Fine for dozens; lazy-load transcripts if the archive reaches hundreds (`ponytail:` note in `core/utils/meetings.ts`).
+- Groq's free tier is small: a 2 h meeting is summarised in parts (slower, uses daily tokens). Gemini reads it in one pass — switch the brain there for very long meetings.
+- Gemini / OpenAI defaults (`gemini-2.5-flash`, `gpt-4.1`) could not be tested without keys; if retired, EVES auto-switches to the best model the key lists.
+- Google Drive / Notion integrations still point at placeholder MCP endpoints (untouched — not part of this brief).
+- Tailwind is configured but emits nothing (no `@tailwind` directives); its classes in older components are no-ops. Left in place; remove the dependency if you never plan to use it.
+- In dev mode (the launchers) Task Manager still shows the runtime's own process name; `npm run package` builds a proper `EVES.exe`.
+
+### Follow-up — popup: fully opaque + more hacker motion (2026-09-27)
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| Fully solid panel | `popup/styles.css` (`--bg-panel: #05070d`, `--bg-inset: #020306`) | Requested more opacity — nothing behind the popup shows through now. |
+| Boot sequence | `popup/index.html` (`#boot`), `popup/app.js` (`boot()`) | ~1.5 s typed lines on launch (`init audio_core [OK]` …), then fades out; never blocks clicks. |
+| Radar sweep in the orb | `#orb-radar` | Slow sweep on standby, fast green sweep while listening. |
+| Live hex stream | `#hex-stream` | Header hex line keeps decrypting (switches to `REC:` while recording); ticks only while the popup is visible. |
+| Status glitch-in | `setStatus()` + `.glitch-in` | RGB-split glitch whenever the status changes (LISTENING, SAVING…). |
+| Listening accents | corner brackets pulse green; faint grid drifts behind the live feed | Clear "recording" state without clutter. |
+
+### Follow-up — "stealth" wording removed everywhere (2026-09-27)
+
+Stealth was disabled long ago but the dashboard still advertised it. Replaced with **SENTINEL / SECURE** wording, same styling:
+dashboard feature card (`SENTINEL MODE` — local-first vault), boot log line, `./launch_eves --secure`, `SENTINEL_LAYER` status, boot sequence (`BootSequence.tsx`), log feed (`LiveLogFeed.tsx`), cipher panel (`HackerPanels.tsx`), art variant `stealth` → `sentinel` (`CyberArt.tsx`, `CyberKit.tsx`), keyframes `stealthPulse` → `sentinelPulse` (`animations.css`, `tailwind.config.ts`), retired-settings list (`store.ts`), marketing site feature card (`website/…/FeaturesGrid.tsx`).
+Scan: zero "stealth" / "WDA_EXCLUDEFROMCAPTURE" left · `tsc` 0 · `npm test` ok.

@@ -10,7 +10,7 @@ const bootLines: { text: string; type: 'ok' | 'info' | 'warn' | 'cmd' }[] = [
   { text: 'Mounting audio capture drivers............... [OK]', type: 'ok' },
   { text: '  └─ Loopback (system audio)................. [READY]', type: 'ok' },
   { text: '  └─ Microphone (external input)............. [READY]', type: 'ok' },
-  { text: 'Activating stealth module.................... [OK]', type: 'ok' },
+  { text: 'Activating sentinel module................... [OK]', type: 'ok' },
   { text: '  └─ SetWindowDisplayAffinity = EXCLUDEFROMCAPTURE', type: 'ok' },
   { text: '  └─ Taskbar visibility = HIDDEN', type: 'ok' },
   { text: '  └─ Alt+Tab exclusion = ENABLED', type: 'ok' },
@@ -106,7 +106,7 @@ export function BootSequence({ onComplete }: { onComplete?: () => void }) {
           <span style={{ color: '#666', fontSize: '13px' }}>:</span>
           <span style={{ color: '#A78BFA', fontSize: '13px' }}>~</span>
           <span style={{ color: '#666', fontSize: '13px' }}>$ </span>
-          <span style={{ color: '#10B981', fontSize: '13px' }}>./eves --init --stealth</span>
+          <span style={{ color: '#10B981', fontSize: '13px' }}>./eves --init --secure</span>
         </div>
 
         {bootLines.slice(0, visibleLines).map((line, i) => (

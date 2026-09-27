@@ -6,7 +6,7 @@ const features = [
   { icon: Mic2, color: '#7C3AED', title: 'AI Transcription', desc: 'Deepgram nova-2 transcribes with 95%+ accuracy. Speaker diarization identifies who said what.' },
   { icon: Brain, color: '#06B6D4', title: 'Intent Detection', desc: 'Groq analyzes hidden agendas, actual goals, and what wasn\'t said.' },
   { icon: CheckSquare, color: '#F43F5E', title: 'Action Extraction', desc: 'Every commitment and task auto-extracted with owner and priority.' },
-  { icon: ShieldOff, color: '#F59E0B', title: 'Stealth Mode', desc: 'Invisible during screen sharing. Your analysis stays private.' },
+  { icon: ShieldOff, color: '#F59E0B', title: 'Sentinel Mode', desc: 'Local-first vault. Audio, keys and transcripts stay on your machine.' },
   { icon: HardDrive, color: '#14B8A6', title: 'Drive Sync', desc: 'Fetch recordings directly from Google Drive. Upload summaries back automatically.' },
   { icon: FileText, color: '#A78BFA', title: 'Notion Export', desc: 'Export structured meeting pages to Notion with one click.' }
 ]

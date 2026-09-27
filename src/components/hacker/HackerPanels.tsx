@@ -206,7 +206,7 @@ export function CipherStream() {
 export function DataTicker() {
   const items: [string, string][] = [
     ['UPLINK', P.green], ['DEEPGRAM · NOVA-2', P.cyan], ['GROQ · LLaMA-3.1-70B', P.purple],
-    ['STEALTH · WDA_EXCLUDEFROMCAPTURE', P.green], ['AES-256-GCM', P.yellow], ['16kHz PCM', P.blue],
+    ['SENTINEL · LOCAL_VAULT', P.green], ['AES-256-GCM', P.yellow], ['16kHz PCM', P.blue],
     ['0 TELEMETRY', P.green], ['LOCAL-ONLY', P.orange], ['LATENCY 69ms', P.cyan], ['ZERO FOOTPRINT', P.red],
   ]
   const seq = [...items, ...items]

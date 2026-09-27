@@ -20,7 +20,7 @@ const C = {
 
 export type CyberVariant =
   | 'neural'
-  | 'stealth'
+  | 'sentinel'
   | 'waveform'
   | 'network'
   | 'circuit'
@@ -64,7 +64,7 @@ export function CyberArt({
       <rect width="400" height="240" fill="url(#ca-grid)" />
 
       {variant === 'neural' && <Neural accent={accent} />}
-      {variant === 'stealth' && <Stealth accent={accent} />}
+      {variant === 'sentinel' && <Sentinel accent={accent} />}
       {variant === 'waveform' && <Waveform accent={accent} />}
       {variant === 'network' && <Network accent={accent} />}
       {variant === 'circuit' && <Circuit accent={accent} />}
@@ -143,8 +143,8 @@ function Neural({ accent }: { accent: string }) {
   )
 }
 
-/* ══════════════════════════ STEALTH RADAR ══════════════════════════ */
-function Stealth({ accent }: { accent: string }) {
+/* ══════════════════════════ SENTINEL RADAR ══════════════════════════ */
+function Sentinel({ accent }: { accent: string }) {
   const cx = 200
   const cy = 120
   return (

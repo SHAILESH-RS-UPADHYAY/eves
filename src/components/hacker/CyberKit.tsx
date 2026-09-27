@@ -314,7 +314,7 @@ export function DecryptStandby({ archived = 0 }: { archived?: number }) {
   }, [])
   return (
     <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', minHeight: '420px', border: '1px solid rgba(171,178,191,0.12)', fontFamily: mono }}>
-      <CyberArt variant="stealth" accent={C.green} />
+      <CyberArt variant="sentinel" accent={C.green} />
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(19,21,25,0.35), rgba(15,17,20,0.82))' }} />
       <div style={{ position: 'relative', zIndex: 2, height: '100%', minHeight: '420px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
         <div style={{ fontSize: '10px', color: C.green, letterSpacing: '3px', marginBottom: '10px', textShadow: `0 0 10px ${C.green}66` }}>

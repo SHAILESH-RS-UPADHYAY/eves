@@ -29,7 +29,7 @@ export default {
       },
       animation: {
         float: 'float 4s ease-in-out infinite',
-        'pulse-glow': 'stealthPulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
+        'pulse-glow': 'sentinelPulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
         shimmer: 'shimmer 1.5s ease-in-out infinite',
         breath: 'sentimentBreath 2s ease-in-out infinite alternate'
       }

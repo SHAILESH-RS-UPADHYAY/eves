@@ -434,7 +434,12 @@ async function listDevices() {
 
 // ─── UI helpers ─────────────────────────────────────────────
 function setStatus(text) {
+  if (ui.label.textContent === text) return
   ui.label.textContent = text
+  // restart the glitch-in animation on every change
+  ui.label.classList.remove('glitch-in')
+  void ui.label.offsetWidth
+  ui.label.classList.add('glitch-in')
 }
 
 function setListeningUI(on) {
@@ -552,4 +557,40 @@ eves?.onCycleSource(() => switchSource(SOURCES[(SOURCES.indexOf(source) + 1) % S
 eves?.onSaveSession(() => (listening ? stop() : notify('Not recording — nothing to save', 'amber')))
 eves?.onClickThroughChanged((on) => ui.popup.classList.toggle('click-through', on))
 
+// ─── Hacker ambience ────────────────────────────────────────
+// Live hex stream under the title bar — ticks only while the popup is on screen.
+const hexStream = $('hex-stream')
+const hex = () => '0x' + Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase().padStart(8, '0')
+setInterval(() => {
+  if (document.visibilityState !== 'visible') return
+  hexStream.textContent = `${hex()} ${hex()} ${hex()} // ${listening ? 'REC' : 'CH'}:${hex().slice(2, 6)}`
+}, 180)
+
+// Boot sequence on launch: a few typed lines, then it clears (never blocks clicks).
+async function boot() {
+  const el = $('boot')
+  const lines = [
+    ['> init audio_core', 'OK'],
+    ['> link deepgram://nova-3', 'OK'],
+    ['> mount recorder /recordings', 'OK'],
+    ['> eves ready', '']
+  ]
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+  for (const [cmd, status] of lines) {
+    const row = document.createElement('div')
+    el.append(row)
+    for (let i = 1; i <= cmd.length; i++) {
+      row.textContent = cmd.slice(0, i)
+      await wait(14)
+    }
+    if (status) row.append(' ', span(`[${status}]`, 'ok'))
+    await wait(90)
+  }
+  el.append(span('▊', 'caret'))
+  await wait(350)
+  el.classList.add('done')
+  setTimeout(() => el.remove(), 600)
+}
+
+boot()
 renderHistory()

@@ -33,12 +33,16 @@
       </div>
     </header>
 
-    <div class="hex-deco">0x45564553 0x4D495320 0x56322E32 // CH:0x1A4F</div>
+    <div class="hex-deco" id="hex-stream">0x45564553 0x4D495320 0x56322E32 // CH:0x1A4F</div>
+
+    <!-- Boot sequence: types a few lines on launch, then clears -->
+    <div id="boot" aria-hidden="true"></div>
 
     <main id="body">
       <!-- Status -->
       <section id="status-section">
         <div id="status-orb">
+          <div id="orb-radar"></div>
           <div id="orb-ring"></div>
           <div id="orb-core"></div>
           <div id="orb-pulse"></div>
