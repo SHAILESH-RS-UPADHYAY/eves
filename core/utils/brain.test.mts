@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import {
   analyzeMeeting, brainMessages, chunkLines, clock, meetingForQuestion, normalizeAnalysis,
-  talkTime, toolPromptHeader, transcriptLines, wordFrequency
+  preferredModel, talkTime, toolPromptHeader, transcriptLines, withModelFallback, wordFrequency
 } from './brain.ts'
 import { stylePath } from '../../src/lib/paths.ts'
 import type { LlmTarget } from './llm.ts'
@@ -113,5 +113,25 @@ assert.equal(msgs[0].role, 'system')
 assert.ok(msgs.at(-1)!.content.includes('## 2. MISSION'))
 assert.ok(msgs[0].content.includes('Write the prompt in English.'))
 assert.ok(msgs.reduce((s, m) => s + m.content.length, 0) < 16_000 + 3_000)
+
+// retired model → best available picked, persisted via callback, retried once
+assert.equal(preferredModel('groq', ['allam-2-7b', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b', 'qwen/qwen3.8-27b']), 'openai/gpt-oss-120b')
+assert.equal(preferredModel('gemini', ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3-flash', 'gemini-3-flash-lite', 'gemini-2.5-pro']), 'gemini-3-flash')
+assert.equal(preferredModel('openai', ['gpt-4o-mini', 'gpt-4.1', 'gpt-5', 'gpt-5.1', 'o3']), 'gpt-5.1')
+const seen: string[] = []
+globalThis.fetch = (async (url: string, init?: RequestInit) => {
+  if (String(url).endsWith('/models')) return new Response(JSON.stringify({ data: [{ id: 'openai/gpt-oss-120b' }, { id: 'allam-2-7b' }] }))
+  const model = JSON.parse(String(init!.body)).model
+  seen.push(model)
+  return model === 'llama-3.3-70b-versatile'
+    ? new Response('{"error":{"message":"The model does not exist"}}', { status: 404 })
+    : new Response(JSON.stringify({ choices: [{ message: { content: 'hi' } }] }))
+}) as typeof fetch
+let switched = ''
+const { complete } = await import('./llm.ts')
+const out = await withModelFallback({ ...t, provider: 'groq', model: 'llama-3.3-70b-versatile' }, (x) => complete(x, []), (m) => { switched = m })
+assert.equal(out, 'hi')
+assert.equal(switched, 'openai/gpt-oss-120b')
+assert.deepEqual(seen, ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b'])
 
 console.log('brain: ok')

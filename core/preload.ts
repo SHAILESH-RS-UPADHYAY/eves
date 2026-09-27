@@ -45,6 +45,7 @@ const api = {
   listModels: (provider: AiProvider, key: string) => ipcRenderer.invoke('ai:models', provider, key) as Promise<IpcResult<string[]>>,
   onAiDelta: on<[chunk: { requestId: string; text: string }]>('ai:delta'),
   onAiProgress: on<[progress: { key: string; stage: string }]>('ai:progress'),
+  onModelSwitched: on<[info: { provider: AiProvider; model: string }]>('ai:model-switched'),
 
   // ─── Google Drive ───────────────────────────────────────
   driveListFiles: () => ipcRenderer.invoke('drive:list'),

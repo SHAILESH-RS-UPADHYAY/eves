@@ -1,10 +1,10 @@
 import { ipcMain, dialog } from '../runtime'
 import * as fs from 'fs'
 import * as path from 'path'
-import { getSettings } from '../utils/store'
+import { getSettings, modelSwitcher } from '../utils/store'
 import { getMeeting } from '../utils/meetings'
 import { completeJson } from '../utils/llm'
-import { llmTarget, meetingMaterial, toolPromptHeader, type ContextBlock } from '../utils/brain'
+import { llmTarget, meetingMaterial, toolPromptHeader, withModelFallback, type ContextBlock } from '../utils/brain'
 import { stylePath } from '../../src/lib/paths'
 import { PROVIDERS } from '../../src/lib/providers'
 import type { RepoInfo, RepoFileNode, RepoSynthesisResult, IpcResult } from '../../src/types'
@@ -259,14 +259,18 @@ export function registerRepoHandlers() {
   })
 
   // Repo Intel "compile": meeting × company repo → structured directive + coding prompt
-  ipcMain.handle('repo:synthesize', async (_e, args: { meetingId?: string; transcript?: string; meetingTitle?: string }): Promise<IpcResult<RepoSynthesisResult>> => {
+  ipcMain.handle('repo:synthesize', async (e, args: { meetingId?: string; transcript?: string; meetingTitle?: string }): Promise<IpcResult<RepoSynthesisResult>> => {
     try {
       const settings = getSettings()
       if (!settings.companyRepoPath) return { success: false, error: 'No repository attached. Select your company repo folder first.' }
       const t = llmTarget(settings)
       const budget = PROVIDERS[t.provider].budget
       const meeting = args.meetingId ? getMeeting(args.meetingId) : null
-      const material = meeting ? (await meetingMaterial(meeting, t, budget)).text : (args.transcript ?? '').slice(0, budget * 0.6)
+      const switchModel = modelSwitcher(e.sender, t.provider)
+      const onSwitch = (m: string) => { t.model = m; switchModel(m) }
+      const material = meeting
+        ? (await withModelFallback(t, (target) => meetingMaterial(meeting, target, budget), onSwitch)).text
+        : (args.transcript ?? '').slice(0, budget * 0.6)
       if (!material.trim()) return { success: false, error: 'Meeting transcript is empty. Record a meeting or paste notes first.' }
 
       const company = repoContext(settings.companyRepoPath, 'company', budget * 0.3, material.slice(0, 4000))
@@ -288,10 +292,10 @@ Use only paths that exist in the repository index unless marked CREATE. Meetings
 ${company?.text ?? ''}
 ${vault ? `\n=== ${vault.title} ===\n${vault.text}` : ''}`
 
-      const parsed = await completeJson<Record<string, any>>(t, [
+      const parsed = await withModelFallback(t, (target) => completeJson<Record<string, any>>(target, [
         { role: 'system', content: system },
         { role: 'user', content: `Meeting: ${meeting?.title ?? args.meetingTitle ?? 'Engineering discussion'}\n${material}` }
-      ], { maxTokens: 4096 })
+      ], { maxTokens: 4096 }), onSwitch)
 
       const info = indexRepo(settings.companyRepoPath).info
       const source = meeting ?? { title: args.meetingTitle ?? 'Pasted notes', date: new Date().toISOString() }

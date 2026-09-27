@@ -1,6 +1,6 @@
 // node core/utils/llm.test.mts — exercises the client against a fake fetch (no network, no keys)
 import assert from 'node:assert/strict'
-import { complete, completeJson, extractJson, retryDelay, sseEvents, stream, type LlmTarget } from './llm.ts'
+import { complete, completeJson, extractJson, ModelUnavailableError, retryDelay, sseEvents, stream, type LlmTarget } from './llm.ts'
 
 const target: LlmTarget = { provider: 'groq', label: 'GROQ', base: 'https://fake.local/v1', model: 'm', key: 'k' }
 const enc = new TextEncoder()
@@ -66,5 +66,13 @@ assert.deepEqual(await completeJson(gemini, [{ role: 'user', content: 'json plea
 assert.equal(calls.length, 2)
 assert.equal(calls[0].body.response_format, undefined)
 assert.equal(calls[0].body.max_completion_tokens, undefined)
+
+// retired / unknown models surface as ModelUnavailableError (callers switch models)
+script = [new Response('{"error":{"message":"The model `llama-3.3-70b-versatile` does not exist"}}', { status: 404 })]
+await assert.rejects(complete(target, []), ModelUnavailableError)
+script = [new Response('{"error":{"message":"The model `x` has been decommissioned","code":"model_decommissioned"}}', { status: 400 })]
+await assert.rejects(complete(target, []), ModelUnavailableError)
+script = [new Response('{"error":{"message":"messages: required"}}', { status: 400 })]
+await assert.rejects(complete(target, []), (e: unknown) => !(e instanceof ModelUnavailableError))
 
 console.log('llm: ok')
