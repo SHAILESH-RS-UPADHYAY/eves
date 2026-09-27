@@ -2,6 +2,8 @@
 // hours. Everything per audio block / per transcript message is O(1): the live
 // feed renders only the tail, peaks are folded as they arrive, time is wall-clock.
 
+import { deepgramUrl, toPcm16 } from '../src/lib/stt.ts'
+
 const eves = window.eves
 const $ = (id) => document.getElementById(id)
 
@@ -118,14 +120,9 @@ function stopAudio() {
 }
 
 function onAudioBlock(input) {
-  const pcm = new Int16Array(input.length)
+  if (socket?.ws.readyState === WebSocket.OPEN) socket.ws.send(toPcm16(input))
   let max = 0
-  for (let i = 0; i < input.length; i++) {
-    const s = Math.max(-1, Math.min(1, input[i]))
-    pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff
-    if (Math.abs(s) > max) max = Math.abs(s)
-  }
-  if (socket?.ws.readyState === WebSocket.OPEN) socket.ws.send(pcm.buffer)
+  for (let i = 0; i < input.length; i++) max = Math.max(max, Math.abs(input[i]))
 
   if (!session) return
   session.peakMax = Math.max(session.peakMax, max)
@@ -180,28 +177,13 @@ function stopRecorder() {
 }
 
 // ─── Deepgram live transcription ────────────────────────────
-// 'multi' = nova-3 code-switching (Hindi ↔ English in one sentence) — Hinglish.
-function deepgramUrl(settings) {
-  const language = settings.defaultLanguage || 'multi'
-  return 'wss://api.deepgram.com/v1/listen?' + new URLSearchParams({
-    encoding: 'linear16',
-    sample_rate: '16000',
-    channels: '1',
-    model: language === 'multi' ? 'nova-3' : 'nova-2',
-    language,
-    smart_format: 'true',
-    interim_results: 'true',
-    diarize: String(settings.enableDiarization !== false),
-    endpointing: '300'
-  })
-}
-
 async function connect() {
   const settings = await eves?.getSettings()
   if (!settings?.deepgramApiKey) throw new Error('ERR_DG_NOKEY: add your Deepgram key in the dashboard → api_keys')
 
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(deepgramUrl(settings), ['token', settings.deepgramApiKey])
+    const url = deepgramUrl({ language: settings.defaultLanguage, diarize: settings.enableDiarization !== false })
+    const ws = new WebSocket(url, ['token', settings.deepgramApiKey])
     const conn = { ws, offset: 0, keepAlive: null, purposeful: false }
     const timeout = setTimeout(() => { ws.close(); reject(new Error('ERR_DG_TIMEOUT: Deepgram did not answer in 10s')) }, 10000)
 

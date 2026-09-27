@@ -11,10 +11,9 @@ const speakerNames = ['Speaker A', 'Speaker B', 'Speaker C', 'Speaker D', 'Speak
 interface TranscriptViewProps {
   transcription: TranscriptionResult
   onWordClick?: (startTime: number) => void
-  standalone?: boolean
 }
 
-export function TranscriptView({ transcription, onWordClick, standalone }: TranscriptViewProps) {
+export function TranscriptView({ transcription, onWordClick }: TranscriptViewProps) {
   const [query, setQuery] = useState('')
   const [activeSpeaker, setActiveSpeaker] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)

@@ -7,7 +7,7 @@ interface IntentRadarProps {
 }
 
 export function IntentRadar({ intentions }: IntentRadarProps) {
-  const data = intentions.map((intent, i) => ({
+  const data = intentions.map((intent) => ({
     subject: intent.speaker,
     value: intent.sentiment === 'POSITIVE' ? 80 : intent.sentiment === 'NEUTRAL' ? 60 : intent.sentiment === 'CAUTIOUS' ? 40 : 20,
     fullMark: 100

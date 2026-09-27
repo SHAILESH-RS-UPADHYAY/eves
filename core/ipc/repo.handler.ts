@@ -37,8 +37,9 @@ function scanDir(dirPath: string, basePath: string, depth: number, maxDepth: num
   } catch {
     return []
   }
-  // directories first, then alphabetical
-  entries.sort((a, b) => Number(b.isDirectory()) - Number(a.isDirectory()) || a.name.localeCompare(b.name))
+  // Files of this level are indexed before descending, so a huge sub-folder can't
+  // eat the file budget and hide root files (README, INDEX.md, manifests).
+  entries.sort((a, b) => Number(a.isDirectory()) - Number(b.isDirectory()) || a.name.localeCompare(b.name))
 
   const nodes: RepoFileNode[] = []
   for (const entry of entries) {
@@ -61,7 +62,8 @@ function scanDir(dirPath: string, basePath: string, depth: number, maxDepth: num
       nodes.push({ name, path: relPath, type: 'file', extension: ext, size })
     }
   }
-  return nodes
+  // display order stays directories first
+  return nodes.sort((a, b) => Number(b.type === 'directory') - Number(a.type === 'directory'))
 }
 
 const flatten = (nodes: RepoFileNode[]): string[] =>
@@ -149,7 +151,7 @@ export function indexRepo(root: string, fresh = false): RepoIndex {
       manifestSummary,
       readmeSummary: readmeFile ? readText(path.join(root, readmeFile), 6000).split('\n').slice(0, 150).join('\n').trim() : undefined,
       treePreview: tree,
-      catalog: CATALOGS.find((c) => files.includes(c)),
+      catalog: CATALOGS.find((c) => fs.existsSync(path.join(root, c))),
       skillCount: files.filter((f) => /(^|\/)SKILL\.md$/i.test(f)).length
     }
   }

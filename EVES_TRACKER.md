@@ -32,10 +32,10 @@ Turn EVES from "record + transcribe" into a full meeting-to-mission workflow for
 | 1 | Keyword removal, folder/config renames, dead-code purge, type-error baseline to zero | ✅ done |
 | 2 | Popup redesign (modal, movable, opaque, animated) + long-meeting capture hardening | ✅ done |
 | 3 | Storage engine (per-meeting files) + long-recording playback (any speed) | ✅ done |
-| 4 | Multi-provider AI brain backend (Groq / Gemini / OpenAI), long-transcript summarisation | ⏳ |
-| 5 | Repo intelligence: company repo + reference (skills) repo, persisted attachments | ⏳ |
-| 6 | BRAIN page: chat, spatial prompt pills, voice input, frontend preview | ⏳ |
-| 7 | Settings (keys, provider, models, language, path style) + panel/status updates | ⏳ |
+| 4 | Multi-provider AI brain backend (Groq / Gemini / OpenAI), long-transcript summarisation | ✅ done |
+| 5 | Repo intelligence: company repo + reference (skills) repo, persisted attachments | ✅ done |
+| 6 | BRAIN page: chat, spatial prompt pills, voice input, frontend preview | ✅ done |
+| 7 | Settings (keys, provider, models, language, path style) + panel/status updates | ✅ done |
 | 8 | Verification, README, final audit | ⏳ |
 
 ## Phase 0 — Baseline audit (2026-09-27)
@@ -127,3 +127,61 @@ Findings that shaped the plan:
 | Self-check | `core/utils/audioUrl.test.mts`, `npm test` | Tests the real TS module (no duplicated copy): URL round-trip + 9 range cases. |
 
 **Verification (real app, driven over DevTools):** migration ran (14 meetings); a live 20 s recording via Alt+L with synthesized speech produced a 56 KB file, 39 peaks and two correctly timed utterances; the meeting page loaded it instantly from peaks; 2× playback measured (6 s audio in 3 s); seek +10 s landed at 0:13; protocol returned 206 / 200 / 416 / 403 as designed; an upload through the file input resolved its path, streamed to prerecorded transcription and rendered a decoded waveform. Test meetings deleted afterwards. `tsc` 0 · `npm test` ok.
+
+### Phase 4 — Multi-provider AI brain backend (✅)
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| One provider table | `src/lib/providers.ts` (new) | Groq, Gemini (AI Studio) and OpenAI (Codex family): base URL, default model, context budget, key field, key URL, pitch, colour. Shared by backend and settings UI; also holds `DEFAULT_SETTINGS` (the two duplicated default blocks are gone). `activeProvider()` uses the chosen provider or falls back to any provider that has a key. |
+| SDK-free LLM client | `core/utils/llm.ts` (new), `groq-sdk` removed (−10 packages) | All three speak the OpenAI chat-completions dialect → one `fetch` client: streaming (SSE), JSON mode + one repair round-trip, 429/5xx retries honouring `Retry-After` / Groq's "try again in 1m2.5s", actionable errors (bad key, model gone, too large → "switch to Gemini"), abortable. Groq gets an explicit output cap (it counts it against the per-minute budget). |
+| Self-healing models | `ModelUnavailableError` (llm), `preferredModel` + `withModelFallback` (brain), `modelSwitcher` (store) | Providers retire models (Groq retired `llama-3.3-70b-versatile`; the old code was pinned to the already-dead `llama-3.1-70b-versatile`, so **every analysis was failing**). On "model not found / decommissioned" EVES lists the key's models, picks the strongest by a preference order, saves it and retries once. Groq default is now `openai/gpt-oss-120b`. |
+| Brain engine | `core/utils/brain.ts` (new) | Transcript as `[mm:ss] S1: …` lines · local facts (talk time, word cloud — no tokens spent) · part-by-part digest for transcripts beyond the provider's budget (a 2h meeting on Groq = two rounds; Gemini reads it whole) with a no-infinite-loop guard · digest cached on the meeting · analysis prompt + `normalizeAnalysis` (any model output becomes something every chart can render) · question-aware context packing (summary + most relevant part notes + raw ±2-turn excerpts around the question's words) · prompt-pill instructions · deterministic prompt header. |
+| Analysis gets `mainGoal` | `src/types` | Shown on the brief; "krna kya hai" in one sentence. |
+| AI IPC | `core/ipc/ai.handler.ts` (new, replaces the Groq handler) | `ai:analyze(meetingId)` — main reads the transcript from disk (no 100 KB transcripts over IPC), saves analysis + digest. `ai:chat` — streams `ai:delta` events, progress via `ai:progress`, `ai:cancel` stops it. `ai:models` — model list, doubles as key test. |
+| Analyze from the dashboard | `src/hooks/useAnalyze.ts` (replaces `useGroq`), `MeetingPage.tsx` (`./analyze_meeting` / `./re_analyze` button), `App.tsx` | Pending edits are flushed before main reads the meeting (fixes a transcribe→analyze race). Auto-analysis only runs when some AI key exists. |
+| Loading toasts end | `ui.store.ts` (`addToast` returns id), hooks | "Transcribing… / Analyzing…" toasts used to stay forever (no timer, no close button). |
+| Settings migration | `core/utils/store.ts` | Drops retired fields from the stored settings; `aiModels` merged per provider. |
+
+**Verification:** `npm test` (llm: fake-fetch retry/stream/JSON repair/model-gone; brain: paths, chunking, talk time, word cloud, normalisation, single-pass vs part-by-part summarisation, digest reuse, question-aware excerpts, budget, fallback picking the real Groq list). Real calls with the saved Groq key: 49 s meeting analysed in 3.1 s; the 16-min Hinglish meeting in 5.2 s with owned/dated action items and timestamped decisions; streamed Codex/Claude prompts (1,361 deltas, 4–8 s).
+
+### Phase 5 — Repository intelligence: company repo + skill vault (✅)
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| Monorepo-aware scanner | `core/ipc/repo.handler.ts` | Manifests found at root **and one level down** (`frontend/package.json`, `backend/requirements.txt`) — your repo was detected as just "Codebase" before; now: Node, TypeScript, React, Tailwind, Redux Toolkit, Vite, Python, FastAPI, Pydantic, LangChain/LangGraph, Redis, APScheduler, Uvicorn, Docker + build scripts. Data-driven stack tables. |
+| Root files never lost | same (`scanDir`) | Each level's files are indexed before descending — in a 23k-file vault the file cap used to be spent inside `external_repos`, hiding `INDEX.md`. Catalog detected on disk. |
+| Secret-safe context | same (`READABLE`, `SECRET_NAME`) | Only source-like files are ever read into a prompt; names like `service_account.json`, `*token*`, `.env`, `*.db` never are. `uploads/`, `logs/`, `tmp/` skipped. |
+| Model context builder | `repoContext(root, 'company' \| 'vault', budget, query)` | Company: path, stack, scripts, **agent rules files** (`CODE_AGENT_RULES.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`), README, files most related to the meeting/question (file-name hits weigh double), openings of the top files for big-context providers, directory index. Vault: its catalog (`INDEX.md`) + top level. Cached 5 min. |
+| Persisted attachments | `src/hooks/useRepoLink.ts` (new), `src/store/repo.store.ts` | Company repo and skill vault paths live in settings (the old attachment vanished on restart) and are re-indexed on first use. Dead `history` state removed. |
+| Skill-vault cartridge | `src/components/repo/RepoSlot.tsx` (new) | Attach / switch / rescan / detach, shows the exact path written into prompts (WSL or Windows), catalog status, skill count, top folders; glowing spine that sweeps while indexing. |
+| Repo Intel page | `RepoIntelPage.tsx` | Uses the shared hook; SKILL_VAULT slot added between repo recon and meeting context; synthesis is provider-agnostic, reads long meetings via their digest, and its prompt starts with the same deterministic workspace + skills header. |
+| Spinners spin | `src/styles/animations.css` | `animate-spin`/`animate-pulse` were no-op class names (no Tailwind output is generated in this project), so every loading icon was frozen. |
+
+**Verification:** real scan of your company repo (1,181 files, full stack, scripts) and your vault (`INDEX.md` catalog, 1,808 skill files); generated Claude Code prompt opens with your exact section-1 wording including the master catalog line.
+
+### Phase 6 — EVES BRAIN page (✅)
+
+New sidebar item **EVES Brain** (`brain.sh`, top bar `NEURAL_CORE`, command palette entry). The popup's **OPEN IN BRAIN ›** and session-log items land here on the right meeting.
+
+| Piece | Files | What it does |
+| :-- | :-- | :-- |
+| Page | `src/components/brain/BrainPage.tsx` | Left dock: **MEETING_LINK** (pick any transcribed meeting, length/speakers/words, ANALYZE / RE-ANALYZE with live stage, LISTEN → player), **COMPANY_REPO** and **SKILL_VAULT** cartridges. Right console: **mission brief** (main goal, TL;DR, decisions / actions / open questions / concerns), **spatial pills**, streaming **chat**, **composer**. Header: active brain chip (provider · model), EN / HINGLISH and WSL / WIN toggles. One scroll area per column (no double scrollbars). Empty state with `./launch_eves` when nothing is transcribed. |
+| Spatial pills | `src/components/brain/SpatialPills.tsx` | MAIN GOAL · HOW TO BUILD · CODEX PROMPT · CLAUDE CODE PROMPT · CURSOR PROMPT · FRONTEND PREVIEW · ACTION PLAN · RISKS & QUESTIONS. Neon glass capsules with cursor-tracking 3D tilt, moving specular highlight, staggered entrance, orbit ring while their answer streams; others dim. Each pill also has spoken triggers (English + Hinglish). |
+| Chat | `src/components/brain/ChatThread.tsx`, `src/hooks/useBrainChat.ts` | Terminal-style turns; answers rendered as Markdown with [mm:ss] highlighted; coding-tool answers become a **prompt capsule** (exact paste text, "COPY FOR CODEX/CLAUDE CODE/CURSOR"); streaming bubble shows live stages ("condensing part 2/5…", "thinking…"); stop button cancels; history saved per meeting; deltas painted once per frame. |
+| Markdown | `src/lib/markdown.ts` (parser, tested), `src/components/brain/Markdown.tsx` | Headings, lists, tables, quotes, inline code/bold, fenced code with COPY; ```html blocks get **RENDER PREVIEW** — a sandboxed iframe (no scripts, parent CSP) showing the model's mock of the finished screen. No new dependency. |
+| Voice | `src/hooks/useVoiceInput.ts`, `src/lib/stt.ts` (shared with the popup) | Click the mic, speak, click again: short commands ("codex prompt", "main goal kya hai") run a pill, anything else is sent as a question. Deepgram nova-3 multilingual with key-term boost for Codex / Claude / Cursor / EVES. |
+| Hinglish answers | `core/utils/brain.ts` | The language rule also rides on the question (with a Hinglish example) — models follow the latest message over the system prompt. Coding-tool prompts are always English. |
+| Popup de-duplication | `popup/app.js` | Uses the shared `deepgramUrl` / `toPcm16`. |
+| Placeholder transcripts | `core/utils/meetings.ts` | Old builds saved "(no transcript captured yet)" as a transcript for silent sessions; it is ignored at load so those show as audio-only. |
+
+**Verification (real app, real Groq key, driven over DevTools):** brain page renders in the hacker style; picking the 16-min meeting shows its mission brief; MAIN GOAL streamed with the active pill glowing and a working stop button; a Hinglish question came back in Hinglish citing `backend/database.py`; FRONTEND PREVIEW rendered the model's HTML mock of the task-table screen; saying "codex prompt" into the laptop mic (synthesized speech) fired the CODEX pill and produced a capsule with your workspace + skills sections; `showDashboard({page:'brain', meetingId})` switched page and meeting. Test settings/chats were reset afterwards.
+
+### Phase 7 — Settings & status panels (✅, done before Phase 6 because the brain needs keys)
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| Four key cards | `src/components/settings/SettingsModal.tsx` | Deepgram, Groq, Gemini (AI Studio), OpenAI (Codex) in the existing card style; eye toggle; **real** Test buttons (Deepgram project list / provider model list — the old Deepgram test faked success); `ACTIVE BRAIN` badge; one `./save_keys`. |
+| BRAIN tab | same | Provider picker (with key status), per-provider model field with the live model list, reset-to-default, EVES-explains-in (English / Hinglish), path format for prompts (WSL / Windows with a live example), auto-analyze toggle. |
+| STORAGE tab | same, `core/ipc/settings.handler.ts` (`app:storage`, `app:open-folder`) | Replaces a "delete audio" toggle and a "clear all data" button that did nothing: shows where recordings and meetings live, recording count/size, and opens the folders. |
+| Removed dead model radio | same | Both listed Groq models are decommissioned. |
+| Hacker panels | `CyberKit.tsx` (ConnectionMatrix, ConfigConsole), `ControlPanelPage.tsx` | GEMINI and OPENAI uplinks added; config console shows `[brain]` provider/model/auto-analyze/reply-language, `[workspace]` company repo / skill vault / prompt paths, all four keys; API_KEYS stat counts 4 and turns green when transcription + a brain are ready. Same styling. |

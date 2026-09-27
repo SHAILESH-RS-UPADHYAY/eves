@@ -4,8 +4,6 @@ import { Terminal, Shield, Mic2, Brain, Zap, FileText, Key } from 'lucide-react'
 import { StatsRow } from './StatsRow'
 import { MeetingFeed } from './MeetingFeed'
 import { RecentInsights } from './RecentInsights'
-import { EmptyState } from '../extras/EmptyState'
-import { GlassButton } from '../glass/GlassButton'
 import { useMeetingsStore } from '../../store/meetings.store'
 import { useUIStore } from '../../store/ui.store'
 import { MatrixRain } from '../hacker/MatrixRain'
@@ -16,8 +14,6 @@ import { RadarSweep } from '../hacker/RadarSweep'
 import { HackerImage } from '../hacker/HackerImage'
 import type { CyberVariant } from '../hacker/CyberArt'
 import { PacketSniffer, PortScan, ThreatMap, CipherStream, DataTicker, AsciiBanner } from '../hacker/HackerPanels'
-
-const CHECK_COLORS = ['#22d3ee', '#7ee787', '#ffcb6b', '#ff5370', '#c678dd', '#f78c6c', '#61afef']
 
 const features: {
   icon: typeof Brain
@@ -31,7 +27,7 @@ const features: {
     icon: Brain,
     color: '#22d3ee',
     title: 'AI TRANSCRIPTION',
-    desc: 'Deepgram nova-2 engine. 95%+ accuracy. Real-time streaming with speaker diarization.',
+    desc: 'Deepgram nova-3 engine. Hinglish code-switching. Real-time streaming with speaker diarization.',
     variant: 'neural',
     topLabel: '> MODULE_01.DLL'
   },
@@ -55,7 +51,7 @@ const features: {
     icon: Zap,
     color: '#f78c6c',
     title: 'AI SUMMARIZATION',
-    desc: 'Groq LLaMA-3 70B inference. Summary + intent extraction + action items. One-click export.',
+    desc: 'Groq · Gemini · OpenAI brain. Summary + main goal + action items. Prompt pills for Codex / Claude / Cursor.',
     variant: 'circuit',
     topLabel: '> MODULE_04.DLL'
   },

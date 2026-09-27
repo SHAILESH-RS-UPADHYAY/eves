@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, AlertTriangle, ThumbsUp, HelpCircle, Users } from 'lucide-react'
+import { Sparkles, AlertTriangle, ThumbsUp, HelpCircle } from 'lucide-react'
 import { GlassPanel } from '../glass/GlassPanel'
 import { GlassBadge } from '../glass/GlassBadge'
 import { IntentRadar } from './IntentRadar'

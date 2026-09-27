@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Minus, Square, X } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store'
 import { EvesLogo } from '../brand/EvesLogo'
@@ -7,6 +6,7 @@ const pageTitles: Record<string, string> = {
   dashboard: 'MAIN_INTERFACE',
   meetings: 'SESSION_LOGS',
   transcripts: 'TRANSCRIPT_DB',
+  brain: 'NEURAL_CORE',
   repo: 'REPO_SYNTHESIS',
   integrations: 'EXT_SERVICES',
   settings: 'CONFIG'

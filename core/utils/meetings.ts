@@ -21,9 +21,14 @@ export function meetingsDir() {
 /** Ids come from the renderer — never let one become a path. */
 const fileOf = (id: string) => path.join(meetingsDir(), `${id.replace(/[^\w.-]/g, '_')}.json`)
 
+/** Older builds saved this text as the "transcript" of sessions where nothing was transcribed. */
+const PLACEHOLDER = '(no transcript captured yet)'
+
 /** UI flags are never persisted — a crash mid-transcription must not leave a meeting stuck "transcribing". */
 function hydrate(m: Meeting): Meeting {
-  return { ...m, isTranscribing: false, isAnalyzing: false, transcriptionProgress: m.transcription ? 100 : 0 }
+  const fake = m.transcription?.transcript === PLACEHOLDER && !m.transcription.utterances?.length
+  const transcription = fake ? undefined : m.transcription
+  return { ...m, transcription, isTranscribing: false, isAnalyzing: false, transcriptionProgress: transcription ? 100 : 0 }
 }
 
 function write(meeting: Meeting) {

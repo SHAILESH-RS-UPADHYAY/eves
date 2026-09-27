@@ -8,11 +8,12 @@ import { IntegrationsPage } from './components/integrations/IntegrationsPage'
 import { TranscriptsPage } from './components/meeting/TranscriptsPage'
 import { RepoIntelPage } from './components/repo/RepoIntelPage'
 import { ControlPanelPage } from './components/settings/ControlPanelPage'
+import { BrainPage } from './components/brain/BrainPage'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { useSettingsStore } from './store/settings.store'
 import { useAnalyze } from './hooks/useAnalyze'
-import { activeProvider } from './lib/providers'
+import { activeProvider, PROVIDERS } from './lib/providers'
 import type { Meeting } from './types'
 
 export function App() {
@@ -49,6 +50,18 @@ export function App() {
     })
   }, [])
 
+  // Popup "OPEN IN BRAIN" / tray → land on the right page and meeting
+  useEffect(() => window.eves?.onNavigate((route) => {
+    if (route.meetingId) useUIStore.getState().setActiveMeeting(route.meetingId)
+    if (route.page) useUIStore.getState().setPage(route.page)
+  }), [])
+
+  // A provider retired the configured model — main switched and saved; mirror it here
+  useEffect(() => window.eves?.onModelSwitched(({ provider, model }) => {
+    useSettingsStore.setState((s) => ({ settings: { ...s.settings, aiModels: { ...s.settings.aiModels, [provider]: model } } }))
+    addToast({ type: 'info', title: `${PROVIDERS[provider].label} model retired`, message: `EVES switched to ${model}`, duration: 7000 })
+  }), [addToast])
+
   return (
     <>
       <AppShell>
@@ -64,6 +77,7 @@ export function App() {
             {currentPage === 'dashboard' && <DashboardPage />}
             {currentPage === 'meetings' && <MeetingPage />}
             {currentPage === 'transcripts' && <TranscriptsPage />}
+            {currentPage === 'brain' && <BrainPage />}
             {currentPage === 'repo' && <RepoIntelPage />}
             {currentPage === 'integrations' && <IntegrationsPage />}
             {currentPage === 'settings' && <ControlPanelPage />}

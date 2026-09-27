@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { HardDrive, Download, FileAudio, RefreshCw } from 'lucide-react'
 import { GlassPanel } from '../glass/GlassPanel'
 import { GlassButton } from '../glass/GlassButton'
-import { GlassBadge } from '../glass/GlassBadge'
 import { useDrive } from '../../hooks/useDrive'
 
 export function DriveSync() {

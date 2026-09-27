@@ -5,10 +5,9 @@ import type { SentimentPoint } from '../../types'
 
 interface KeyMomentsProps {
   sentimentPoints: SentimentPoint[]
-  duration?: number
 }
 
-export function KeyMoments({ sentimentPoints, duration }: KeyMomentsProps) {
+export function KeyMoments({ sentimentPoints }: KeyMomentsProps) {
   const keyMoments = sentimentPoints
     .filter((p) => Math.abs(p.score) > 0.5)
     .slice(0, 6)

@@ -300,14 +300,21 @@ export const isToolPill = (p?: PillId): p is 'codex' | 'claude' | 'cursor' => p 
 
 function toolAsk(tool: 'codex' | 'claude' | 'cursor', hasVault: boolean) {
   const { name, rules } = TOOL_RULES[tool]
-  return `Write the task-specific body of a production-grade prompt the user will paste into ${name}. EVES already added the header with section 0 (workspace) and section 1 (skill vault) — start at section 2 and use exactly these markdown headings:
-## 2. MISSION — what to build and why, 2-3 sentences, from the meeting.
-## 3. MEETING CONTEXT — the decisions, requirements, constraints, names and numbers that matter, with [mm:ss] references.
-${hasVault ? '## 4. SKILLS TO LOAD — 2-6 exact skill paths from the vault catalog that fit this task, one line each saying why.\n' : '## 4. SKILLS TO LOAD — "none attached".\n'}## 5. CODEBASE MAP — real files/modules from the repository index to read or change (mark NEW files) and what changes in each.
-## 6. IMPLEMENTATION PLAN — ordered, small, verifiable steps.
-## 7. EXPECTED RESULT ON SCREEN — exactly what the user sees in the frontend when done: layout, components, states (empty/loading/error/success), interactions.
-## 8. ACCEPTANCE CRITERIA — checkable bullets, including the exact verification commands (type check, build, tests) for this repository.
-## 9. RULES — ${rules} Never invent files or APIs that are not in the repository; ask before destructive changes; follow the company standards in the vault when present.
+  const sections: [string, string][] = [
+    ['## 2. MISSION', 'what to build and why, 2-3 sentences, from the meeting'],
+    ['## 3. MEETING CONTEXT', 'the decisions, requirements, constraints, names and numbers that matter, each with its [mm:ss]'],
+    ['## 4. SKILLS TO LOAD', hasVault ? '2-6 exact skill paths from the vault catalog that fit this task, one line each saying why' : 'write "none attached"'],
+    ['## 5. CODEBASE MAP', 'real files/modules from the repository index to read or change (mark NEW files) and what changes in each'],
+    ['## 6. IMPLEMENTATION PLAN', 'ordered, small, verifiable steps'],
+    ['## 7. EXPECTED RESULT ON SCREEN', 'exactly what the user sees in the frontend when done: layout, components, states (empty/loading/error/success), interactions'],
+    ['## 8. ACCEPTANCE CRITERIA', 'checkable bullets, including the exact verification commands (type check, build, tests) for this repository'],
+    ['## 9. RULES', `${rules} Never invent files or APIs that are not in the repository; ask before destructive changes; follow the company standards in the vault when present`]
+  ]
+  return `Write the task-specific body of a production-grade prompt the user will paste into ${name}. EVES already wrote the header (section 0 workspace, section 1 skill vault) — start at section 2.
+Use these headings verbatim, in this order, each followed by its content:
+${sections.map(([h]) => h).join('\n')}
+What goes under each:
+${sections.map(([h, what]) => `- ${h.slice(6)}: ${what}.`).join('\n')}
 Write it in English, addressed to the coding agent. Output only these sections — no preamble, no closing remarks.`
 }
 
@@ -359,7 +366,7 @@ export interface ContextBlock {
 
 const LANGUAGE = {
   english: 'Reply in clear, simple English.',
-  hinglish: 'Reply in Hinglish — Hindi written in Roman script mixed with English, the way the user writes. Keep code, file paths and technical terms in English.'
+  hinglish: 'Reply in Hinglish — Hindi written in Roman script mixed with English, the way the user writes (e.g. "Is meeting ka main goal hai ek unified task table banana, taki har section same data save kare."). Keep headings, code, file paths and technical terms in English.'
 }
 
 /**
@@ -407,5 +414,6 @@ export function brainMessages(o: {
     vault && `\n=== ${o.vault!.title} ===\n${vault}`
   ].filter((x) => x !== '').join('\n')
 
-  return [{ role: 'system', content: system }, ...history, { role: 'user', content: ask }]
+  // the language rule rides on the question too — models follow the latest message over the system prompt
+  return [{ role: 'system', content: system }, ...history, { role: 'user', content: `${ask}\n\n${language}` }]
 }

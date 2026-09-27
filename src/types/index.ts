@@ -145,6 +145,8 @@ export interface ChatMessage {
   pill?: PillId
   at: number
   error?: boolean
+  /** "GROQ · openai/gpt-oss-120b" — which brain answered */
+  model?: string
 }
 
 export interface BrainRequest {

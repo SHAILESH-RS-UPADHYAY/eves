@@ -33,7 +33,7 @@ export function TranscriptsPage() {
           tag="LIVE"
           minHeight={480}
         >
-          <TranscriptView transcription={active.transcription} standalone />
+          <TranscriptView transcription={active.transcription} />
         </ExpandableCard>
       ) : (
         <DecryptStandby archived={meetings.length} />

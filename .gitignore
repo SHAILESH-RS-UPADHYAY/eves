@@ -10,3 +10,4 @@ website/dist/
 *.log
 *.txt
 !README.md
+EVES_TRACKER.md

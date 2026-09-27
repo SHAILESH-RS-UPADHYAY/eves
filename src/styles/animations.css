@@ -95,3 +95,6 @@
 
 /* Repo slot spine sweeping while a repository is indexed */
 @keyframes vaultSpine { to { background-position: 0 200%; } }
+
+/* Brain: scan bar under a reply that is still thinking */
+@keyframes brainScan { from { transform: translateX(-100%); } to { transform: translateX(300%); } }

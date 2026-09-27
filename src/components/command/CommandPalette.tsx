@@ -38,6 +38,7 @@ export function CommandPalette() {
       { id: 'nav-dashboard', label: 'Go to Dashboard', icon: Search, section: 'Navigation', action: () => { setPage('dashboard'); setOpen(false) } },
       { id: 'nav-meetings', label: 'Go to Meetings', icon: Search, section: 'Navigation', action: () => { setPage('meetings'); setOpen(false) } },
       { id: 'nav-transcripts', label: 'Go to Transcripts', icon: Search, section: 'Navigation', action: () => { setPage('transcripts'); setOpen(false) } },
+      { id: 'nav-brain', label: 'Go to EVES Brain', icon: Search, section: 'Navigation', action: () => { setPage('brain'); setOpen(false) } },
       { id: 'nav-repo', label: 'Go to Repo Intel', icon: Search, section: 'Navigation', action: () => { setPage('repo'); setOpen(false) } },
       { id: 'nav-integrations', label: 'Go to Integrations', icon: Search, section: 'Navigation', action: () => { setPage('integrations'); setOpen(false) } }
     ]

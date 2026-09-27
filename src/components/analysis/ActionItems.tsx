@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, User, Flag } from 'lucide-react'
+import { Check, User } from 'lucide-react'
 import { GlassCard } from '../glass/GlassCard'
 import { GlassBadge } from '../glass/GlassBadge'
 import type { ActionItem } from '../../types'

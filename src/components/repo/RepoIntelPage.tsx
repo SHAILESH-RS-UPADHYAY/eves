@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   FolderGit2,
   FolderOpen,
@@ -12,14 +12,10 @@ import {
   FilePlus,
   FileMinus,
   FileSearch,
-  CheckCircle2,
-  Terminal,
   GitBranch,
   ChevronDown,
   ChevronRight,
   Download,
-  Layers,
-  Cpu,
   SlidersHorizontal
 } from 'lucide-react'
 import { SectionDivider, ExpandableCard } from '../hacker/CyberKit'

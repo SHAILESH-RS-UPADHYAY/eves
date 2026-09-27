@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import clsx from 'clsx'
 
