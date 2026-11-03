@@ -18,6 +18,13 @@
 
 </div>
 
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="https://shailesh-stats.vercel.app/api/plate?name=repo&amp;repo=eves&amp;theme=dark&amp;w=m">
+  <source media="(max-width: 600px)" srcset="https://shailesh-stats.vercel.app/api/plate?name=repo&amp;repo=eves&amp;theme=light&amp;w=m">
+  <source media="(prefers-color-scheme: dark)" srcset="https://shailesh-stats.vercel.app/api/plate?name=repo&amp;repo=eves&amp;theme=dark">
+  <img src="https://shailesh-stats.vercel.app/api/plate?name=repo&amp;repo=eves&amp;theme=light" width="100%" alt="Commits per week and languages for EVES, drawn live from GitHub.">
+</picture>
+
 ---
 
 ## ▌ Overview
