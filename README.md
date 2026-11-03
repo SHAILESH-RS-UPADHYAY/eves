@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/logo.svg" width="88" height="88" alt="EVES logo"></p>
+
 # EVES — Meeting Intelligence & Context-to-Code Pipeline
 
 <div align="center">
