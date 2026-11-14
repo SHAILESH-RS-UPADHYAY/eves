@@ -8,10 +8,15 @@ mac:
   category: public.app-category.productivity
   target:
     - target: dmg
-      arch: [x64, arm64]
+      arch: [universal]
   darkModeSupport: true
 
+# Fixed names so the website can link straight to releases/latest/download/<file>
+dmg:
+  artifactName: EVES.${ext}
+
 win:
+  signAndEditExecutable: false   # no cert; also avoids winCodeSign symlink errors on Windows
   target:
     - target: nsis
       arch: [x64]
@@ -19,6 +24,9 @@ win:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  artifactName: EVES-Setup.${ext}
+
+publish: null
 
 files:
   - out/**/*

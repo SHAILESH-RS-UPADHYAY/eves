@@ -1,0 +1,37 @@
+# Push a tag like v1.0.1 (or run manually) → builds the Windows .exe and macOS .dmg and attaches them
+# to the same tag in the public SHAILESH-RS-UPADHYAY/eves-releases repo (this repo stays private).
+# Needs secret RELEASES_TOKEN: a fine-grained PAT with "Contents: read & write" on eves-releases.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag: { description: 'Release tag, e.g. v1.0.0', required: true }
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            file: dist/EVES-Setup.exe
+          - os: macos-latest
+            file: dist/EVES.dmg
+    runs-on: ${{ matrix.os }}
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+      CSC_IDENTITY_AUTO_DISCOVERY: false # unsigned until there is a certificate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run package
+      - name: Upload to eves-releases
+        shell: bash
+        run: |
+          gh release view "$TAG" -R SHAILESH-RS-UPADHYAY/eves-releases >/dev/null 2>&1 \
+            || gh release create "$TAG" -R SHAILESH-RS-UPADHYAY/eves-releases --title "EVES ${TAG#v}" --notes "Windows and macOS installers." || true
+          gh release upload "$TAG" "${{ matrix.file }}" -R SHAILESH-RS-UPADHYAY/eves-releases --clobber

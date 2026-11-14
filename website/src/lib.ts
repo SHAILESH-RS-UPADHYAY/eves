@@ -1,7 +1,7 @@
 export const REPO = 'https://github.com/SHAILESH-RS-UPADHYAY/eves'
-// ponytail: both OS buttons open the latest GitHub release (it lists the .exe and .dmg);
-// publish one (npm run package → upload to a release) for the buttons to resolve
-export const RELEASES = `${REPO}/releases/latest`
+// Installers live in a public repo (source stays private). Fixed file names → direct download links.
+export const RELEASES = 'https://github.com/SHAILESH-RS-UPADHYAY/eves-releases/releases/latest'
+export const DOWNLOAD = { Windows: `${RELEASES}/download/EVES-Setup.exe`, macOS: `${RELEASES}/download/EVES.dmg` } as const
 
 const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
 export const IOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document)
