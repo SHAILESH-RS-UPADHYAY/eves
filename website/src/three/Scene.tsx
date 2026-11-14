@@ -2,9 +2,10 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { ParticleField } from './ParticleField'
 import { FloatingOrbs } from './FloatingOrbs'
-import { GlassText3D } from './GlassText3D'
 
-export function Scene() {
+import type { Theme } from '../lib'
+
+export function Scene({ theme }: { theme: Theme }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 5], fov: 60 }}
@@ -13,14 +14,13 @@ export function Scene() {
     >
       {/* Lighting */}
       <ambientLight intensity={0.5} />
-      <pointLight position={[-2, 2, 2]} intensity={2} color="#7C3AED" />
-      <pointLight position={[2, -2, -2]} intensity={1.5} color="#06B6D4" />
-      <pointLight position={[0, 0, -4]} intensity={1} color="#F43F5E" />
+      <pointLight position={[-2, 2, 2]} intensity={2} color="#22d3ee" />
+      <pointLight position={[2, -2, -2]} intensity={1.5} color="#7ee787" />
+      <pointLight position={[0, 0, -4]} intensity={1} color="#0b7285" />
 
       {/* Scene elements */}
-      <ParticleField />
+      <ParticleField light={theme === 'light'} />
       <FloatingOrbs />
-      <GlassText3D />
 
       <OrbitControls
         autoRotate

@@ -1,15 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { Scene } from '../three/Scene'
+import { INTRO_S } from './Intro'
+import { DownloadButtons } from './DownloadButtons'
+import type { Theme } from '../lib'
 
-export function Hero3D() {
+export function Hero3D({ theme }: { theme: Theme }) {
   const badgeRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subRef = useRef<HTMLParagraphElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const tl = gsap.timeline()
+    const tl = gsap.timeline({ delay: INTRO_S })
     if (badgeRef.current) tl.fromTo(badgeRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
     if (titleRef.current) {
       const words = titleRef.current.querySelectorAll('.word')
@@ -22,7 +25,7 @@ export function Hero3D() {
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
       {/* 3D Canvas */}
-      <Scene />
+      <Scene key={theme} theme={theme} />
 
       {/* HTML overlay */}
       <div style={{
@@ -37,8 +40,8 @@ export function Hero3D() {
       }}>
         <div ref={badgeRef} style={{
           padding: '6px 16px',
-          background: 'rgba(124,58,237,0.1)',
-          border: '1px solid rgba(124,58,237,0.3)',
+          background: 'var(--accent-soft)',
+          border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
           borderRadius: '999px',
           fontSize: '11px',
           fontWeight: 600,
@@ -51,7 +54,7 @@ export function Hero3D() {
         </div>
 
         <h1 ref={titleRef} style={{
-          fontSize: '72px',
+          fontSize: 'clamp(44px, 8vw, 80px)',
           fontWeight: 800,
           textAlign: 'center',
           lineHeight: 1.1,
@@ -59,7 +62,7 @@ export function Hero3D() {
         }}>
           <span className="word gradient-text">Your</span>{' '}
           <span className="word gradient-text">meetings.</span>{' '}
-          <span className="word gradient-text">Understood.</span>
+          <span className="word accent-word">Understood.</span>
         </h1>
 
         <p ref={subRef} style={{
@@ -73,33 +76,8 @@ export function Hero3D() {
           EVES transcribes, analyzes, and extracts intelligence from every recording. Private, local, and devastatingly accurate.
         </p>
 
-        <div ref={ctaRef} style={{ display: 'flex', gap: '16px', marginTop: '36px' }}>
-          <button style={{
-            padding: '14px 28px',
-            background: 'var(--gradient-brand)',
-            border: 'none',
-            borderRadius: '12px',
-            color: '#fff',
-            fontSize: '15px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 0 40px rgba(124,58,237,0.3)'
-          }}>
-            Download for macOS
-          </button>
-          <button style={{
-            padding: '14px 28px',
-            background: 'var(--glass-2)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid var(--glass-border)',
-            borderRadius: '12px',
-            color: 'var(--text-primary)',
-            fontSize: '15px',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}>
-            View on GitHub
-          </button>
+        <div ref={ctaRef} style={{ display: 'flex', gap: '12px', marginTop: '36px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <DownloadButtons />
         </div>
 
         {/* Scroll indicator */}

@@ -237,3 +237,14 @@ Removed every Hinglish mention and the Hinglish reply mode: EVES now always answ
 - **PWA**: `manifest.webmanifest`, `sw.js` (network-first, cache fallback), PNG icons 192/512 + apple-touch-icon → "Install app" on phone and laptop.
 - **One mark everywhere** (the portfolio's EVES mark: cyan wave → cursor on a dark tile): `core/utils/evesMark.ts` draws it; `core/icon.ts` (window/taskbar/tray), `resources/icon.png` (installer, via `node scripts/icons.mts`), `EvesLogo.tsx` (sidebar/topbar/CyberKit), popup titlebar, `.github/logo.svg`, website favicon/PWA icons.
 - Popup panel left as-is (visible in screenshots/screen share). `npm run build` ok · `npm test` ok.
+
+### Follow-up — Website redesign: hand-drawn intro, light/dark, pills, downloads (2026-11-14)
+
+- **Intro** (`website/src/components/Intro.tsx`): the EVES mark is drawn by hand, fast — pen nib on the tip, boiling line, cursor outlined then stamped, "EVES" written, then the mark flies into the navbar. Click skips; off under reduced motion.
+- **Light mode is default**, dark via toggle (`ThemeToggle.tsx`): circular ink-wipe from the button + shockwave ring (View Transitions), sun⇄moon morph; choice saved in `localStorage`.
+- **Palette**: violet→cyan gradient removed. Warm paper/ink neutrals + one accent from the mark (`#0b7285` light / `#22d3ee` dark). Solid ink buttons, no rainbow icons; 3D scene uses brand colours, floating "EVES" 3D text removed.
+- **Section titles** (`SectionTitle.tsx`): words ink in on scroll, accent word gets a hand-drawn wave underline.
+- **Features**: detailed cards with custom line icons that draw on reveal + hover micro-motion, bullet specs.
+- **Nav pills** (`NavPills.tsx`): Features / How it works / GitHub with gliding indicator, scroll-spy, detailed hover cards.
+- **Downloads** (`DownloadButtons.tsx`): detected OS primary + other OS (Windows & macOS), phones get "Install EVES" (PWA prompt / iOS Add-to-Home steps). All GitHub links → `SHAILESH-RS-UPADHYAY/eves`; downloads → latest release.
+- Tested: iPhone, Android, macOS UA, Windows desktop — no overflow, no console errors.

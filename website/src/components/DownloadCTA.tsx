@@ -1,8 +1,8 @@
-import { Github, Download } from 'lucide-react'
+import { DownloadButtons } from './DownloadButtons'
 
 export function DownloadCTA() {
   return (
-    <section style={{
+    <section id="download" style={{
       padding: '120px 32px',
       flexDirection: 'column',
       position: 'relative',
@@ -13,7 +13,7 @@ export function DownloadCTA() {
         position: 'absolute',
         width: '600px', height: '600px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, var(--accent-soft) 0%, transparent 70%)',
         top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
         zIndex: 0
@@ -33,34 +33,10 @@ export function DownloadCTA() {
           fontSize: '18px', color: 'var(--text-secondary)',
           maxWidth: '500px', margin: '0 auto 40px'
         }}>
-          Free. Private. Local. No subscriptions. No cloud.
+          Free. Private. Local. Windows and macOS — no subscriptions, no cloud.
         </p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <button style={{
-            padding: '16px 32px',
-            background: 'var(--gradient-brand)',
-            border: 'none', borderRadius: '12px',
-            color: '#fff', fontSize: '16px', fontWeight: 600,
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '10px',
-            boxShadow: '0 0 60px rgba(124,58,237,0.4)'
-          }}>
-            <Download size={20} /> Download EVES
-          </button>
-          <a href="https://github.com" target="_blank" style={{
-            padding: '16px 32px',
-            background: 'var(--glass-2)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid var(--glass-border)',
-            borderRadius: '12px',
-            color: 'var(--text-primary)',
-            fontSize: '16px', fontWeight: 600,
-            cursor: 'pointer',
-            textDecoration: 'none',
-            display: 'flex', alignItems: 'center', gap: '10px'
-          }}>
-            <Github size={20} /> GitHub
-          </a>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <DownloadButtons />
         </div>
       </div>
     </section>

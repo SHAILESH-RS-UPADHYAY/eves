@@ -1,11 +1,12 @@
+import { SectionTitle } from './SectionTitle'
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { Upload, Cpu, Sparkles } from 'lucide-react'
 
 const steps = [
-  { num: '01', icon: Upload, color: '#7C3AED', title: 'Drop your recording', desc: 'Drag any audio file — MP3, WAV, M4A. Or sync directly from Google Drive.' },
-  { num: '02', icon: Cpu, color: '#06B6D4', title: 'AI processes and analyzes', desc: 'Deepgram transcribes with speaker diarization. Groq extracts intentions, actions, and sentiment.' },
-  { num: '03', icon: Sparkles, color: '#F43F5E', title: 'Review insights and export', desc: 'Interactive transcript, radar charts, action items. Export to Notion in one click.' }
+  { num: '01', icon: Upload, color: 'var(--accent)', title: 'Drop your recording', desc: 'Drag any audio file — MP3, WAV, M4A. Or sync directly from Google Drive.' },
+  { num: '02', icon: Cpu, color: 'var(--accent)', title: 'AI processes and analyzes', desc: 'Deepgram transcribes with speaker diarization. Groq extracts intentions, actions, and sentiment.' },
+  { num: '03', icon: Sparkles, color: 'var(--accent)', title: 'Review insights and export', desc: 'Interactive transcript, radar charts, action items. Export to Notion in one click.' }
 ]
 
 export function HowItWorks() {
@@ -26,9 +27,7 @@ export function HowItWorks() {
 
   return (
     <section id="how" ref={sectionRef} style={{ padding: '120px 32px', flexDirection: 'column' }}>
-      <h2 className="gradient-text" style={{ fontSize: '42px', fontWeight: 800, textAlign: 'center', marginBottom: '60px' }}>
-        Three steps to clarity
-      </h2>
+      <SectionTitle text="Three steps to clarity" accent="clarity" kicker="02 — Workflow" />
       <div style={{ display: 'flex', gap: '48px', maxWidth: '900px', width: '100%', alignItems: 'flex-start' }}>
         {steps.map((s, i) => {
           const Icon = s.icon
@@ -43,7 +42,7 @@ export function HowItWorks() {
               }}>{s.num}</div>
               <div style={{
                 width: '56px', height: '56px', borderRadius: '16px',
-                background: `${s.color}22`,
+                background: 'var(--accent-soft)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 16px'
               }}>
@@ -58,7 +57,7 @@ export function HowItWorks() {
                   top: '30px',
                   width: '48px',
                   height: '2px',
-                  background: 'linear-gradient(90deg, rgba(124,58,237,0.3), transparent)'
+                  background: 'linear-gradient(90deg, var(--accent-soft), transparent)'
                 }} />
               )}
             </div>

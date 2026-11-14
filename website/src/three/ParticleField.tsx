@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export function ParticleField() {
+export function ParticleField({ light = false }: { light?: boolean }) {
   const pointsRef = useRef<THREE.Points>(null)
   const { mouse } = useThree()
   const mouseRef = useRef({ x: 0, y: 0 })
@@ -23,9 +23,9 @@ export function ParticleField() {
     const count = 3000
     const arr = new Float32Array(count * 3)
     const palette = [
-      new THREE.Color('#7C3AED'),
-      new THREE.Color('#06B6D4'),
-      new THREE.Color('#ffffff')
+      new THREE.Color(light ? '#0b7285' : '#22d3ee'),
+      new THREE.Color(light ? '#2f6f4f' : '#7ee787'),
+      new THREE.Color(light ? '#15171b' : '#ffffff')
     ]
     for (let i = 0; i < count; i++) {
       const c = palette[Math.floor(Math.random() * palette.length)]

@@ -2,12 +2,12 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
+// Kept to the edges and translucent so they never sit on the headline.
 const sphereConfigs = [
-  { color: '#7C3AED', size: 0.4, pos: [-1.5, 0.5, 0] as [number, number, number], phase: 0 },
-  { color: '#06B6D4', size: 0.6, pos: [1.2, -0.8, -1] as [number, number, number], phase: 1.5 },
-  { color: '#F43F5E', size: 0.35, pos: [0.8, 1.2, -0.5] as [number, number, number], phase: 2.8 },
-  { color: '#F59E0B', size: 0.5, pos: [-1.2, -0.5, -0.8] as [number, number, number], phase: 4.2 },
-  { color: '#14B8A6', size: 0.45, pos: [0.2, -1.5, 0.5] as [number, number, number], phase: 5.7 }
+  { color: '#22d3ee', size: 0.32, pos: [-3.1, 1.3, -1] as [number, number, number], phase: 0 },
+  { color: '#0b7285', size: 0.5, pos: [3.0, -1.1, -1.5] as [number, number, number], phase: 1.5 },
+  { color: '#7ee787', size: 0.22, pos: [2.5, 1.7, -0.8] as [number, number, number], phase: 2.8 },
+  { color: '#9aa3ad', size: 0.38, pos: [-2.7, -1.6, -1.2] as [number, number, number], phase: 4.2 }
 ]
 
 export function FloatingOrbs() {
@@ -43,7 +43,7 @@ function GlassSphere({ color, size, pos, phase }: { color: string; size: number;
         thickness={0.5}
         envMapIntensity={1}
         transparent
-        opacity={0.8}
+        opacity={0.35}
       />
     </mesh>
   )
