@@ -41,7 +41,7 @@ export function NavPills() {
 
   const target = hover ?? active
   useEffect(() => {
-    const el = target ? wrap.current?.querySelector<HTMLElement>(`[data-pill="${target}"]`) : null
+    const el = target ? wrap.current?.querySelector<HTMLElement>(`[data-pill="${target}"]`)?.parentElement : null // the slot: the <a> sits at offsetLeft 0 inside it
     setBox(el ? { left: el.offsetLeft, width: el.offsetWidth } : null)
   }, [target])
 
