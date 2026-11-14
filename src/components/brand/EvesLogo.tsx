@@ -36,16 +36,8 @@ export function EvesLogo({
 
       {showWordmark && (
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-          <span
-            className="rgb-text"
-            style={{
-              fontFamily: '"Courier New", monospace',
-              fontWeight: 800,
-              fontSize: `${Math.round(size * 0.42)}px`,
-              letterSpacing: '4px',
-            }}
-          >
-            EVES
+          <span className="eves-word" style={{ fontSize: `${Math.round(size * 0.5)}px`, color: '#e6edf3', textShadow: '0 0 10px rgba(34,211,238,0.35)' }}>
+            {'EVES'.split('').map((c, i) => <span key={i} className="ew" style={{ ['--i' as string]: i }}>{c}</span>)}
           </span>
           {subtitle && (
             <span style={{

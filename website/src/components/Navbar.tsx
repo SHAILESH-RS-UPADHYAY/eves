@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MARK_VIEWBOX, WAVE } from './Intro'
+import { INTRO_S, MARK_VIEWBOX, WAVE } from './Intro'
 import { ThemeToggle } from './ThemeToggle'
 import { NavPills } from './NavPills'
 import { MOBILE, OS, type Theme } from '../lib'
@@ -22,7 +22,9 @@ export function Navbar({ theme, onTheme }: { theme: Theme; onTheme: (t: Theme) =
           <path className="nm-wave" pathLength={1} strokeWidth="2.1" d={WAVE} />
           <rect className="nm-cursor" x="17.2" y="6.5" width="3.2" height="11" rx="0.5" fill="currentColor" stroke="none" />
         </svg>
-        <span style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>EVES</span>
+        <span className="eves-word" style={{ fontSize: '21px', color: 'var(--text-primary)', ['--ew-delay' as string]: `${INTRO_S * 1000 - 400}ms` }}>
+          {'EVES'.split('').map((c, i) => <span key={i} className="ew" style={{ ['--i' as string]: i }}>{c}</span>)}
+        </span>
       </a>
       <div style={{ display: 'flex', gap: 'clamp(12px, 2.4vw, 28px)', alignItems: 'center' }}>
         <NavPills />

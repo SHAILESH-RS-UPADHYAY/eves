@@ -386,3 +386,16 @@ html, body, #root {
 /* Transcript words: one delegated click handler, hover in CSS (thousands of words per meeting) */
 .tx-word { cursor: pointer; border-radius: 2px; transition: background 0.2s; }
 .tx-word:hover { background: rgba(124, 58, 237, 0.1); }
+
+/* EVES wordmark (portfolio font): letters write in, idle wave, hop on hover */
+.eves-word { font-family: "MuseoModerno", system-ui, sans-serif; font-weight: 500; letter-spacing: .03em; display: inline-flex; line-height: 1; }
+.eves-word .ew {
+  display: inline-block;
+  animation: ewIn .55s cubic-bezier(.2,.8,.2,1) both, ewWave 7s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms + var(--ew-delay, 0ms)), calc(var(--i) * 90ms + var(--ew-delay, 0ms) + 2.5s);
+}
+.eves-word:hover .ew { animation: ewHop .5s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(var(--i) * 50ms); }
+@keyframes ewIn { from { opacity: 0; transform: translateY(.35em) rotate(-6deg); filter: blur(4px); clip-path: inset(0 100% 0 0); } to { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); } }
+@keyframes ewWave { 0%, 6%, 100% { transform: none; } 3% { transform: translateY(-.12em); } }
+@keyframes ewHop { 40% { transform: translateY(-.22em); } }
+@media (prefers-reduced-motion: reduce) { .eves-word .ew { animation: none !important; } }

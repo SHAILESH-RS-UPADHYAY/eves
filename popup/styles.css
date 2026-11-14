@@ -1,3 +1,4 @@
+@import "@fontsource/museomoderno/500.css";
 /* ═══════════════════════════════════════════════════════════
    EVES POPUP — Hollywood hacker HUD, framed as a floating modal
    Cyan + green terminal palette · scanlines · glitch · HUD brackets
@@ -227,9 +228,9 @@ button { font-family: var(--mono); }
 
 #logo-text {
   position: relative;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
   color: var(--cyan);
   text-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
 }
@@ -755,3 +756,16 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* EVES wordmark (portfolio font): letters write in, idle wave, hop on hover */
+.eves-word { font-family: "MuseoModerno", system-ui, sans-serif; font-weight: 500; letter-spacing: .03em; display: inline-flex; line-height: 1; }
+.eves-word .ew {
+  display: inline-block;
+  animation: ewIn .55s cubic-bezier(.2,.8,.2,1) both, ewWave 7s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms + var(--ew-delay, 0ms)), calc(var(--i) * 90ms + var(--ew-delay, 0ms) + 2.5s);
+}
+.eves-word:hover .ew { animation: ewHop .5s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(var(--i) * 50ms); }
+@keyframes ewIn { from { opacity: 0; transform: translateY(.35em) rotate(-6deg); filter: blur(4px); clip-path: inset(0 100% 0 0); } to { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); } }
+@keyframes ewWave { 0%, 6%, 100% { transform: none; } 3% { transform: translateY(-.12em); } }
+@keyframes ewHop { 40% { transform: translateY(-.22em); } }
+@media (prefers-reduced-motion: reduce) { .eves-word .ew { animation: none !important; } }

@@ -248,3 +248,4 @@ Removed every Hinglish mention and the Hinglish reply mode: EVES now always answ
 - **Nav pills** (`NavPills.tsx`): Features / How it works / GitHub with gliding indicator, scroll-spy, detailed hover cards.
 - **Downloads** (`DownloadButtons.tsx`): detected OS primary + other OS (Windows & macOS), phones get "Install EVES" (PWA prompt / iOS Add-to-Home steps). All GitHub links → `SHAILESH-RS-UPADHYAY/eves`; downloads → latest release.
 - Tested: iPhone, Android, macOS UA, Windows desktop — no overflow, no console errors.
+- **Wordmark** (2026-11-14): "EVES" now set in MuseoModerno (the portfolio's font) everywhere — app `EvesLogo` (sidebar/topbar), popup titlebar (glitch kept), site navbar + intro. Shared `.eves-word` animation: letters write in, idle wave, hop on hover. Font bundled in the app via `@fontsource/museomoderno` (works offline).
