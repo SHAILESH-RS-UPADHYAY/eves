@@ -12,7 +12,7 @@ export function Footer() {
     }}>
       <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>EVES © 2026</span>
       <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Built with Deepgram + Groq</span>
-      <a href="https://github.com/SHAILESH-RS-UPADHYAY/eves" target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>GitHub</a>
+      <a href="https://github.com/SHAILESH-RS-UPADHYAY/eves-releases" target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none' }}>GitHub</a>
     </footer>
   )
 }

@@ -1,4 +1,5 @@
-export const REPO = 'https://github.com/SHAILESH-RS-UPADHYAY/eves'
+// Public face of the project (source repo is private)
+export const REPO = 'https://github.com/SHAILESH-RS-UPADHYAY/eves-releases'
 // Installers live in a public repo (source stays private). Fixed file names → direct download links.
 export const RELEASES = 'https://github.com/SHAILESH-RS-UPADHYAY/eves-releases/releases/latest'
 export const DOWNLOAD = { Windows: `${RELEASES}/download/EVES-Setup.exe`, macOS: `${RELEASES}/download/EVES.dmg` } as const

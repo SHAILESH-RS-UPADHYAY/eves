@@ -15,7 +15,7 @@ const PILLS: Pill[] = [
     preview: { title: 'From call to clarity', items: [['01 Drop', 'MP3 · WAV · M4A · Drive'], ['02 Analyze', 'transcribe → understand'], ['03 Act', 'review · export · prompt']] } },
   { id: 'github', label: 'GitHub', href: REPO, external: true,
     icon: <path d="M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6 0C6.8 2.8 5.8 3.1 5.8 3.1a4.3 4.3 0 0 0-.1 3.2A4.6 4.6 0 0 0 4.4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />,
-    preview: { title: 'SHAILESH-RS-UPADHYAY/eves', items: [['Stack', 'Electron · React · TS'], ['Runs on', 'Windows · macOS'], ['Source', 'view on GitHub ↗']] } },
+    preview: { title: 'SHAILESH-RS-UPADHYAY/eves-releases', items: [['Stack', 'Electron · React · TS'], ['Runs on', 'Windows · macOS'], ['Releases', 'installers ↗']] } },
 ]
 
 /**
