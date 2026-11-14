@@ -43,7 +43,7 @@ export function Navbar() {
         transition: 'background 0.3s'
       }}
     >
-      <span className="gradient-text" style={{ fontSize: '20px', fontWeight: 800 }}>◈ EVES</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}><img src="/icon.svg" alt="" width={28} height={28} /><span className="gradient-text" style={{ fontSize: '20px', fontWeight: 800 }}>EVES</span></span>
       <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
         <a href="#features" style={navLinkStyle}>Features</a>
         <a href="#how" style={navLinkStyle}>How It Works</a>
