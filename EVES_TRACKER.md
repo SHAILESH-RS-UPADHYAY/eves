@@ -233,7 +233,7 @@ Removed every Hinglish mention and the Hinglish reply mode: EVES now always answ
 
 ### Follow-up — Live website + EVES mark everywhere (2026-11-14)
 
-- **Website live on Vercel** (project `eves`, root `website`, Vite preset). Fixes: `website/package-lock.json`, missing `lucide-react` dep, `css.postcss: {}` so it no longer inherits the Electron app's Tailwind config.
+- **Website live on Vercel** (project `eves`, root `website`, Vite preset). Fixes: `website/package-lock.json`, missing `lucide-react` dep, `css.postcss: {}` so it no longer inherits the desktop app's Tailwind config.
 - **PWA**: `manifest.webmanifest`, `sw.js` (network-first, cache fallback), PNG icons 192/512 + apple-touch-icon → "Install app" on phone and laptop.
 - **One mark everywhere** (the portfolio's EVES mark: cyan wave → cursor on a dark tile): `core/utils/evesMark.ts` draws it; `core/icon.ts` (window/taskbar/tray), `resources/icon.png` (installer, via `node scripts/icons.mts`), `EvesLogo.tsx` (sidebar/topbar/CyberKit), popup titlebar, `.github/logo.svg`, website favicon/PWA icons.
 - Popup panel left as-is (visible in screenshots/screen share). `npm run build` ok · `npm test` ok.

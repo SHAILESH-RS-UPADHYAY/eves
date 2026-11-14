@@ -3,7 +3,7 @@ import { evesMarkRGBA } from './utils/evesMark'
 
 // Rasterised in code so the tray and taskbar never fall back to a stock icon.
 export function evesIcon(size: number, scaleFactor = 1) {
-  const px = size // bitmap pixels; scaleFactor only tells Electron its DPI
+  const px = size // bitmap pixels; scaleFactor only tells the window system its DPI
   const rgba = evesMarkRGBA(px)
   const bgra = Buffer.alloc(rgba.length)
   for (let o = 0; o < rgba.length; o += 4) {
