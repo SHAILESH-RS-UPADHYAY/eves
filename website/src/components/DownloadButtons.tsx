@@ -35,6 +35,7 @@ export function DownloadButtons({ github = true }: { github?: boolean }) {
         </p>
       )}
       <span className="dl-meta">v1.0 · Windows 10+ · macOS 11+ (Intel & Apple silicon) · free</span>
+      {!MOBILE && <span className="dl-meta">Windows warning? Click <b>More info → Run anyway</b>. macOS: right-click → <b>Open</b>.</span>}
     </div>
   )
 }

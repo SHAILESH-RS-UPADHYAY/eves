@@ -33,12 +33,20 @@ export function ControlPanelPage() {
       <SectionDivider
         label="CONTROL_PANEL // ROOT ACCESS"
         right={
+          <span style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => useSettingsStore.getState().updateSettings({ onboarded: false })}
+            style={{ fontSize: '9px', fontFamily: mono, color: '#7ee787', background: 'rgba(126,231,135,0.1)', border: '1px solid rgba(126,231,135,0.35)', borderRadius: '5px', padding: '4px 10px', cursor: 'pointer', letterSpacing: '1px', fontWeight: 700 }}
+          >
+            ▸ REPLAY_TOUR
+          </button>
           <button
             onClick={() => setSettingsOpen(true)}
             style={{ fontSize: '9px', fontFamily: mono, color: '#22d3ee', background: 'rgba(34,211,238,0.1)', border: '1px solid rgba(34,211,238,0.35)', borderRadius: '5px', padding: '4px 10px', cursor: 'pointer', letterSpacing: '1px', fontWeight: 700 }}
           >
             ▸ EDIT_CONFIG
           </button>
+          </span>
         }
       />
 

@@ -9,6 +9,7 @@ import { TranscriptsPage } from './components/meeting/TranscriptsPage'
 import { RepoIntelPage } from './components/repo/RepoIntelPage'
 import { ControlPanelPage } from './components/settings/ControlPanelPage'
 import { BrainPage } from './components/brain/BrainPage'
+import { Onboarding } from './components/extras/Onboarding'
 import { useUIStore } from './store/ui.store'
 import { useMeetingsStore } from './store/meetings.store'
 import { useSettingsStore } from './store/settings.store'
@@ -85,6 +86,7 @@ export function App() {
         </AnimatePresence>
       </AppShell>
       <SettingsModal />
+      <Onboarding />
     </>
   )
 }

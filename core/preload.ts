@@ -85,6 +85,7 @@ const api = {
   onCycleSource: on('cycle-source'),
   onSaveSession: on('save-session'),
   onClickThroughChanged: on<[enabled: boolean]>('click-through-changed'),
+  onPopupVisible: on<[visible: boolean]>('popup-visible'),
 
   // ─── Events: main → dashboard ───────────────────────────
   onSessionSaved: on<[meeting: Meeting]>('session-saved'),

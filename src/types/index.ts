@@ -173,6 +173,8 @@ export interface AppSettings {
   companyRepoPath: string
   referenceRepoPath: string
   notionDatabaseId?: string
+  /** Set once the first-run guide + setup is finished (or skipped) */
+  onboarded?: boolean
 }
 
 export type DataFolder = 'recordings' | 'meetings'

@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { app, BrowserWindow, desktopCapturer, globalShortcut, ipcMain, Menu, protocol, screen, session, Tray, devServerUrl } from './runtime'
+import { app, BrowserWindow, desktopCapturer, globalShortcut, ipcMain, Menu, protocol, screen, session, shell, Tray, devServerUrl } from './runtime'
 import type { BrowserWindowConstructorOptions, Rectangle } from './runtime'
 import { registerRecorderHandlers, recoverOrphanRecordings } from './ipc/recorder.handler'
 import { registerMeetingHandlers } from './ipc/meetings.handler'
@@ -88,6 +88,7 @@ function createDashboardWindow(): BrowserWindow {
 function showDashboard(route?: DashboardRoute) {
   if (!alive(dashboardWindow)) dashboardWindow = createDashboardWindow()
   const win = dashboardWindow
+  if (win.isMinimized()) win.restore()
   win.show()
   win.focus()
   if (route) whenLoaded(win, () => win.webContents.send('navigate', route))
@@ -131,6 +132,11 @@ function createPopupWindow(): BrowserWindow {
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   rememberBounds(win, 'popupBounds')
   hideOnClose(win)
+  // backgroundThrottling is off (recorder timers), so the page never learns it is hidden and
+  // kept animating + compositing at 60 fps (~2 cores, measured). Tell it, so it can sleep.
+  const awake = (on: boolean) => () => { if (!win.isDestroyed()) win.webContents.send('popup-visible', on) }
+  win.on('show', awake(true)); win.on('restore', awake(true))
+  win.on('hide', awake(false)); win.on('minimize', awake(false))
   return win
 }
 
@@ -227,8 +233,16 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'eves-audio', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: true } }
 ])
 
+// One EVES at a time: a second launch (shortcut, installer "Run EVES") just brings the dashboard up.
+// Two instances used to run side by side, each with its own always-animating popup.
+const primary = app.requestSingleInstanceLock()
+if (!primary) app.quit()
+app.on('second-instance', () => showDashboard())
+
 app.whenReady().then(() => {
-  if (process.platform === 'win32') app.setAppUserModelId('EVES')
+  if (!primary) return
+  // must match the installer's appId, or Windows shows the shortcut/taskbar with a stock icon
+  if (process.platform === 'win32') app.setAppUserModelId('com.personal.eves')
   migrateSettings()
   // before recovery: legacy meetings must be on disk or their audio looks orphaned
   migrateLegacyMeetings()
@@ -246,9 +260,14 @@ app.whenReady().then(() => {
   registerHotkeys()
   try { createTray() } catch (err) { console.warn('Tray unavailable:', err) }
 
-  const dashboardOnly = process.argv.includes('--dashboard') || process.env.EVES_OPEN_DASHBOARD === '1'
-  if (dashboardOnly) showDashboard()
-  else showPopup()
+  // "Get a key" links etc. open in the real browser, never in a bare app window
+  app.on('web-contents-created', (_e, wc) => wc.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//.test(url)) shell.openExternal(url)
+    return { action: 'deny' }
+  }))
+
+  // The dashboard is home; the floating panel opens on demand (button, Alt+Backspace, tray, Alt+L)
+  showDashboard()
 
   const recovered = recoverOrphanRecordings()
   if (recovered > 0) console.log(`Recovered ${recovered} orphaned recording(s) from a previous session`)
@@ -260,4 +279,4 @@ app.on('before-quit', () => { isQuitting = true })
 app.on('will-quit', () => globalShortcut.unregisterAll())
 // EVES lives in the tray — closing windows must not end it
 app.on('window-all-closed', () => {})
-app.on('activate', () => { showPopup() })
+app.on('activate', () => { showDashboard() })

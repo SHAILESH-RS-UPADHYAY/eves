@@ -197,6 +197,15 @@ New sidebar item **EVES Brain** (`brain.sh`, top bar `NEURAL_CORE`, command pale
 
 **Final state:** `tsc` (strict unused) 0 errors · `npm test` → audioUrl, llm, brain, markdown all ok · `npm run build` ok · normal launch boots clean (only EVES lines in the console) · keyword left only in `package.json`/lockfile, `core/runtime.ts`, `eves.config.ts`.
 
+### 2026-11-15 — First-run guide + install note
+
+| Change | Files | Why |
+| :-- | :-- | :-- |
+| First-run guide (4 steps: welcome, record, analyze, keys → opens config) | `src/components/extras/Onboarding.tsx`, `App.tsx`, `types` (`onboarded`) | New PCs start blank; users need to know shortcuts + add their own keys. Skipped for existing users who already have keys. Replay via Control Panel `▸ REPLAY_TOUR`. |
+| Unsigned-installer hint | `website/src/components/DownloadButtons.tsx` | SmartScreen "Unknown publisher" until code signing (Azure Trusted Signing) is set up. |
+
+Keys/sessions live in `%APPDATA%\eves-nodejs\Config\eves.json` and `%APPDATA%\eves\` — never in the installer (asar scanned: 0 keys).
+
 ## Known limits / next steps
 
 - The dashboard loads every meeting fully at startup (~1–2 MB per 2 h transcript). Fine for dozens; lazy-load transcripts if the archive reaches hundreds (`ponytail:` note in `core/utils/meetings.ts`).
